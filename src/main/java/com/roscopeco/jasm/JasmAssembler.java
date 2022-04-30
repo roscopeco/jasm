@@ -26,6 +26,7 @@ import static org.objectweb.asm.ClassWriter.COMPUTE_MAXS;
  * The JASM Assembler
  */
 public final class JasmAssembler {
+    private final String unitName;
     private final Supplier<InputStream> source;
 
     /**
@@ -35,7 +36,8 @@ public final class JasmAssembler {
      *
      * @param source A supplier of {@code InputStream}
      */
-    public JasmAssembler(@NonNull final Supplier<InputStream> source) {
+    public JasmAssembler(@NonNull final String unitName, @NonNull final Supplier<InputStream> source) {
+        this.unitName = unitName;
         this.source = source;
     }
 
@@ -61,14 +63,14 @@ public final class JasmAssembler {
     private JasmLexer buildLexer(final CharStream input) {
         final var lexer = new JasmLexer(input);
         lexer.removeErrorListeners();
-        lexer.addErrorListener(ThrowingErrorListener.INSTANCE);
+        lexer.addErrorListener(new ThrowingErrorListener(this.unitName));
         return lexer;
     }
 
     private JasmParser buildParser(final TokenStream tokens) {
         final var parser = new JasmParser(tokens);
         parser.removeErrorListeners();
-        parser.addErrorListener(ThrowingErrorListener.INSTANCE);
+        parser.addErrorListener(new ThrowingErrorListener(this.unitName));
         return parser;
     }
 }

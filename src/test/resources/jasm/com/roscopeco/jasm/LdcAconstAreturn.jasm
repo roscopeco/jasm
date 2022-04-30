@@ -6,7 +6,7 @@ class com/roscopeco/jasm/LdcAconstAreturn {
     }
 
     testAconstNull()Ljava/lang/Object; {
-        aconstnull
+        aconst_null
         areturn
     }
 

@@ -44,7 +44,9 @@ If you really need some use-cases to justify the electrons squandered in
 pursuit of this project, how about these (mostly lifted from Jasmin's README):
 
 * Curious People - Want to understand more about the way JVM bytecode works
-  or the things that are possible at the bytecode level? This might help!
+  or the things that are possible at the bytecode level? Always wondered what 
+  `invokedynamic` is for? Curious as to how `@SneakyThrows` can possibly work?
+  This might help!
 
 * Teachers - Perhaps you're teaching a compiler course, you could use this
   to introduce students to JVM bytecode, or even as an IL for the compilers.

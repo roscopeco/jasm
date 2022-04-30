@@ -1,0 +1,5 @@
+class com/roscopeco/jasm/insntest/Checkcast {
+    insnTest()V {
+        checkcast java/util/ArrayList
+    }
+}

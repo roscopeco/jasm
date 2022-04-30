@@ -5,8 +5,13 @@
  */
 package com.roscopeco.jasm.e2e;
 
+import com.roscopeco.jasm.model.AthrowTest;
+import com.roscopeco.jasm.model.CheckcastTest;
+import com.roscopeco.jasm.model.IfIcmpTests;
+import com.roscopeco.jasm.model.IfTests;
 import com.roscopeco.jasm.model.Interface1;
 import com.roscopeco.jasm.model.Interface2;
+import com.roscopeco.jasm.model.IfNullNonNullTest;
 import com.roscopeco.jasm.model.Superclass;
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +26,9 @@ import static com.roscopeco.jasm.TestUtil.intVoidInvoker;
 import static com.roscopeco.jasm.TestUtil.objectArgsInvoker;
 import static com.roscopeco.jasm.TestUtil.objectVoidInvoker;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+@SuppressWarnings("java:S5961" /* Some methods need to assert combinatorial explosion of multiple variants */)
 class JasmE2ETests {
     @Test
     void shouldAssembleEmptyClassToValidJavaClass() {
@@ -256,23 +263,23 @@ class JasmE2ETests {
         assertThat(clz.getDeclaredConstructors()).hasSize(1);
         assertThat(clz.getDeclaredMethods()).hasSize(14);
 
-        final var obj = instantiate(clz);
+        final var obj = instantiate(clz, IfIcmpTests.class);
 
         // Tests IF_ICMPxx (all variants)
-        assertThat(boolVoidInvoker(obj, "testEqWhenEqualPasses").get()).isTrue();
-        assertThat(boolVoidInvoker(obj, "testEqNotEqualPasses").get()).isTrue();
-        assertThat(boolVoidInvoker(obj, "testGeWhenLessPasses").get()).isTrue();
-        assertThat(boolVoidInvoker(obj, "testGeWhenEqualPasses").get()).isTrue();
-        assertThat(boolVoidInvoker(obj, "testGeWhenGreaterPasses").get()).isTrue();
-        assertThat(boolVoidInvoker(obj, "testGtWhenLessPasses").get()).isTrue();
-        assertThat(boolVoidInvoker(obj, "testGtWhenGreaterPasses").get()).isTrue();
-        assertThat(boolVoidInvoker(obj, "testLeWhenLessPasses").get()).isTrue();
-        assertThat(boolVoidInvoker(obj, "testLeWhenEqualPasses").get()).isTrue();
-        assertThat(boolVoidInvoker(obj, "testLeWhenGreaterPasses").get()).isTrue();
-        assertThat(boolVoidInvoker(obj, "testLtWhenLessPasses").get()).isTrue();
-        assertThat(boolVoidInvoker(obj, "testLtWhenGreaterPasses").get()).isTrue();
-        assertThat(boolVoidInvoker(obj, "testNeWhenEqualPasses").get()).isTrue();
-        assertThat(boolVoidInvoker(obj, "testNeNotEqualPasses").get()).isTrue();
+        assertThat(obj.testEqWhenEqualPasses()).isTrue();
+        assertThat(obj.testEqNotEqualPasses()).isTrue();
+        assertThat(obj.testGeWhenLessPasses()).isTrue();
+        assertThat(obj.testGeWhenEqualPasses()).isTrue();
+        assertThat(obj.testGeWhenGreaterPasses()).isTrue();
+        assertThat(obj.testGtWhenLessPasses()).isTrue();
+        assertThat(obj.testGtWhenGreaterPasses()).isTrue();
+        assertThat(obj.testLeWhenLessPasses()).isTrue();
+        assertThat(obj.testLeWhenEqualPasses()).isTrue();
+        assertThat(obj.testLeWhenGreaterPasses()).isTrue();
+        assertThat(obj.testLtWhenLessPasses()).isTrue();
+        assertThat(obj.testLtWhenGreaterPasses()).isTrue();
+        assertThat(obj.testNeWhenEqualPasses()).isTrue();
+        assertThat(obj.testNeNotEqualPasses()).isTrue();
     }
 
     @Test
@@ -286,22 +293,81 @@ class JasmE2ETests {
         assertThat(clz.getDeclaredConstructors()).hasSize(1);
         assertThat(clz.getDeclaredMethods()).hasSize(14);
 
-        final var obj = instantiate(clz);
+        final var obj = instantiate(clz, IfTests.class);
 
         // Tests IFxx (all variants)
-        assertThat(boolVoidInvoker(obj, "testEqWhenEqualPasses").get()).isTrue();
-        assertThat(boolVoidInvoker(obj, "testEqNotEqualPasses").get()).isTrue();
-        assertThat(boolVoidInvoker(obj, "testGeWhenLessPasses").get()).isTrue();
-        assertThat(boolVoidInvoker(obj, "testGeWhenEqualPasses").get()).isTrue();
-        assertThat(boolVoidInvoker(obj, "testGeWhenGreaterPasses").get()).isTrue();
-        assertThat(boolVoidInvoker(obj, "testGtWhenLessPasses").get()).isTrue();
-        assertThat(boolVoidInvoker(obj, "testGtWhenGreaterPasses").get()).isTrue();
-        assertThat(boolVoidInvoker(obj, "testLeWhenLessPasses").get()).isTrue();
-        assertThat(boolVoidInvoker(obj, "testLeWhenEqualPasses").get()).isTrue();
-        assertThat(boolVoidInvoker(obj, "testLeWhenGreaterPasses").get()).isTrue();
-        assertThat(boolVoidInvoker(obj, "testLtWhenLessPasses").get()).isTrue();
-        assertThat(boolVoidInvoker(obj, "testLtWhenGreaterPasses").get()).isTrue();
-        assertThat(boolVoidInvoker(obj, "testNeWhenEqualPasses").get()).isTrue();
-        assertThat(boolVoidInvoker(obj, "testNeNotEqualPasses").get()).isTrue();
+        assertThat(obj.testEqWhenEqualPasses()).isTrue();
+        assertThat(obj.testEqNotEqualPasses()).isTrue();
+        assertThat(obj.testGeWhenLessPasses()).isTrue();
+        assertThat(obj.testGeWhenEqualPasses()).isTrue();
+        assertThat(obj.testGeWhenGreaterPasses()).isTrue();
+        assertThat(obj.testGtWhenLessPasses()).isTrue();
+        assertThat(obj.testGtWhenGreaterPasses()).isTrue();
+        assertThat(obj.testLeWhenLessPasses()).isTrue();
+        assertThat(obj.testLeWhenEqualPasses()).isTrue();
+        assertThat(obj.testLeWhenGreaterPasses()).isTrue();
+        assertThat(obj.testLtWhenLessPasses()).isTrue();
+        assertThat(obj.testLtWhenGreaterPasses()).isTrue();
+        assertThat(obj.testNeWhenEqualPasses()).isTrue();
+        assertThat(obj.testNeNotEqualPasses()).isTrue();
+    }
+
+    @Test
+    void shouldAssembleIfNullNonNullTestsToValidJavaClass() {
+        final var clz = assembleAndDefine("com/roscopeco/jasm/IfNullNonNullTests.jasm");
+
+        assertThat(clz.getName()).isEqualTo("com.roscopeco.jasm.IfNullNonNullTests");
+
+        assertThat(clz.getDeclaredClasses()).isEmpty();
+        assertThat(clz.getDeclaredFields()).isEmpty();
+        assertThat(clz.getDeclaredConstructors()).hasSize(1);
+        assertThat(clz.getDeclaredMethods()).hasSize(4);
+
+        final var obj = instantiate(clz, IfNullNonNullTest.class);
+
+        // Tests IFNULL and IFNONNULL
+        assertThat(obj.testIfNullWhenNullPasses()).isTrue();
+        assertThat(obj.testIfNullWhenNonNullPasses()).isTrue();
+        assertThat(obj.testIfNonNullWhenNullPasses()).isTrue();
+        assertThat(obj.testIfNonNullWhenNonNullPasses()).isTrue();
+    }
+
+    @Test
+    void shouldAssembleAthrowTestToValidJavaClass() {
+        final var clz = assembleAndDefine("com/roscopeco/jasm/AthrowTest.jasm");
+
+        assertThat(clz.getName()).isEqualTo("com.roscopeco.jasm.AthrowTest");
+
+        assertThat(clz.getDeclaredClasses()).isEmpty();
+        assertThat(clz.getDeclaredFields()).isEmpty();
+        assertThat(clz.getDeclaredConstructors()).hasSize(1);
+        assertThat(clz.getDeclaredMethods()).hasSize(1);
+
+        final var obj = instantiate(clz, AthrowTest.class);
+        final var exception = new Exception();
+
+        assertThatThrownBy(() -> obj.sneakyThrow(exception))
+                .isSameAs(exception);
+    }
+
+    @Test
+    void shouldAssembleCheckcastTestToValidJavaClass() {
+        final var clz = assembleAndDefine("com/roscopeco/jasm/CheckcastTest.jasm");
+
+        assertThat(clz.getName()).isEqualTo("com.roscopeco.jasm.CheckcastTest");
+
+        assertThat(clz.getDeclaredClasses()).isEmpty();
+        assertThat(clz.getDeclaredFields()).isEmpty();
+        assertThat(clz.getDeclaredConstructors()).hasSize(1);
+        assertThat(clz.getDeclaredMethods()).hasSize(1);
+
+        final var obj = instantiate(clz, CheckcastTest.class);
+        final var list = new ArrayList<>();
+        final var nonList = "";
+
+        assertThat(obj.castToList(list)).isSameAs(list);
+
+        assertThatThrownBy(() -> obj.castToList(nonList))
+                .isInstanceOf(ClassCastException.class);
     }
 }

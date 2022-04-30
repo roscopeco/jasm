@@ -1,0 +1,13 @@
+public class com/roscopeco/jasm/CheckcastTest implements com/roscopeco/jasm/model/CheckcastTest {
+    public <init>()V {
+        aload 0
+        invokespecial java/lang/Object.<init>()V
+        return
+    }
+
+    public castToList(Ljava/lang/Object;)Ljava/util/List; {
+        aload 1
+        checkcast java/util/List
+        areturn
+    }
+}

@@ -1,0 +1,12 @@
+public class com/roscopeco/jasm/AthrowTest implements com/roscopeco/jasm/model/AthrowTest {
+    public <init>()V {
+        aload 0
+        invokespecial java/lang/Object.<init>()V
+        return
+    }
+
+    public sneakyThrow(Ljava/lang/Throwable;)V {
+        aload 1
+        athrow
+    }
+}

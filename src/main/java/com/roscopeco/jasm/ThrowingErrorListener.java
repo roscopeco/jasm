@@ -5,14 +5,17 @@
  */
 package com.roscopeco.jasm;
 
+import lombok.NonNull;
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
 
 class ThrowingErrorListener extends BaseErrorListener {
-    public static final ThrowingErrorListener INSTANCE = new ThrowingErrorListener();
+    private final String unitName;
 
-    private ThrowingErrorListener() { }
+    ThrowingErrorListener(@NonNull final String unitName) {
+        this.unitName = unitName;
+    }
 
     @Override
     public void syntaxError(
@@ -23,6 +26,6 @@ class ThrowingErrorListener extends BaseErrorListener {
             final String msg,
             final RecognitionException e
     ) {
-        throw new SyntaxErrorException("line " + line + ":" + charPositionInLine + " " + msg, e);
+        throw new SyntaxErrorException(unitName + ": line " + line + ":" + charPositionInLine + " " + msg, e);
     }
 }

@@ -1,5 +1,5 @@
 class com/roscopeco/jasm/insntest/AconstNull {
     insnTest()V {
-        aconstnull
+        aconst_null
     }
 }

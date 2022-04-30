@@ -481,7 +481,7 @@ class JasmIntegrationTests {
                 Arguments.of("com/roscopeco/jasm/IfIcmpTests.jasm", """
                 // class version 61.0 (61)
                 // access flags 0x1
-                public class com/roscopeco/jasm/IfIcmpTests {
+                public class com/roscopeco/jasm/IfIcmpTests implements com/roscopeco/jasm/model/IfIcmpTests {
                 
                 
                   // access flags 0x1
@@ -682,7 +682,7 @@ class JasmIntegrationTests {
                 Arguments.of("com/roscopeco/jasm/IfTests.jasm", """
                 // class version 61.0 (61)
                 // access flags 0x1
-                public class com/roscopeco/jasm/IfTests {
+                public class com/roscopeco/jasm/IfTests implements com/roscopeco/jasm/model/IfTests {
                 
                 
                   // access flags 0x1
@@ -858,6 +858,104 @@ class JasmIntegrationTests {
                    L0
                     LDC 1
                     IRETURN
+                    MAXSTACK = 0
+                    MAXLOCALS = 0
+                }
+                """),
+
+
+                /* ************************************************************************************************ */
+                Arguments.of("com/roscopeco/jasm/IfNullNonNullTests.jasm", """
+                // class version 61.0 (61)
+                // access flags 0x1
+                public class com/roscopeco/jasm/IfNullNonNullTests implements com/roscopeco/jasm/model/IfNullNonNullTest {
+                
+                
+                  // access flags 0x1
+                  public <init>()V
+                    ALOAD 0
+                    INVOKESPECIAL java/lang/Object.<init> ()V
+                    RETURN
+                    MAXSTACK = 0
+                    MAXLOCALS = 0
+                
+                  // access flags 0x1
+                  public testIfNullWhenNullPasses()Z
+                    ACONST_NULL
+                    IFNULL L0
+                    LDC 0
+                    IRETURN
+                   L0
+                    LDC 1
+                    IRETURN
+                    MAXSTACK = 0
+                    MAXLOCALS = 0
+                
+                  // access flags 0x1
+                  public testIfNullWhenNonNullPasses()Z
+                    NEW java/lang/String
+                    IFNULL L0
+                    LDC 1
+                    IRETURN
+                   L0
+                    LDC 0
+                    IRETURN
+                    MAXSTACK = 0
+                    MAXLOCALS = 0
+                
+                  // access flags 0x1
+                  public testIfNonNullWhenNullPasses()Z
+                    ACONST_NULL
+                    IFNONNULL L0
+                    LDC 1
+                    IRETURN
+                   L0
+                    LDC 0
+                    IRETURN
+                    MAXSTACK = 0
+                    MAXLOCALS = 0
+                
+                  // access flags 0x1
+                  public testIfNonNullWhenNonNullPasses()Z
+                    NEW java/lang/String
+                    IFNONNULL L0
+                    LDC 0
+                    IRETURN
+                   L0
+                    LDC 1
+                    IRETURN
+                    MAXSTACK = 0
+                    MAXLOCALS = 0
+                }
+                """),
+
+
+                /* ************************************************************************************************ */
+                Arguments.of("com/roscopeco/jasm/insntest/Athrow.jasm", """
+                // class version 61.0 (61)
+                // access flags 0x0
+                class com/roscopeco/jasm/insntest/Athrow {
+                
+                
+                  // access flags 0x0
+                  insnTest()V
+                    ATHROW
+                    MAXSTACK = 0
+                    MAXLOCALS = 0
+                }
+                """),
+
+
+                /* ************************************************************************************************ */
+                Arguments.of("com/roscopeco/jasm/insntest/Checkcast.jasm", """
+                // class version 61.0 (61)
+                // access flags 0x0
+                class com/roscopeco/jasm/insntest/Checkcast {
+                
+                
+                  // access flags 0x0
+                  insnTest()V
+                    CHECKCAST java/util/ArrayList
                     MAXSTACK = 0
                     MAXLOCALS = 0
                 }

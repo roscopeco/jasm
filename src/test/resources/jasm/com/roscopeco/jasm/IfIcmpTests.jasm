@@ -1,4 +1,4 @@
-public class com/roscopeco/jasm/IfIcmpTests {
+public class com/roscopeco/jasm/IfIcmpTests implements com/roscopeco/jasm/model/IfIcmpTests {
     public <init>()V {
         aload 0
         invokespecial java/lang/Object.<init>()V

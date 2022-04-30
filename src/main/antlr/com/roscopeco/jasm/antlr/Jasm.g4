@@ -69,9 +69,11 @@ stat
  ;
 
 instruction
- : insn_aconstnull
+ : insn_aconst_null
  | insn_aload
  | insn_areturn
+ | insn_athrow
+ | insn_checkcast
  | insn_dup
  | insn_freturn
  | insn_goto
@@ -90,6 +92,8 @@ instruction
  | insn_if_icmple
  | insn_if_icmplt
  | insn_if_icmpne
+ | insn_ifnull
+ | insn_ifnonnull
  | insn_invokeinterface
  | insn_invokespecial
  | insn_invokestatic
@@ -101,7 +105,7 @@ instruction
  | label
  ;
 
-insn_aconstnull
+insn_aconst_null
  : ACONST_NULL
  ;
 
@@ -111,6 +115,14 @@ insn_aload
 
 insn_areturn
  : ARETURN
+ ;
+
+insn_athrow
+ : ATHROW
+ ;
+
+insn_checkcast
+ : CHECKCAST QNAME
  ;
 
 insn_dup
@@ -183,6 +195,14 @@ insn_if_icmplt
 
 insn_if_icmpne
  : IFICMPNE NAME
+ ;
+
+insn_ifnull
+ : IFNULL NAME
+ ;
+
+insn_ifnonnull
+ : IFNONNULL NAME
  ;
 
 insn_invokeinterface
@@ -266,9 +286,11 @@ STATIC      : 'static';
 INIT        : '<init>';
 CLINIT      : '<clinit>';
 
-ACONST_NULL     : 'aconstnull';
+ACONST_NULL     : 'aconst_null';
 ALOAD           : 'aload';
 ARETURN         : 'areturn';
+ATHROW          : 'athrow';
+CHECKCAST       : 'checkcast';
 DUP             : 'dup';
 FRETURN         : 'freturn';
 GOTO            : 'goto';
@@ -287,6 +309,8 @@ IFICMPLE        : 'if_icmple';
 IFICMPLT        : 'if_icmplt';
 IFICMPGE        : 'if_icmpge';
 IFICMPNE        : 'if_icmpne';
+IFNULL          : 'ifnull';
+IFNONNULL       : 'ifnonnull';
 INVOKEINTERFACE : 'invokeinterface';
 INVOKESPECIAL   : 'invokespecial';
 INVOKESTATIC    : 'invokestatic';
@@ -340,5 +364,5 @@ SPACE
  ;
 
 OTHER
- : .
+ : . -> channel(HIDDEN)
  ;

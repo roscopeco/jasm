@@ -40,6 +40,22 @@ class ParserInstructionTests {
     }
 
     @Test
+    void handlesAthrow() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Athrow.jasm", code -> code
+                .athrow()
+                .noMoreCode()
+        );
+    }
+
+    @Test
+    void handlesCheckcast() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Checkcast.jasm", code -> code
+                .checkcast("java/util/ArrayList")
+                .noMoreCode()
+        );
+    }
+
+    @Test
     void handlesDup() {
         runInstructionTest("com/roscopeco/jasm/insntest/Dup.jasm", code -> code
                 .dup()
@@ -110,6 +126,17 @@ class ParserInstructionTests {
                 .if_icmple("label")
                 .if_icmplt("label")
                 .if_icmpne("label")
+                .label("label:")
+                .vreturn()
+                .noMoreCode()
+        );
+    }
+
+    @Test
+    void handlesIfNullNonNull() {
+        runInstructionTest("com/roscopeco/jasm/insntest/IfNullNonNull.jasm", code -> code
+                .ifNull("label")
+                .ifNonNull("label")
                 .label("label:")
                 .vreturn()
                 .noMoreCode()

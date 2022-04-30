@@ -22,6 +22,8 @@ import java.util.stream.Collectors;
 import static org.objectweb.asm.Opcodes.ACONST_NULL;
 import static org.objectweb.asm.Opcodes.ALOAD;
 import static org.objectweb.asm.Opcodes.ARETURN;
+import static org.objectweb.asm.Opcodes.ATHROW;
+import static org.objectweb.asm.Opcodes.CHECKCAST;
 import static org.objectweb.asm.Opcodes.DUP;
 import static org.objectweb.asm.Opcodes.FRETURN;
 import static org.objectweb.asm.Opcodes.GOTO;
@@ -38,6 +40,8 @@ import static org.objectweb.asm.Opcodes.IFGT;
 import static org.objectweb.asm.Opcodes.IFLE;
 import static org.objectweb.asm.Opcodes.IFLT;
 import static org.objectweb.asm.Opcodes.IFNE;
+import static org.objectweb.asm.Opcodes.IFNONNULL;
+import static org.objectweb.asm.Opcodes.IFNULL;
 import static org.objectweb.asm.Opcodes.IF_ACMPEQ;
 import static org.objectweb.asm.Opcodes.IF_ACMPNE;
 import static org.objectweb.asm.Opcodes.IF_ICMPEQ;
@@ -141,9 +145,9 @@ class JasmAssemblingVisitor extends JasmBaseVisitor<Void> {
         }
 
         @Override
-        public Void visitInsn_aconstnull(JasmParser.Insn_aconstnullContext ctx) {
+        public Void visitInsn_aconst_null(JasmParser.Insn_aconst_nullContext ctx) {
             this.methodVisitor.visitInsn(ACONST_NULL);
-            return super.visitInsn_aconstnull(ctx);
+            return super.visitInsn_aconst_null(ctx);
         }
 
         @Override
@@ -156,6 +160,18 @@ class JasmAssemblingVisitor extends JasmBaseVisitor<Void> {
         public Void visitInsn_areturn(JasmParser.Insn_areturnContext ctx) {
             this.methodVisitor.visitInsn(ARETURN);
             return super.visitInsn_areturn(ctx);
+        }
+
+        @Override
+        public Void visitInsn_athrow(JasmParser.Insn_athrowContext ctx) {
+            this.methodVisitor.visitInsn(ATHROW);
+            return super.visitInsn_athrow(ctx);
+        }
+
+        @Override
+        public Void visitInsn_checkcast(JasmParser.Insn_checkcastContext ctx) {
+            this.methodVisitor.visitTypeInsn(CHECKCAST, ctx.QNAME().getText());
+            return super.visitInsn_checkcast(ctx);
         }
 
         @Override
@@ -266,6 +282,18 @@ class JasmAssemblingVisitor extends JasmBaseVisitor<Void> {
         public Void visitInsn_if_icmpne(JasmParser.Insn_if_icmpneContext ctx) {
             this.methodVisitor.visitJumpInsn(IF_ICMPNE, getLabel(ctx.NAME().getText()).label);
             return super.visitInsn_if_icmpne(ctx);
+        }
+
+        @Override
+        public Void visitInsn_ifnull(JasmParser.Insn_ifnullContext ctx) {
+            this.methodVisitor.visitJumpInsn(IFNULL, getLabel(ctx.NAME().getText()).label);
+            return super.visitInsn_ifnull(ctx);
+        }
+
+        @Override
+        public Void visitInsn_ifnonnull(JasmParser.Insn_ifnonnullContext ctx) {
+            this.methodVisitor.visitJumpInsn(IFNONNULL, getLabel(ctx.NAME().getText()).label);
+            return super.visitInsn_ifnonnull(ctx);
         }
 
         @Override

@@ -40,7 +40,7 @@ public class CodeSequenceAssert extends AbstractAssert<CodeSequenceAssert, JasmP
     }
 
     public CodeSequenceAssert aconstNull() {
-        return genericNoOperandCheck("aconstnull", JasmParser.InstructionContext::insn_aconstnull);
+        return genericNoOperandCheck("aconst_null", JasmParser.InstructionContext::insn_aconst_null);
     }
 
     public CodeSequenceAssert aload(final int expected) {
@@ -59,6 +59,17 @@ public class CodeSequenceAssert extends AbstractAssert<CodeSequenceAssert, JasmP
 
     public CodeSequenceAssert areturn() {
         return genericNoOperandCheck("areturn", JasmParser.InstructionContext::insn_areturn);
+    }
+
+    public CodeSequenceAssert athrow() {
+        return genericNoOperandCheck("athrow", JasmParser.InstructionContext::insn_athrow);
+    }
+
+    public CodeSequenceAssert checkcast(final String expected) {
+        return genericStringOperandCheck("checkcast", expected,
+                JasmParser.InstructionContext::insn_checkcast,
+                (checkcast) -> checkcast.QNAME().getText()
+        );
     }
 
     public CodeSequenceAssert dup() {
@@ -180,6 +191,21 @@ public class CodeSequenceAssert extends AbstractAssert<CodeSequenceAssert, JasmP
                 (if_icmpne) -> if_icmpne.NAME().getText()
         );
     }
+
+    public CodeSequenceAssert ifNull(final String expected) {
+        return genericStringOperandCheck("ifnull", expected,
+                JasmParser.InstructionContext::insn_ifnull,
+                (ifnull) -> ifnull.NAME().getText()
+        );
+    }
+
+    public CodeSequenceAssert ifNonNull(final String expected) {
+        return genericStringOperandCheck("ifnonnull", expected,
+                JasmParser.InstructionContext::insn_ifnonnull,
+                (ifnonnull) -> ifnonnull.NAME().getText()
+        );
+    }
+
 
     public CodeSequenceAssert invokeInterface(
             @NonNull final String owner,

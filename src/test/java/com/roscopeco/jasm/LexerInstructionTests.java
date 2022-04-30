@@ -43,6 +43,25 @@ class LexerInstructionTests {
     }
 
     @Test
+    void shouldLexAthrow() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Athrow.jasm", lexer ->
+                assertNextToken(lexer)
+                        .hasType(JasmLexer.ATHROW));
+    }
+
+    @Test
+    void shouldLexCheckCast() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Checkcast.jasm", lexer -> {
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.CHECKCAST);
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.QNAME)
+                    .hasText("java/util/ArrayList");
+        });
+    }
+
+    @Test
     void shouldLexDup() {
         runInstructionTest("com/roscopeco/jasm/insntest/Dup.jasm", lexer -> assertNextToken(lexer)
                 .hasType(JasmLexer.DUP));
@@ -218,6 +237,33 @@ class LexerInstructionTests {
 
             assertNextToken(lexer)
                     .hasType(JasmLexer.IFICMPNE);
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.NAME)
+                    .hasText("label");
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.LABEL)
+                    .hasText("label:");
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.RETURN);
+        });
+    }
+
+
+    @Test
+    void shouldLexIfNullNonNull() {
+        runInstructionTest("com/roscopeco/jasm/insntest/IfNullNonNull.jasm", lexer -> {
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.IFNULL);
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.NAME)
+                    .hasText("label");
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.IFNONNULL);
 
             assertNextToken(lexer)
                     .hasType(JasmLexer.NAME)

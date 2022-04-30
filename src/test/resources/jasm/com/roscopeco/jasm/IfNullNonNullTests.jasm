@@ -1,0 +1,55 @@
+public class com/roscopeco/jasm/IfNullNonNullTests implements com/roscopeco/jasm/model/IfNullNonNullTest {
+    public <init>()V {
+        aload 0
+        invokespecial java/lang/Object.<init>()V
+        return
+    }
+
+    public testIfNullWhenNullPasses()Z {
+        aconst_null
+        ifnull isNull
+
+        ldc 0
+        ireturn
+
+    isNull:
+        ldc 1
+        ireturn
+    }
+
+    public testIfNullWhenNonNullPasses()Z {
+        new java/lang/String
+        ifnull isNull
+
+        ldc true
+        ireturn
+
+    isNull:
+        ldc false
+        ireturn
+    }
+
+    public testIfNonNullWhenNullPasses()Z {
+        aconst_null
+        ifnonnull isNonNull
+
+        ldc true
+        ireturn
+
+    isNonNull:
+        ldc false
+        ireturn
+    }
+
+    public testIfNonNullWhenNonNullPasses()Z {
+        new java/lang/String
+        ifnonnull isNonNull
+
+        ldc false
+        ireturn
+
+    isNonNull:
+        ldc true
+        ireturn
+    }
+}

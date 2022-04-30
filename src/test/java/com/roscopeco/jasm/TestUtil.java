@@ -15,6 +15,7 @@ import java.util.function.Supplier;
 
 import com.roscopeco.jasm.antlr.JasmLexer;
 import com.roscopeco.jasm.antlr.JasmParser;
+import lombok.NonNull;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -34,37 +35,37 @@ public class TestUtil {
         return TestUtil.class.getClassLoader().getResourceAsStream("jasm/" + testCase);
     }
 
-    public static JasmLexer testCaseLexer(final String testCase) {
+    public static JasmLexer testCaseLexer(@NonNull final String testCase) {
         try (final var input = inputStreamForTestCase(testCase)) {
 
             assertThat(input).as("InputStream for test-case source").isNotNull();
 
-            return buildLexer(CharStreams.fromStream(input));
+            return buildLexer(testCase, CharStreams.fromStream(input));
 
         } catch (IOException e) {
             throw new AssertionFailedError("Unable to load testCase: " + testCase, e);
         }
     }
 
-    public static JasmParser testCaseParser(final String testCase) {
-        return buildParser(new CommonTokenStream(testCaseLexer(testCase)));
+    public static JasmParser testCaseParser(@NonNull final String testCase) {
+        return buildParser(testCase, new CommonTokenStream(testCaseLexer(testCase)));
     }
 
     public static JasmParser.ClassContext doParse(final String testCase) {
         return testCaseParser(testCase).class_();
     }
 
-    public static JasmLexer buildLexer(final CharStream input) {
+    public static JasmLexer buildLexer(@NonNull final String unitName, @NonNull final CharStream input) {
         final var lexer = new JasmLexer(input);
         lexer.removeErrorListeners();
-        lexer.addErrorListener(ThrowingErrorListener.INSTANCE);
+        lexer.addErrorListener(new ThrowingErrorListener(unitName));
         return lexer;
     }
 
-    public static JasmParser buildParser(final TokenStream tokens) {
+    public static JasmParser buildParser(@NonNull final String unitName, @NonNull final TokenStream tokens) {
         final var parser = new JasmParser(tokens);
         parser.removeErrorListeners();
-        parser.addErrorListener(ThrowingErrorListener.INSTANCE);
+        parser.addErrorListener(new ThrowingErrorListener(unitName));
         return parser;
     }
 
@@ -167,8 +168,12 @@ public class TestUtil {
         }
     }
 
+    public static <T> T instantiate(@NonNull final Class<?> implementation, @NonNull final Class<T> iface) {
+        return iface.cast(instantiate(implementation));
+    }
+
     public static byte[] assemble(final String testCase) {
-        return new JasmAssembler(() -> inputStreamForTestCase(testCase)).assemble();
+        return new JasmAssembler(testCase, () -> inputStreamForTestCase(testCase)).assemble();
     }
 
     public static Class<?> assembleAndDefine(final String testCase) {

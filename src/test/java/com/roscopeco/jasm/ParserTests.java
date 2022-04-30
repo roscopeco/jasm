@@ -21,6 +21,7 @@ class ParserTests {
     void shouldFailOnEmptyFile() {
         assertThatThrownBy(() -> doParse("emptyfile.jasm"))
                 .isInstanceOf(SyntaxErrorException.class)
+                .hasMessageContaining("emptyfile.jasm")
                 .hasMessageContaining("<EOF>");
     }
 
