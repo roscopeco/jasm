@@ -1,0 +1,3 @@
+class ClassWithObjectField {
+    Ljava/lang/Object; someField
+}

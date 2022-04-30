@@ -1,0 +1,5 @@
+class com/roscopeco/jasm/insntest/Aload {
+    V insnTest() {
+        aload 0
+    }
+}

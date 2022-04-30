@@ -1,0 +1,8 @@
+class com/roscopeco/jasm/BasicFieldTests {
+    I defaultIntField
+    public J publicLongField
+    final F finalFloatField
+    D defaultDoubleField
+    Z defaultBoolField
+    Ljava/lang/Object; defaultRefField
+}
