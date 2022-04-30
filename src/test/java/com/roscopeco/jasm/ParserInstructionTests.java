@@ -40,9 +40,29 @@ class ParserInstructionTests {
     }
 
     @Test
+    void handlesDup() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Dup.jasm", code -> code
+                .dup()
+                .noMoreCode()
+        );
+    }
+
+    @Test
     void handlesFreturn() {
         runInstructionTest("com/roscopeco/jasm/insntest/Freturn.jasm", code -> code
                 .freturn()
+                .noMoreCode()
+        );
+    }
+
+    @Test
+    void handlesGoto() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Goto.jasm", code -> code
+                .label("infinity:")
+                ._goto("infinity")
+                ._goto("unreachable")
+                .label("unreachable:")
+                .vreturn()
                 .noMoreCode()
         );
     }
@@ -101,6 +121,14 @@ class ParserInstructionTests {
                 .ldc(10)
                 .ldc(5.0f)
                 .ldc("Test string")
+                .noMoreCode()
+        );
+    }
+
+    @Test
+    void handlesNew() {
+        runInstructionTest("com/roscopeco/jasm/insntest/New.jasm", code -> code
+                .anew("java/util/ArrayList")
                 .noMoreCode()
         );
     }

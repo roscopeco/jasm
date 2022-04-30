@@ -9,7 +9,7 @@ class
  ;
 
 classname
- : TYPENAME
+ : QNAME
  | NAME
  ;
 
@@ -27,7 +27,7 @@ method
  ;
 
 membername
- : TYPENAME
+ : QNAME
  | NAME
  | INIT
  | CLINIT
@@ -40,7 +40,7 @@ type
  | TYPE_FLOAT
  | TYPE_DOUBLE
  | TYPE_BOOL
- | TYPENAME SEMI
+ | QNAME SEMI
  ;
 
 modifier
@@ -65,7 +65,9 @@ instruction
  : insn_aconstnull
  | insn_aload
  | insn_areturn
+ | insn_dup
  | insn_freturn
+ | insn_goto
  | insn_iconst
  | insn_invokeinterface
  | insn_invokespecial
@@ -73,7 +75,9 @@ instruction
  | insn_invokevirtual
  | insn_ireturn
  | insn_ldc
+ | insn_new
  | insn_return
+ | label
  ;
 
 insn_aconstnull
@@ -88,8 +92,16 @@ insn_areturn
  : ARETURN
  ;
 
+insn_dup
+ : DUP
+ ;
+
 insn_freturn
  : FRETURN
+ ;
+
+insn_goto
+ : GOTO NAME
  ;
 
 insn_iconst
@@ -112,8 +124,12 @@ insn_invokevirtual
  : INVOKEVIRTUAL owner DOT membername method_descriptor
  ;
 
+label
+ : LABEL
+ ;
+
 owner
- : TYPENAME
+ : QNAME
  | NAME
  ;
 
@@ -127,6 +143,10 @@ insn_ireturn
 
 insn_ldc
  : LDC atom
+ ;
+
+insn_new
+ : NEW QNAME
  ;
 
 insn_return
@@ -166,7 +186,9 @@ CLINIT: '<clinit>';
 ACONST_NULL: 'aconstnull';
 ALOAD: 'aload';
 ARETURN: 'areturn';
+DUP: 'dup';
 FRETURN: 'freturn';
+GOTO: 'goto';
 ICONST: 'iconst';
 INVOKEINTERFACE: 'invokeinterface';
 INVOKESPECIAL: 'invokespecial';
@@ -174,6 +196,7 @@ INVOKESTATIC: 'invokestatic';
 INVOKEVIRTUAL: 'invokevirtual';
 IRETURN: 'ireturn';
 LDC: 'ldc';
+NEW: 'new';
 RETURN: 'return';
 
 TYPE_VOID: 'V';
@@ -186,11 +209,15 @@ TYPE_BOOL: 'Z';
 TRUE : 'true';
 FALSE : 'false';
 
+LABEL
+ : [a-zA-Z_] [a-zA-Z_0-9]* ':'
+ ;
+
 NAME
  : [a-zA-Z_] [a-zA-Z_0-9]*
  ;
 
-TYPENAME
+QNAME
  : [a-zA-Z_] [a-zA-Z_0-9/]*
  ;
 

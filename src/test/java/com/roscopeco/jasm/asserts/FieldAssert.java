@@ -46,7 +46,7 @@ public class FieldAssert extends AbstractAssert<FieldAssert, JasmParser.FieldCon
     public FieldAssert isReference(@NonNull final String typeName) {
         isNotNull();
 
-        if (actual.type().TYPENAME() == null) {
+        if (actual.type().QNAME() == null) {
             failWithMessage("Expected field "
                     + actual.membername().getText()
                     + " to be of type L, but is "

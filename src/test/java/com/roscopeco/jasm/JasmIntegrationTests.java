@@ -10,13 +10,16 @@ import java.io.PrintWriter;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.objectweb.asm.util.TraceClassVisitor;
 
+import static com.roscopeco.jasm.TestUtil.doParse;
 import static com.roscopeco.jasm.TestUtil.testCaseParser;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class JasmIntegrationTests {
 
@@ -331,6 +334,59 @@ class JasmIntegrationTests {
                     MAXSTACK = 0
                     MAXLOCALS = 0
                 }
+                """),
+
+
+                /* ************************************************************************************************ */
+                Arguments.of("com/roscopeco/jasm/insntest/Dup.jasm", """
+                // class version 61.0 (61)
+                // access flags 0x0
+                class com/roscopeco/jasm/insntest/Dup {
+                
+                
+                  // access flags 0x0
+                  insnTest()V
+                    DUP
+                    MAXSTACK = 0
+                    MAXLOCALS = 0
+                }
+                """),
+
+
+                /* ************************************************************************************************ */
+                Arguments.of("com/roscopeco/jasm/insntest/New.jasm", """
+                // class version 61.0 (61)
+                // access flags 0x0
+                class com/roscopeco/jasm/insntest/New {
+                
+                
+                  // access flags 0x0
+                  insnTest()V
+                    NEW java/util/ArrayList
+                    MAXSTACK = 0
+                    MAXLOCALS = 0
+                }
+                """),
+
+
+                /* ************************************************************************************************ */
+                Arguments.of("com/roscopeco/jasm/GotoLabelTest.jasm", """
+                // class version 61.0 (61)
+                // access flags 0x1
+                public class com/roscopeco/jasm/GotoLabelTest {
+                
+                
+                  // access flags 0x9
+                  public static testMethod(Ljava/util/List;)V
+                    GOTO L0
+                    ALOAD 0
+                    LDC "CANARY"
+                    INVOKEINTERFACE java/util/List.add (Ljava/lang/Object;)Z (itf)
+                   L0
+                    RETURN
+                    MAXSTACK = 0
+                    MAXLOCALS = 0
+                }
                 """)
         );
     }
@@ -343,8 +399,16 @@ class JasmIntegrationTests {
 
     @ParameterizedTest
     @MethodSource("provideTestCases")
-    void shouldAssembleEmptyClass(final String testCaseSource, final String expectedTraceClassOutput) {
+    void traceClassOutputShouldBeAsExpected(final String testCaseSource, final String expectedTraceClassOutput) {
         testCaseParser(testCaseSource).class_().accept(assembler);
         assertThat(baos).hasToString(expectedTraceClassOutput);
+    }
+
+    @Test
+    void assemblyShouldFailOnUndeclaredLabel() {
+        final var parsed = testCaseParser("com/roscopeco/jasm/ClassWithUndeclaredLabel.jasm").class_();
+        assertThatThrownBy(() -> parsed.accept(assembler))
+                .isInstanceOf(SyntaxErrorException.class)
+                .hasMessageContaining("undeclaredLabel");
     }
 }

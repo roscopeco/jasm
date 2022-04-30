@@ -1,0 +1,5 @@
+class com/roscopeco/jasm/insntest/New {
+    V insnTest() {
+        new java/util/ArrayList
+    }
+}

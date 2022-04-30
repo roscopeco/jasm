@@ -1,0 +1,9 @@
+class com/roscopeco/jasm/insntest/Goto {
+    V insnTest() {
+    infinity:
+        goto infinity
+        goto unreachable
+    unreachable:
+        return
+    }
+}

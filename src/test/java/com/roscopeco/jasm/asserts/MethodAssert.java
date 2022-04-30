@@ -69,7 +69,7 @@ public class MethodAssert extends AbstractAssert<MethodAssert, JasmParser.Method
                 ", but is "
                 + actual.type().get(0).getText();
 
-        if (actual.type().size() == 0 || actual.type().get(0).TYPENAME() == null) {
+        if (actual.type().size() == 0 || actual.type().get(0).QNAME() == null) {
             failWithMessage(failureMessage.get());
         }
 

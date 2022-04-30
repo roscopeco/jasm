@@ -50,12 +50,30 @@ public class CodeSequenceAssert extends AbstractAssert<CodeSequenceAssert, JasmP
         );
     }
 
+    public CodeSequenceAssert anew(final String expected) {
+        return genericStringOperandCheck("new", expected,
+                JasmParser.InstructionContext::insn_new,
+                (anew) -> anew.QNAME().getText()
+        );
+    }
+
     public CodeSequenceAssert areturn() {
         return genericNoOperandCheck("areturn", JasmParser.InstructionContext::insn_areturn);
     }
 
+    public CodeSequenceAssert dup() {
+        return genericNoOperandCheck("dup", JasmParser.InstructionContext::insn_dup);
+    }
+
     public CodeSequenceAssert freturn() {
         return genericNoOperandCheck("freturn", JasmParser.InstructionContext::insn_freturn);
+    }
+
+    public CodeSequenceAssert _goto(final String expected) {
+        return genericStringOperandCheck("goto", expected,
+                JasmParser.InstructionContext::insn_goto,
+                (_goto) -> _goto.NAME().getText()
+        );
     }
 
     public CodeSequenceAssert iconst(final int expected) {
@@ -70,7 +88,7 @@ public class CodeSequenceAssert extends AbstractAssert<CodeSequenceAssert, JasmP
             @NonNull final String name,
             @NonNull final String descriptor
     ) {
-        return assertInvoke(
+        return genericNonDynamicInvokeCheck(
                 "invokeinterface",
                 owner,
                 name,
@@ -87,7 +105,7 @@ public class CodeSequenceAssert extends AbstractAssert<CodeSequenceAssert, JasmP
             @NonNull final String name,
             @NonNull final String descriptor
     ) {
-        return assertInvoke(
+        return genericNonDynamicInvokeCheck(
                 "invokespecial",
                 owner,
                 name,
@@ -104,7 +122,7 @@ public class CodeSequenceAssert extends AbstractAssert<CodeSequenceAssert, JasmP
             @NonNull final String name,
             @NonNull final String descriptor
     ) {
-        return assertInvoke(
+        return genericNonDynamicInvokeCheck(
                 "invokestatic",
                 owner,
                 name,
@@ -121,7 +139,7 @@ public class CodeSequenceAssert extends AbstractAssert<CodeSequenceAssert, JasmP
             @NonNull final String name,
             @NonNull final String descriptor
     ) {
-        return assertInvoke(
+        return genericNonDynamicInvokeCheck(
                 "invokevirtual",
                 owner,
                 name,
@@ -133,58 +151,15 @@ public class CodeSequenceAssert extends AbstractAssert<CodeSequenceAssert, JasmP
         );
     }
 
-    private <T> CodeSequenceAssert assertInvoke(
-            @NonNull final String invokeType,
-            @NonNull final String owner,
-            @NonNull final String name,
-            @NonNull final String descriptor,
-            @NonNull final Function<JasmParser.InstructionContext, T> invokeExtractor,
-            @NonNull final Function<T, JasmParser.OwnerContext> ownerExtractor,
-            @NonNull final Function<T, JasmParser.MembernameContext> membernameExtractor,
-            @NonNull final Function<T, JasmParser.Method_descriptorContext> descriptorExtractor
-    ) {
-        final Function<JasmParser.InstructionContext, String> failMessageSupplier = (insn) ->
-                "Expected "
-                    + invokeType
-                    + owner + "." + name + descriptor
-                    + " instruction at pc("
-                    + this.pc
-                    + "), but was "
-                    + insn.getText();
-
-        isNotNull();
-        assertThat(actual.stat()).isNotNull();
-        hasNotUnderflowed(invokeType);
-
-        final var stat = actual.stat().get(pc);
-        if (stat.instruction() == null || invokeExtractor.apply(stat.instruction()) == null) {
-            failWithMessage(failMessageSupplier.apply(stat.instruction()));
-        }
-
-        final var insn = invokeExtractor.apply(stat.instruction());
-
-        if (!owner.equals(ownerExtractor.apply(insn).getText())) {
-            failWithMessage(failMessageSupplier.apply(stat.instruction()) + "\n"
-                    + "    <owner mismatch: '"
-                    + owner + "' vs '" + ownerExtractor.apply(insn).getText() + "'>");
-        }
-        if (!name.equals(membernameExtractor.apply(insn).getText())) {
-            failWithMessage(failMessageSupplier.apply(stat.instruction()) + "\n"
-                    + "    <name mismatch: '"
-                    + name + "' vs '" + membernameExtractor.apply(insn).getText() + "'>");
-        }
-        if (!descriptor.equals(descriptorExtractor.apply(insn).getText())) {
-            failWithMessage(failMessageSupplier.apply(stat.instruction()) + "\n"
-                    + "    <descriptor mismatch'"
-                    + descriptor + "' vs '" + descriptorExtractor.apply(insn).getText() + "'>");
-        }
-
-        this.pc++;
-        return this;
-    }
-
     public CodeSequenceAssert ireturn() {
         return genericNoOperandCheck("ireturn", JasmParser.InstructionContext::insn_ireturn);
+    }
+
+    public CodeSequenceAssert label(@NonNull final String expected) {
+        return genericStringOperandCheck("label", expected,
+                JasmParser.InstructionContext::label,
+                RuleContext::getText
+        );
     }
 
     public CodeSequenceAssert ldc(final int expected) {
@@ -244,6 +219,25 @@ public class CodeSequenceAssert extends AbstractAssert<CodeSequenceAssert, JasmP
             @NonNull final Function<JasmParser.InstructionContext, T> getInsnFunc,
             @NonNull final Function<T, String> getAtomTextFunc
     ) {
+        return genericAnyOperandCheck(name, expectedOperand, getInsnFunc, getAtomTextFunc, (i) -> Integer.toString(i));
+    }
+
+    private <T> CodeSequenceAssert genericStringOperandCheck(
+            @NonNull final String name,
+            @NonNull final String expectedOperand,
+            @NonNull final Function<JasmParser.InstructionContext, T> getInsnFunc,
+            @NonNull final Function<T, String> getAtomTextFunc
+    ) {
+        return genericAnyOperandCheck(name, expectedOperand, getInsnFunc, getAtomTextFunc, Function.identity());
+    }
+
+    private <T, O> CodeSequenceAssert genericAnyOperandCheck(
+            @NonNull final String name,
+            @NonNull final O expectedOperand,
+            @NonNull final Function<JasmParser.InstructionContext, T> getInsnFunc,
+            @NonNull final Function<T, String> getAtomTextFunc,
+            @NonNull final Function<O, String> getOperandTextFunc
+    ) {
         isNotNull();
         assertThat(actual.stat()).isNotNull();
         hasNotUnderflowed(name);
@@ -251,7 +245,8 @@ public class CodeSequenceAssert extends AbstractAssert<CodeSequenceAssert, JasmP
         final var stat = actual.stat().get(pc);
         if (stat.instruction() == null
                 || getInsnFunc.apply(stat.instruction()) == null
-                || !Integer.toString(expectedOperand).equals(getAtomTextFunc.apply(getInsnFunc.apply(stat.instruction())))
+                || !getOperandTextFunc.apply(expectedOperand).equals(
+                        getAtomTextFunc.apply(getInsnFunc.apply(stat.instruction())))
         ) {
             failWithMessage("Expected "
                     + name
@@ -293,6 +288,56 @@ public class CodeSequenceAssert extends AbstractAssert<CodeSequenceAssert, JasmP
                     .map(RuleContext::getText)
                     .orElse("<Unknown>")
             );
+        }
+
+        this.pc++;
+        return this;
+    }
+
+    private <T> CodeSequenceAssert genericNonDynamicInvokeCheck(
+            @NonNull final String invokeType,
+            @NonNull final String owner,
+            @NonNull final String name,
+            @NonNull final String descriptor,
+            @NonNull final Function<JasmParser.InstructionContext, T> invokeExtractor,
+            @NonNull final Function<T, JasmParser.OwnerContext> ownerExtractor,
+            @NonNull final Function<T, JasmParser.MembernameContext> membernameExtractor,
+            @NonNull final Function<T, JasmParser.Method_descriptorContext> descriptorExtractor
+    ) {
+        final Function<JasmParser.InstructionContext, String> failMessageSupplier = (insn) ->
+                "Expected "
+                        + invokeType
+                        + owner + "." + name + descriptor
+                        + " instruction at pc("
+                        + this.pc
+                        + "), but was "
+                        + insn.getText();
+
+        isNotNull();
+        assertThat(actual.stat()).isNotNull();
+        hasNotUnderflowed(invokeType);
+
+        final var stat = actual.stat().get(pc);
+        if (stat.instruction() == null || invokeExtractor.apply(stat.instruction()) == null) {
+            failWithMessage(failMessageSupplier.apply(stat.instruction()));
+        }
+
+        final var insn = invokeExtractor.apply(stat.instruction());
+
+        if (!owner.equals(ownerExtractor.apply(insn).getText())) {
+            failWithMessage(failMessageSupplier.apply(stat.instruction()) + "\n"
+                    + "    <owner mismatch: '"
+                    + owner + "' vs '" + ownerExtractor.apply(insn).getText() + "'>");
+        }
+        if (!name.equals(membernameExtractor.apply(insn).getText())) {
+            failWithMessage(failMessageSupplier.apply(stat.instruction()) + "\n"
+                    + "    <name mismatch: '"
+                    + name + "' vs '" + membernameExtractor.apply(insn).getText() + "'>");
+        }
+        if (!descriptor.equals(descriptorExtractor.apply(insn).getText())) {
+            failWithMessage(failMessageSupplier.apply(stat.instruction()) + "\n"
+                    + "    <descriptor mismatch'"
+                    + descriptor + "' vs '" + descriptorExtractor.apply(insn).getText() + "'>");
         }
 
         this.pc++;

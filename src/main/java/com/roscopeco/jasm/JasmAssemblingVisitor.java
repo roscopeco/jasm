@@ -8,16 +8,23 @@ package com.roscopeco.jasm;
 import com.roscopeco.jasm.antlr.JasmBaseVisitor;
 import com.roscopeco.jasm.antlr.JasmParser;
 import lombok.NonNull;
+import lombok.val;
 import org.antlr.v4.runtime.RuleContext;
 import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.objectweb.asm.Opcodes.ACONST_NULL;
 import static org.objectweb.asm.Opcodes.ALOAD;
 import static org.objectweb.asm.Opcodes.ARETURN;
+import static org.objectweb.asm.Opcodes.DUP;
 import static org.objectweb.asm.Opcodes.FRETURN;
+import static org.objectweb.asm.Opcodes.GOTO;
 import static org.objectweb.asm.Opcodes.ICONST_0;
 import static org.objectweb.asm.Opcodes.ICONST_1;
 import static org.objectweb.asm.Opcodes.ICONST_2;
@@ -30,6 +37,7 @@ import static org.objectweb.asm.Opcodes.INVOKESPECIAL;
 import static org.objectweb.asm.Opcodes.INVOKESTATIC;
 import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
 import static org.objectweb.asm.Opcodes.IRETURN;
+import static org.objectweb.asm.Opcodes.NEW;
 import static org.objectweb.asm.Opcodes.RETURN;
 import static org.objectweb.asm.Opcodes.V17;
 
@@ -82,6 +90,7 @@ class JasmAssemblingVisitor extends JasmBaseVisitor<Void> {
     }
 
     private class JasmMethodVisitor extends JasmBaseVisitor<Void> {
+        private final HashMap<String, LabelHolder> labels = new HashMap<>();
         private MethodVisitor methodVisitor;
 
         @Override
@@ -99,7 +108,16 @@ class JasmAssemblingVisitor extends JasmBaseVisitor<Void> {
             this.methodVisitor.visitMaxs(0, 0);
             this.methodVisitor.visitEnd();
 
+            guardAllLabelsDeclared();
+
             return ret;
+        }
+
+        @Override
+        public Void visitLabel(JasmParser.LabelContext ctx) {
+            final var label = declareLabel(ctx.LABEL().getText());
+            this.methodVisitor.visitLabel(label.label);
+            return super.visitLabel(ctx);
         }
 
         @Override
@@ -121,9 +139,21 @@ class JasmAssemblingVisitor extends JasmBaseVisitor<Void> {
         }
 
         @Override
+        public Void visitInsn_dup(JasmParser.Insn_dupContext ctx) {
+            this.methodVisitor.visitInsn(DUP);
+            return super.visitInsn_dup(ctx);
+        }
+
+        @Override
         public Void visitInsn_freturn(JasmParser.Insn_freturnContext ctx) {
             this.methodVisitor.visitInsn(FRETURN);
             return super.visitInsn_freturn(ctx);
+        }
+
+        @Override
+        public Void visitInsn_goto(JasmParser.Insn_gotoContext ctx) {
+            this.methodVisitor.visitJumpInsn(GOTO, getLabel(ctx.NAME().getText()).label);
+            return super.visitInsn_goto(ctx);
         }
 
         @Override
@@ -207,6 +237,12 @@ class JasmAssemblingVisitor extends JasmBaseVisitor<Void> {
         }
 
         @Override
+        public Void visitInsn_new(JasmParser.Insn_newContext ctx) {
+            this.methodVisitor.visitTypeInsn(NEW, ctx.QNAME().getText());
+            return super.visitInsn_new(ctx);
+        }
+
+        @Override
         public Void visitInsn_return(final JasmParser.Insn_returnContext ctx) {
             this.methodVisitor.visitInsn(RETURN);
             return super.visitInsn_return(ctx);
@@ -259,8 +295,41 @@ class JasmAssemblingVisitor extends JasmBaseVisitor<Void> {
             return constant.substring(1, constant.length() - 1).replace("\"\"", "\"");
         }
 
-        private String fixDescriptor(final String languageDescriptor) {
+        private String fixDescriptor(@NonNull final String languageDescriptor) {
             return languageDescriptor.replaceAll("([IJFDZV]);", "$1");
         }
+
+        private String normaliseLabelName(@NonNull final String labelName) {
+            if (labelName.endsWith(":")) {
+                return labelName.substring(0, labelName.length() - 1);
+            } else {
+                return labelName;
+            }
+        }
+
+        private LabelHolder getLabel(@NonNull final String name) {
+            return labels.computeIfAbsent(normaliseLabelName(name), k -> new LabelHolder(new Label(), false));
+        }
+
+        private LabelHolder declareLabel(@NonNull final String name) {
+            final var normalName = normaliseLabelName(name);
+            final var label = labels.get(normalName);
+
+            return Optional.ofNullable(label)
+                    .orElse(labels.put(normalName, new LabelHolder(new Label(), true)));
+        }
+
+        private void guardAllLabelsDeclared() {
+            final var undeclaredLabels = labels.entrySet().stream()
+                    .filter(l -> !l.getValue().declared())
+                    .map(Map.Entry::getKey)
+                    .collect(Collectors.joining());
+
+            if (!undeclaredLabels.isEmpty()) {
+                throw new SyntaxErrorException("Labels used but not declared: [" + undeclaredLabels + "]");
+            }
+        }
+
+        private record LabelHolder(Label label, boolean declared) { }
     }
 }

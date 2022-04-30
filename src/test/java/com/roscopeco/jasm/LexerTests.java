@@ -114,7 +114,7 @@ class LexerTests {
                 .hasType(JasmLexer.CLASS);
 
         assertNextToken(lexer)
-                .hasType(JasmLexer.TYPENAME)
+                .hasType(JasmLexer.QNAME)
                 .hasText("com/roscopeco/jasm/EmptyClassInPackage");
 
         assertNextToken(lexer)
@@ -137,7 +137,7 @@ class LexerTests {
                 .hasType(JasmLexer.LBRACE);
 
         assertNextToken(lexer)
-                .hasType(JasmLexer.TYPENAME)
+                .hasType(JasmLexer.QNAME)
                 .hasText("Ljava/lang/Object");
 
         assertNextToken(lexer)
@@ -163,7 +163,7 @@ class LexerTests {
                 .hasText("class");
 
         assertNextToken(lexer)
-                .hasType(JasmLexer.TYPENAME)
+                .hasType(JasmLexer.QNAME)
                 .hasText("com/roscopeco/jasm/MinimalMethodTest");
 
         assertNextToken(lexer)

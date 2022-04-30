@@ -7,17 +7,11 @@ package com.roscopeco.jasm.e2e;
 
 import org.junit.jupiter.api.Test;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.roscopeco.jasm.TestUtil.assemble;
 import static com.roscopeco.jasm.TestUtil.assembleAndDefine;
 import static com.roscopeco.jasm.TestUtil.boolVoidInvoker;
-import static com.roscopeco.jasm.TestUtil.defineClass;
 import static com.roscopeco.jasm.TestUtil.floatVoidInvoker;
 import static com.roscopeco.jasm.TestUtil.instantiate;
 import static com.roscopeco.jasm.TestUtil.intVoidInvoker;
@@ -148,10 +142,8 @@ class JasmE2ETests {
     }
 
     @Test
-    void shouldAssembleInvokeTestsToValidJavaClass() throws IOException {
-        final var bytes = assemble("com/roscopeco/jasm/InvokeTests.jasm");
-
-        final var clz = defineClass(bytes);
+    void shouldAssembleInvokeTestsToValidJavaClass() {
+        final var clz = assembleAndDefine("com/roscopeco/jasm/InvokeTests.jasm");
 
         assertThat(clz.getName()).isEqualTo("com.roscopeco.jasm.InvokeTests");
 
@@ -172,5 +164,45 @@ class JasmE2ETests {
                 .isSameAs(list);
 
         assertThat(list).containsExactly("Hello World");
+    }
+
+    @Test
+    void shouldAssembleNewDupTestToValidJavaClass() {
+        final var clz = assembleAndDefine("com/roscopeco/jasm/NewDupTest.jasm");
+
+        assertThat(clz.getName()).isEqualTo("com.roscopeco.jasm.NewDupTest");
+
+        assertThat(clz.getDeclaredClasses()).isEmpty();
+        assertThat(clz.getDeclaredFields()).isEmpty();
+        assertThat(clz.getDeclaredConstructors()).isEmpty();
+        assertThat(clz.getDeclaredMethods()).hasSize(1);
+
+        // Tests both NEW and DUP
+        final var obj = objectVoidInvoker(clz, "createList").get();
+
+        assertThat(obj).isInstanceOf(ArrayList.class);
+
+        final var list = (ArrayList<?>)obj;
+
+        assertThat(list).isEmpty();
+    }
+
+    @Test
+    void shouldAssembleGotoTestToValidJavaClass() {
+        final var clz = assembleAndDefine("com/roscopeco/jasm/GotoLabelTest.jasm");
+
+        assertThat(clz.getName()).isEqualTo("com.roscopeco.jasm.GotoLabelTest");
+
+        assertThat(clz.getDeclaredClasses()).isEmpty();
+        assertThat(clz.getDeclaredFields()).isEmpty();
+        assertThat(clz.getDeclaredConstructors()).isEmpty();
+        assertThat(clz.getDeclaredMethods()).hasSize(1);
+
+        final var list = new ArrayList<>();
+
+        // Tests GOTO and labels - should skip adding "CANARY" to the list
+        final var obj = objectArgsInvoker(clz, "testMethod", List.class).apply(new Object[] { list });
+
+        assertThat(list).isEmpty();
     }
 }
