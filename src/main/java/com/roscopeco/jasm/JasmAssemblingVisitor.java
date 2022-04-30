@@ -32,6 +32,8 @@ import static org.objectweb.asm.Opcodes.ICONST_3;
 import static org.objectweb.asm.Opcodes.ICONST_4;
 import static org.objectweb.asm.Opcodes.ICONST_5;
 import static org.objectweb.asm.Opcodes.ICONST_M1;
+import static org.objectweb.asm.Opcodes.IF_ACMPEQ;
+import static org.objectweb.asm.Opcodes.IF_ACMPNE;
 import static org.objectweb.asm.Opcodes.INVOKEINTERFACE;
 import static org.objectweb.asm.Opcodes.INVOKESPECIAL;
 import static org.objectweb.asm.Opcodes.INVOKESTATIC;
@@ -160,6 +162,18 @@ class JasmAssemblingVisitor extends JasmBaseVisitor<Void> {
         public Void visitInsn_iconst(final JasmParser.Insn_iconstContext ctx) {
             this.methodVisitor.visitInsn(generateIconstOpcode(ctx.atom()));
             return super.visitInsn_iconst(ctx);
+        }
+
+        @Override
+        public Void visitInsn_if_acmpeq(JasmParser.Insn_if_acmpeqContext ctx) {
+            this.methodVisitor.visitJumpInsn(IF_ACMPEQ, getLabel(ctx.NAME().getText()).label);
+            return super.visitInsn_if_acmpeq(ctx);
+        }
+
+        @Override
+        public Void visitInsn_if_acmpne(JasmParser.Insn_if_acmpneContext ctx) {
+            this.methodVisitor.visitJumpInsn(IF_ACMPNE, getLabel(ctx.NAME().getText()).label);
+            return super.visitInsn_if_acmpne(ctx);
         }
 
         @Override

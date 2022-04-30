@@ -100,9 +100,29 @@ class LexerInstructionTests {
     }
 
     @Test
-    void shouldLexIreturn() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Ireturn.jasm", lexer -> assertNextToken(lexer)
-                .hasType(JasmLexer.IRETURN));
+    void shouldLexIfAcmps() {
+        runInstructionTest("com/roscopeco/jasm/insntest/IfAcmp.jasm", lexer -> {
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.IFACMPEQ);
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.NAME)
+                    .hasText("label");
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.IFACMPNE);
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.NAME)
+                    .hasText("label");
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.LABEL)
+                    .hasText("label:");
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.RETURN);
+        });
     }
 
     @Test
@@ -245,6 +265,12 @@ class LexerInstructionTests {
             assertNextToken(lexer)
                     .hasType(JasmLexer.SEMI);
         });
+    }
+
+    @Test
+    void shouldLexIreturn() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Ireturn.jasm", lexer -> assertNextToken(lexer)
+                .hasType(JasmLexer.IRETURN));
     }
 
     @Test

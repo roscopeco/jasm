@@ -69,6 +69,8 @@ instruction
  | insn_freturn
  | insn_goto
  | insn_iconst
+ | insn_if_acmpeq
+ | insn_if_acmpne
  | insn_invokeinterface
  | insn_invokespecial
  | insn_invokestatic
@@ -106,6 +108,14 @@ insn_goto
 
 insn_iconst
  : ICONST atom
+ ;
+
+insn_if_acmpeq
+ : IFACMPEQ NAME
+ ;
+
+insn_if_acmpne
+ : IFACMPNE NAME
  ;
 
 insn_invokeinterface
@@ -190,6 +200,8 @@ DUP: 'dup';
 FRETURN: 'freturn';
 GOTO: 'goto';
 ICONST: 'iconst';
+IFACMPEQ: 'if_acmpeq';
+IFACMPNE: 'if_acmpne';
 INVOKEINTERFACE: 'invokeinterface';
 INVOKESPECIAL: 'invokespecial';
 INVOKESTATIC: 'invokestatic';

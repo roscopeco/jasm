@@ -387,6 +387,76 @@ class JasmIntegrationTests {
                     MAXSTACK = 0
                     MAXLOCALS = 0
                 }
+                """),
+
+
+                /* ************************************************************************************************ */
+                Arguments.of("com/roscopeco/jasm/IfAcmpTests.jasm", """
+                // class version 61.0 (61)
+                // access flags 0x1
+                public class com/roscopeco/jasm/IfAcmpTests {
+                
+                
+                  // access flags 0x1
+                  public <init>()V
+                    ALOAD 0
+                    INVOKESPECIAL java/lang/Object.<init> ()V
+                    RETURN
+                    MAXSTACK = 0
+                    MAXLOCALS = 0
+                
+                  // access flags 0x1
+                  public testEqWhenEqualPasses()Z
+                    NEW java/lang/String
+                    DUP
+                    IF_ACMPEQ L0
+                    LDC 0
+                    IRETURN
+                   L0
+                    LDC 1
+                    IRETURN
+                    MAXSTACK = 0
+                    MAXLOCALS = 0
+                
+                  // access flags 0x1
+                  public testEqNotEqualPasses()Z
+                    NEW java/lang/String
+                    NEW java/lang/String
+                    IF_ACMPEQ L0
+                    LDC 1
+                    IRETURN
+                   L0
+                    LDC 0
+                    IRETURN
+                    MAXSTACK = 0
+                    MAXLOCALS = 0
+                
+                  // access flags 0x1
+                  public testNeWhenEqualPasses()Z
+                    NEW java/lang/String
+                    DUP
+                    IF_ACMPNE L0
+                    LDC 1
+                    IRETURN
+                   L0
+                    LDC 0
+                    IRETURN
+                    MAXSTACK = 0
+                    MAXLOCALS = 0
+                
+                  // access flags 0x1
+                  public testNeNotEqualPasses()Z
+                    NEW java/lang/String
+                    NEW java/lang/String
+                    IF_ACMPNE L0
+                    LDC 0
+                    IRETURN
+                   L0
+                    LDC 1
+                    IRETURN
+                    MAXSTACK = 0
+                    MAXLOCALS = 0
+                }
                 """)
         );
     }

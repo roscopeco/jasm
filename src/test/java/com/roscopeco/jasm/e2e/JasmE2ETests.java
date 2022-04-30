@@ -205,4 +205,24 @@ class JasmE2ETests {
 
         assertThat(list).isEmpty();
     }
+
+    @Test
+    void shouldAssembleIfAcmpTestsToValidJavaClass() {
+        final var clz = assembleAndDefine("com/roscopeco/jasm/IfAcmpTests.jasm");
+
+        assertThat(clz.getName()).isEqualTo("com.roscopeco.jasm.IfAcmpTests");
+
+        assertThat(clz.getDeclaredClasses()).isEmpty();
+        assertThat(clz.getDeclaredFields()).isEmpty();
+        assertThat(clz.getDeclaredConstructors()).hasSize(1);
+        assertThat(clz.getDeclaredMethods()).hasSize(4);
+
+        final var obj = instantiate(clz);
+
+        // Tests IF_ACMPEQ and IF_ACMPNE
+        assertThat(boolVoidInvoker(obj, "testEqWhenEqualPasses").get()).isTrue();
+        assertThat(boolVoidInvoker(obj, "testEqNotEqualPasses").get()).isTrue();
+        assertThat(boolVoidInvoker(obj, "testNeWhenEqualPasses").get()).isTrue();
+        assertThat(boolVoidInvoker(obj, "testNeNotEqualPasses").get()).isTrue();
+    }
 }

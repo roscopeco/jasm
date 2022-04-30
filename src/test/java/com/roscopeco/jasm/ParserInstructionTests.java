@@ -76,6 +76,17 @@ class ParserInstructionTests {
     }
 
     @Test
+    void handlesIfAcmps() {
+        runInstructionTest("com/roscopeco/jasm/insntest/IfAcmp.jasm", code -> code
+                .if_acmpeq("label")
+                .if_acmpne("label")
+                .label("label:")
+                .vreturn()
+                .noMoreCode()
+        );
+    }
+
+    @Test
     void handlesInvokeInterface() {
         runInstructionTest("com/roscopeco/jasm/insntest/InvokeInterface.jasm", code -> code
                 .invokeInterface("java/util/List", "get", "(I)Ljava/lang/Object;")

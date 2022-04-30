@@ -83,6 +83,20 @@ public class CodeSequenceAssert extends AbstractAssert<CodeSequenceAssert, JasmP
         );
     }
 
+    public CodeSequenceAssert if_acmpeq(final String expected) {
+        return genericStringOperandCheck("if_icmpeq", expected,
+                JasmParser.InstructionContext::insn_if_acmpeq,
+                (if_acmpeq) -> if_acmpeq.NAME().getText()
+        );
+    }
+
+    public CodeSequenceAssert if_acmpne(final String expected) {
+        return genericStringOperandCheck("if_icmpeq", expected,
+                JasmParser.InstructionContext::insn_if_acmpne,
+                (if_acmpne) -> if_acmpne.NAME().getText()
+        );
+    }
+    
     public CodeSequenceAssert invokeInterface(
             @NonNull final String owner,
             @NonNull final String name,
