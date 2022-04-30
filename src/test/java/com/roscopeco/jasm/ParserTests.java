@@ -10,12 +10,7 @@ import lombok.NonNull;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.ArgumentsSource;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
-
-import java.util.stream.Stream;
 
 import static com.roscopeco.jasm.TestUtil.doParse;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,7 +20,8 @@ class ParserTests {
     @Test
     void shouldFailOnEmptyFile() {
         assertThatThrownBy(() -> doParse("emptyfile.jasm"))
-                .isInstanceOf(ParseCancellationException.class);
+                .isInstanceOf(SyntaxErrorException.class)
+                .hasMessageContaining("<EOF>");
     }
 
     @ParameterizedTest

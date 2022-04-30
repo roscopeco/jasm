@@ -1,5 +1,5 @@
 class com/roscopeco/jasm/insntest/Ireturn {
-    V insnTest() {
+    insnTest()V {
         ireturn
     }
 }

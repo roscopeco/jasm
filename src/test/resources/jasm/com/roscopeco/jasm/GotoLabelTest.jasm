@@ -1,5 +1,5 @@
 public class com/roscopeco/jasm/GotoLabelTest {
-    public static V testMethod(Ljava/util/List;) {
+    public static testMethod(Ljava/util/List;)V {
         goto skipAdd
 
         aload 0

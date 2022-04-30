@@ -8,7 +8,6 @@ package com.roscopeco.jasm;
 import com.roscopeco.jasm.antlr.JasmBaseVisitor;
 import com.roscopeco.jasm.antlr.JasmParser;
 import lombok.NonNull;
-import lombok.val;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.objectweb.asm.ClassVisitor;
@@ -267,9 +266,9 @@ class JasmAssemblingVisitor extends JasmBaseVisitor<Void> {
         }
 
         private String generateDescriptor(final JasmParser.MethodContext ctx) {
-            final var returnType = ctx.type(0).getText();
-            final var paramTypes = ctx.type().stream()
-                    .skip(1)
+            final var type = ctx.type();
+            final var returnType = type.get(type.size() - 1).getText();
+            final var paramTypes = type.subList(0, type.size() - 1).stream()
                     .map(RuleContext::getText)
                     .collect(Collectors.joining());
 

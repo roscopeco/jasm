@@ -1,11 +1,11 @@
 class com/roscopeco/jasm/ConstructorMethodTest {
-    public V <init>() {
+    public <init>()V {
         aload 0
         invokespecial java/lang/Object.<init>()V
         return
     }
 
-    public I testMethod() {
+    public testMethod()I {
         iconst -1
         ireturn
     }

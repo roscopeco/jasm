@@ -1,5 +1,5 @@
 class com/roscopeco/jasm/insntest/InvokeSpecial {
-    V insnTest() {
+    insnTest()V {
         invokespecial java/lang/Object.<init>(Ljava/lang/String;I;Z)V
     }
 }

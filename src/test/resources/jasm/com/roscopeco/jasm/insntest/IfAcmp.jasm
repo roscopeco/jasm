@@ -1,5 +1,5 @@
 class com/roscopeco/jasm/insntest/IfAcmp {
-    V insnTest() {
+    insnTest()V {
         if_acmpeq label
         if_acmpne label
     label:

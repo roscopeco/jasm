@@ -1,11 +1,11 @@
 public class com/roscopeco/jasm/IfAcmpTests {
-    public V <init>() {
+    public <init>()V {
         aload 0
         invokespecial java/lang/Object.<init>()V
         return
     }
 
-    public Z testEqWhenEqualPasses() {
+    public testEqWhenEqualPasses()Z {
         new java/lang/String
         dup
         if_acmpeq areEqual
@@ -18,7 +18,7 @@ public class com/roscopeco/jasm/IfAcmpTests {
         ireturn
     }
 
-    public Z testEqNotEqualPasses() {
+    public testEqNotEqualPasses()Z {
         new java/lang/String
         new java/lang/String
 
@@ -32,7 +32,7 @@ public class com/roscopeco/jasm/IfAcmpTests {
         ireturn
     }
 
-    public Z testNeWhenEqualPasses() {
+    public testNeWhenEqualPasses()Z {
         new java/lang/String
         dup
         if_acmpne notEqual
@@ -45,7 +45,7 @@ public class com/roscopeco/jasm/IfAcmpTests {
         ireturn
     }
 
-    public Z testNeNotEqualPasses() {
+    public testNeNotEqualPasses()Z {
         new java/lang/String
         new java/lang/String
         if_acmpne notEqual

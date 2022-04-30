@@ -94,11 +94,11 @@ class LexerTests {
                 .hasType(JasmLexer.LBRACE);
 
         assertNextToken(lexer)
-                .hasType(JasmLexer.TYPE_INT);
-
-        assertNextToken(lexer)
                 .hasType(JasmLexer.NAME)
                 .hasText("someField");
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.TYPE_INT);
 
         assertNextToken(lexer)
                 .hasType(JasmLexer.RBRACE);
@@ -138,15 +138,15 @@ class LexerTests {
                 .hasType(JasmLexer.LBRACE);
 
         assertNextToken(lexer)
+                .hasType(JasmLexer.NAME)
+                .hasText("someField");
+
+        assertNextToken(lexer)
                 .hasType(JasmLexer.QNAME)
                 .hasText("Ljava/lang/Object");
 
         assertNextToken(lexer)
                 .hasType(JasmLexer.SEMI);
-
-        assertNextToken(lexer)
-                .hasType(JasmLexer.NAME)
-                .hasText("someField");
 
         assertNextToken(lexer)
                 .hasType(JasmLexer.RBRACE);
@@ -171,9 +171,6 @@ class LexerTests {
                 .hasType(JasmLexer.LBRACE);
 
         assertNextToken(lexer)
-                .hasType(JasmLexer.TYPE_VOID);
-
-        assertNextToken(lexer)
                 .hasType(JasmLexer.NAME)
                 .hasText("testMethod");
 
@@ -182,6 +179,9 @@ class LexerTests {
 
         assertNextToken(lexer)
                 .hasType(JasmLexer.RPAREN);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.TYPE_VOID);
 
         assertNextToken(lexer)
                 .hasType(JasmLexer.LBRACE);
@@ -240,9 +240,6 @@ class LexerTests {
                     .hasType(JasmLexer.PUBLIC);
 
             tokens.next()
-                    .hasType(JasmLexer.TYPE_VOID);
-
-            tokens.next()
                     .hasType(JasmLexer.INIT);
 
             tokens.next()
@@ -250,6 +247,9 @@ class LexerTests {
 
             tokens.next()
                     .hasType(JasmLexer.RPAREN);
+
+            tokens.next()
+                    .hasType(JasmLexer.TYPE_VOID);
 
             tokens.next()
                     .hasType(JasmLexer.LBRACE);

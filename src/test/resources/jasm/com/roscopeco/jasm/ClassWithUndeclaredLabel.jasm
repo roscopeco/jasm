@@ -1,5 +1,5 @@
 class com/roscopeco/jasm/ClassWithUndeclaredLabel {
-    V someMethod() {
+    someMethod()V {
         goto undeclaredLabel
     }
 }

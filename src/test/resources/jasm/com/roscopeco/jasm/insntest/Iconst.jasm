@@ -1,5 +1,5 @@
 class com/roscopeco/jasm/insntest/Iconst {
-    V insnTest() {
+    insnTest()V {
         iconst 0
     }
 }

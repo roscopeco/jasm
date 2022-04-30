@@ -1,5 +1,5 @@
 class com/roscopeco/jasm/insntest/Areturn {
-    Ljava/lang/Object; insnTest() {
+    insnTest()Ljava/lang/Object; {
         areturn
     }
 }

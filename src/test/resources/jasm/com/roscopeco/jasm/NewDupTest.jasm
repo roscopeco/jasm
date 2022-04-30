@@ -1,5 +1,5 @@
 public class com/roscopeco/jasm/NewDupTest {
-    public static Ljava/util/List; createList() {
+    public static createList()Ljava/util/List; {
         new java/util/ArrayList
         dup
         invokespecial java/util/ArrayList.<init>()V

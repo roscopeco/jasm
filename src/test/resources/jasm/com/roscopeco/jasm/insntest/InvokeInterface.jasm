@@ -1,5 +1,5 @@
 class com/roscopeco/jasm/insntest/InvokeInterface {
-    V insnTest() {
+    insnTest()V {
         invokeinterface java/util/List.get(I)Ljava/lang/Object;
     }
 }

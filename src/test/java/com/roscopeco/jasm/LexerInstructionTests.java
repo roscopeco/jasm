@@ -7,7 +7,6 @@ package com.roscopeco.jasm;
 
 import com.roscopeco.jasm.antlr.JasmLexer;
 import lombok.NonNull;
-import org.assertj.core.api.LocalDateAssert;
 import org.assertj.core.api.ThrowingConsumer;
 import org.junit.jupiter.api.Test;
 
@@ -346,10 +345,6 @@ class LexerInstructionTests {
         assertNextToken(lexer)
                 .hasType(JasmLexer.LBRACE);
 
-        expectedReturnTokenTypes.forEach(token -> assertNextToken(lexer)
-                .hasType(token)
-        );
-
         assertNextToken(lexer)
                 .hasType(JasmLexer.NAME)
                 .hasText("insnTest");
@@ -359,6 +354,10 @@ class LexerInstructionTests {
 
         assertNextToken(lexer)
                 .hasType(JasmLexer.RPAREN);
+
+        expectedReturnTokenTypes.forEach(token -> assertNextToken(lexer)
+                .hasType(token)
+        );
 
         assertNextToken(lexer)
                 .hasType(JasmLexer.LBRACE);

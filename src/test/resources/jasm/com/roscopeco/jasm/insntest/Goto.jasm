@@ -1,5 +1,5 @@
 class com/roscopeco/jasm/insntest/Goto {
-    V insnTest() {
+    insnTest()V {
     infinity:
         goto infinity
         goto unreachable

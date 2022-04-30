@@ -1,35 +1,35 @@
 class com/roscopeco/jasm/IconstVariants {
-    public static I insnTestM1() {
+    public static insnTestM1()I {
         iconst -1
         ireturn
     }
 
-    public static I insnTest0() {
+    public static insnTest0()I {
         iconst 0
         ireturn
     }
 
-    public static I insnTest1() {
+    public static insnTest1()I {
         iconst 1
         ireturn
     }
 
-    public static I insnTest2() {
+    public static insnTest2()I {
         iconst 2
         ireturn
     }
 
-    public static I insnTest3() {
+    public static insnTest3()I {
         iconst 3
         ireturn
     }
 
-    public static I insnTest4() {
+    public static insnTest4()I {
         iconst 4
         ireturn
     }
 
-    public static I insnTest5() {
+    public static insnTest5()I {
         iconst 5
         ireturn
     }

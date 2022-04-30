@@ -27,16 +27,15 @@ member
  ;
 
 field
- : modifier* type membername
+ : modifier* membername type
  ;
 
 method
- : modifier* type membername LPAREN type* RPAREN stat_block
+ : modifier* membername LPAREN type* RPAREN type stat_block
  ;
 
 membername
- : QNAME
- | NAME
+ : NAME
  | INIT
  | CLINIT
  ;

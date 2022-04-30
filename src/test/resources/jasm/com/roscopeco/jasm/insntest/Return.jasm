@@ -1,5 +1,5 @@
 class com/roscopeco/jasm/insntest/Return {
-    V insnTest() {
+    insnTest()V {
         return
     }
 }

@@ -1,5 +1,5 @@
 class com/roscopeco/jasm/insntest/New {
-    V insnTest() {
+    insnTest()V {
         new java/util/ArrayList
     }
 }

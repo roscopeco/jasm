@@ -204,7 +204,7 @@ class JasmE2ETests {
         final var list = new ArrayList<>();
 
         // Tests GOTO and labels - should skip adding "CANARY" to the list
-        final var obj = objectArgsInvoker(clz, "testMethod", List.class).apply(new Object[] { list });
+        objectArgsInvoker(clz, "testMethod", List.class).apply(new Object[] { list });
 
         assertThat(list).isEmpty();
     }

@@ -16,7 +16,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.objectweb.asm.util.TraceClassVisitor;
 
-import static com.roscopeco.jasm.TestUtil.doParse;
 import static com.roscopeco.jasm.TestUtil.testCaseParser;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
