@@ -76,8 +76,20 @@ instruction
  | insn_freturn
  | insn_goto
  | insn_iconst
+ | insn_ifeq
+ | insn_ifge
+ | insn_ifgt
+ | insn_ifle
+ | insn_iflt
+ | insn_ifne
  | insn_if_acmpeq
  | insn_if_acmpne
+ | insn_if_icmpeq
+ | insn_if_icmpge
+ | insn_if_icmpgt
+ | insn_if_icmple
+ | insn_if_icmplt
+ | insn_if_icmpne
  | insn_invokeinterface
  | insn_invokespecial
  | insn_invokestatic
@@ -117,12 +129,60 @@ insn_iconst
  : ICONST atom
  ;
 
+insn_ifeq
+ : IFEQ NAME
+ ;
+
+insn_ifge
+ : IFGE NAME
+ ;
+
+insn_ifgt
+ : IFGT NAME
+ ;
+
+insn_ifle
+ : IFLE NAME
+ ;
+
+insn_iflt
+ : IFLT NAME
+ ;
+
+insn_ifne
+ : IFNE NAME
+ ;
+
 insn_if_acmpeq
  : IFACMPEQ NAME
  ;
 
 insn_if_acmpne
  : IFACMPNE NAME
+ ;
+
+insn_if_icmpeq
+ : IFICMPEQ NAME
+ ;
+
+insn_if_icmpge
+ : IFICMPGE NAME
+ ;
+
+insn_if_icmpgt
+ : IFICMPGT NAME
+ ;
+
+insn_if_icmple
+ : IFICMPLE NAME
+ ;
+
+insn_if_icmplt
+ : IFICMPLT NAME
+ ;
+
+insn_if_icmpne
+ : IFICMPNE NAME
  ;
 
 insn_invokeinterface
@@ -213,8 +273,20 @@ DUP             : 'dup';
 FRETURN         : 'freturn';
 GOTO            : 'goto';
 ICONST          : 'iconst';
+IFEQ            : 'ifeq';
+IFGT            : 'ifgt';
+IFLE            : 'ifle';
+IFLT            : 'iflt';
+IFGE            : 'ifge';
+IFNE            : 'ifne';
 IFACMPEQ        : 'if_acmpeq';
 IFACMPNE        : 'if_acmpne';
+IFICMPEQ        : 'if_icmpeq';
+IFICMPGT        : 'if_icmpgt';
+IFICMPLE        : 'if_icmple';
+IFICMPLT        : 'if_icmplt';
+IFICMPGE        : 'if_icmpge';
+IFICMPNE        : 'if_icmpne';
 INVOKEINTERFACE : 'invokeinterface';
 INVOKESPECIAL   : 'invokespecial';
 INVOKESTATIC    : 'invokestatic';

@@ -99,6 +99,60 @@ class LexerInstructionTests {
     }
 
     @Test
+    void shouldLexIfs() {
+        runInstructionTest("com/roscopeco/jasm/insntest/If.jasm", lexer -> {
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.IFEQ);
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.NAME)
+                    .hasText("label");
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.IFGE);
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.NAME)
+                    .hasText("label");
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.IFGT);
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.NAME)
+                    .hasText("label");
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.IFLE);
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.NAME)
+                    .hasText("label");
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.IFLT);
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.NAME)
+                    .hasText("label");
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.IFNE);
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.NAME)
+                    .hasText("label");
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.LABEL)
+                    .hasText("label:");
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.RETURN);
+        });
+    }
+
+    @Test
     void shouldLexIfAcmps() {
         runInstructionTest("com/roscopeco/jasm/insntest/IfAcmp.jasm", lexer -> {
             assertNextToken(lexer)
@@ -110,6 +164,60 @@ class LexerInstructionTests {
 
             assertNextToken(lexer)
                     .hasType(JasmLexer.IFACMPNE);
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.NAME)
+                    .hasText("label");
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.LABEL)
+                    .hasText("label:");
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.RETURN);
+        });
+    }
+
+    @Test
+    void shouldLexIfIcmps() {
+        runInstructionTest("com/roscopeco/jasm/insntest/IfIcmp.jasm", lexer -> {
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.IFICMPEQ);
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.NAME)
+                    .hasText("label");
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.IFICMPGE);
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.NAME)
+                    .hasText("label");
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.IFICMPGT);
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.NAME)
+                    .hasText("label");
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.IFICMPLE);
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.NAME)
+                    .hasText("label");
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.IFICMPLT);
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.NAME)
+                    .hasText("label");
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.IFICMPNE);
 
             assertNextToken(lexer)
                     .hasType(JasmLexer.NAME)

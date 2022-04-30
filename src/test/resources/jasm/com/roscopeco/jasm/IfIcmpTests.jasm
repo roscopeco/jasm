@@ -1,0 +1,196 @@
+public class com/roscopeco/jasm/IfIcmpTests {
+    public <init>()V {
+        aload 0
+        invokespecial java/lang/Object.<init>()V
+        return
+    }
+
+    public testEqWhenEqualPasses()Z {
+        ldc 1
+        ldc 1
+        if_icmpeq areEqual
+
+        ldc 0
+        ireturn
+
+    areEqual:
+        ldc 1
+        ireturn
+    }
+
+    public testEqNotEqualPasses()Z {
+        ldc 1
+        ldc 2
+
+        if_icmpeq areEqual
+
+        ldc 1
+        ireturn
+
+    areEqual:
+        ldc 0
+        ireturn
+    }
+
+    public testGeWhenGreaterPasses()Z {
+        ldc 2
+        ldc 1
+        if_icmpge isGreaterOrEqual
+
+        ldc 0
+        ireturn
+
+    isGreaterOrEqual:
+        ldc 1
+        ireturn
+    }
+
+    public testGeWhenEqualPasses()Z {
+        ldc 1
+        ldc 1
+
+        if_icmpge areEqual
+
+        ldc 0
+        ireturn
+
+    areEqual:
+        ldc 1
+        ireturn
+    }
+
+    public testGeWhenLessPasses()Z {
+        ldc 1
+        ldc 2
+
+        if_icmpge isLess
+
+        ldc 1
+        ireturn
+
+    isLess:
+        ldc 0
+        ireturn
+    }
+
+    public testGtWhenGreaterPasses()Z {
+        ldc 2
+        ldc 1
+        if_icmpgt isGreater
+
+        ldc 0
+        ireturn
+
+    isGreater:
+        ldc 1
+        ireturn
+    }
+
+    public testGtWhenLessPasses()Z {
+        ldc 1
+        ldc 2
+
+        if_icmpgt isLess
+
+        ldc 1
+        ireturn
+
+    isLess:
+        ldc 0
+        ireturn
+    }
+
+    public testLeWhenGreaterPasses()Z {
+        ldc 2
+        ldc 1
+        if_icmple isLessOrEqual
+
+        ldc 1
+        ireturn
+
+    isLessOrEqual:
+        ldc 0
+        ireturn
+    }
+
+    public testLeWhenEqualPasses()Z {
+        ldc 1
+        ldc 1
+
+        if_icmple areEqual
+
+        ldc 0
+        ireturn
+
+    areEqual:
+        ldc 1
+        ireturn
+    }
+
+    public testLeWhenLessPasses()Z {
+        ldc 1
+        ldc 2
+
+        if_icmple isLess
+
+        ldc 0
+        ireturn
+
+    isLess:
+        ldc 1
+        ireturn
+    }
+
+    public testLtWhenGreaterPasses()Z {
+        ldc 2
+        ldc 1
+        if_icmplt isLess
+
+        ldc 1
+        ireturn
+
+    isLess:
+        ldc 0
+        ireturn
+    }
+
+    public testLtWhenLessPasses()Z {
+        ldc 1
+        ldc 2
+
+        if_icmplt isLess
+
+        ldc 0
+        ireturn
+
+    isLess:
+        ldc 1
+        ireturn
+    }
+
+    public testNeWhenEqualPasses()Z {
+        ldc 1
+        ldc 1
+        if_icmpne notEqual
+
+        ldc 1
+        ireturn
+
+    notEqual:
+        ldc 0
+        ireturn
+    }
+
+    public testNeNotEqualPasses()Z {
+        ldc 1
+        ldc 2
+        if_icmpne notEqual
+
+        ldc 0
+        ireturn
+
+    notEqual:
+        ldc 1
+        ireturn
+    }
+}

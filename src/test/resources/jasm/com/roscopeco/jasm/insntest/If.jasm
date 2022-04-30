@@ -1,0 +1,12 @@
+class com/roscopeco/jasm/insntest/IfIcmp {
+    insnTest()V {
+        ifeq label
+        ifge label
+        ifgt label
+        ifle label
+        iflt label
+        ifne label
+    label:
+        return
+    }
+}

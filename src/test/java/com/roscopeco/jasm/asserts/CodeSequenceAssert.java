@@ -83,20 +83,104 @@ public class CodeSequenceAssert extends AbstractAssert<CodeSequenceAssert, JasmP
         );
     }
 
+    public CodeSequenceAssert ifeq(final String expected) {
+        return genericStringOperandCheck("ifeq", expected,
+                JasmParser.InstructionContext::insn_ifeq,
+                (ifeq) -> ifeq.NAME().getText()
+        );
+    }
+
+    public CodeSequenceAssert ifge(final String expected) {
+        return genericStringOperandCheck("ifge", expected,
+                JasmParser.InstructionContext::insn_ifge,
+                (ifge) -> ifge.NAME().getText()
+        );
+    }
+
+    public CodeSequenceAssert ifgt(final String expected) {
+        return genericStringOperandCheck("ifgt", expected,
+                JasmParser.InstructionContext::insn_ifgt,
+                (ifgt) -> ifgt.NAME().getText()
+        );
+    }
+
+    public CodeSequenceAssert ifle(final String expected) {
+        return genericStringOperandCheck("ifle", expected,
+                JasmParser.InstructionContext::insn_ifle,
+                (ifle) -> ifle.NAME().getText()
+        );
+    }
+
+    public CodeSequenceAssert iflt(final String expected) {
+        return genericStringOperandCheck("iflt", expected,
+                JasmParser.InstructionContext::insn_iflt,
+                (iflt) -> iflt.NAME().getText()
+        );
+    }
+
+    public CodeSequenceAssert ifne(final String expected) {
+        return genericStringOperandCheck("ifeq", expected,
+                JasmParser.InstructionContext::insn_ifne,
+                (ifne) -> ifne.NAME().getText()
+        );
+    }
+
     public CodeSequenceAssert if_acmpeq(final String expected) {
-        return genericStringOperandCheck("if_icmpeq", expected,
+        return genericStringOperandCheck("if_acmpeq", expected,
                 JasmParser.InstructionContext::insn_if_acmpeq,
                 (if_acmpeq) -> if_acmpeq.NAME().getText()
         );
     }
 
     public CodeSequenceAssert if_acmpne(final String expected) {
-        return genericStringOperandCheck("if_icmpeq", expected,
+        return genericStringOperandCheck("if_acmpeq", expected,
                 JasmParser.InstructionContext::insn_if_acmpne,
                 (if_acmpne) -> if_acmpne.NAME().getText()
         );
     }
-    
+
+    public CodeSequenceAssert if_icmpeq(final String expected) {
+        return genericStringOperandCheck("if_icmpeq", expected,
+                JasmParser.InstructionContext::insn_if_icmpeq,
+                (if_icmpeq) -> if_icmpeq.NAME().getText()
+        );
+    }
+
+    public CodeSequenceAssert if_icmpge(final String expected) {
+        return genericStringOperandCheck("if_icmpge", expected,
+                JasmParser.InstructionContext::insn_if_icmpge,
+                (if_icmpge) -> if_icmpge.NAME().getText()
+        );
+    }
+
+    public CodeSequenceAssert if_icmpgt(final String expected) {
+        return genericStringOperandCheck("if_icmpgt", expected,
+                JasmParser.InstructionContext::insn_if_icmpgt,
+                (if_icmpgt) -> if_icmpgt.NAME().getText()
+        );
+    }
+
+    public CodeSequenceAssert if_icmple(final String expected) {
+        return genericStringOperandCheck("if_icmple", expected,
+                JasmParser.InstructionContext::insn_if_icmple,
+                (if_icmple) -> if_icmple.NAME().getText()
+        );
+    }
+
+    public CodeSequenceAssert if_icmplt(final String expected) {
+        return genericStringOperandCheck("if_icmplt", expected,
+                JasmParser.InstructionContext::insn_if_icmplt,
+                (if_icmplt) -> if_icmplt.NAME().getText()
+        );
+    }
+
+    public CodeSequenceAssert if_icmpne(final String expected) {
+        return genericStringOperandCheck("if_icmpeq", expected,
+                JasmParser.InstructionContext::insn_if_icmpne,
+                (if_icmpne) -> if_icmpne.NAME().getText()
+        );
+    }
+
     public CodeSequenceAssert invokeInterface(
             @NonNull final String owner,
             @NonNull final String name,

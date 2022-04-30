@@ -76,10 +76,40 @@ class ParserInstructionTests {
     }
 
     @Test
+    void handlesIfs() {
+        runInstructionTest("com/roscopeco/jasm/insntest/If.jasm", code -> code
+                .ifeq("label")
+                .ifge("label")
+                .ifgt("label")
+                .ifle("label")
+                .iflt("label")
+                .ifne("label")
+                .label("label:")
+                .vreturn()
+                .noMoreCode()
+        );
+    }
+
+    @Test
     void handlesIfAcmps() {
         runInstructionTest("com/roscopeco/jasm/insntest/IfAcmp.jasm", code -> code
                 .if_acmpeq("label")
                 .if_acmpne("label")
+                .label("label:")
+                .vreturn()
+                .noMoreCode()
+        );
+    }
+
+    @Test
+    void handlesIfIcmps() {
+        runInstructionTest("com/roscopeco/jasm/insntest/IfIcmp.jasm", code -> code
+                .if_icmpeq("label")
+                .if_icmpge("label")
+                .if_icmpgt("label")
+                .if_icmple("label")
+                .if_icmplt("label")
+                .if_icmpne("label")
                 .label("label:")
                 .vreturn()
                 .noMoreCode()

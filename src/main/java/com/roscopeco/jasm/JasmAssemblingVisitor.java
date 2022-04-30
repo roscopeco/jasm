@@ -32,8 +32,20 @@ import static org.objectweb.asm.Opcodes.ICONST_3;
 import static org.objectweb.asm.Opcodes.ICONST_4;
 import static org.objectweb.asm.Opcodes.ICONST_5;
 import static org.objectweb.asm.Opcodes.ICONST_M1;
+import static org.objectweb.asm.Opcodes.IFEQ;
+import static org.objectweb.asm.Opcodes.IFGE;
+import static org.objectweb.asm.Opcodes.IFGT;
+import static org.objectweb.asm.Opcodes.IFLE;
+import static org.objectweb.asm.Opcodes.IFLT;
+import static org.objectweb.asm.Opcodes.IFNE;
 import static org.objectweb.asm.Opcodes.IF_ACMPEQ;
 import static org.objectweb.asm.Opcodes.IF_ACMPNE;
+import static org.objectweb.asm.Opcodes.IF_ICMPEQ;
+import static org.objectweb.asm.Opcodes.IF_ICMPGE;
+import static org.objectweb.asm.Opcodes.IF_ICMPGT;
+import static org.objectweb.asm.Opcodes.IF_ICMPLE;
+import static org.objectweb.asm.Opcodes.IF_ICMPLT;
+import static org.objectweb.asm.Opcodes.IF_ICMPNE;
 import static org.objectweb.asm.Opcodes.INVOKEINTERFACE;
 import static org.objectweb.asm.Opcodes.INVOKESPECIAL;
 import static org.objectweb.asm.Opcodes.INVOKESTATIC;
@@ -110,10 +122,13 @@ class JasmAssemblingVisitor extends JasmBaseVisitor<Void> {
 
             final var ret = super.visitMethod(ctx);
 
+            // Do this **before** computing frames, as if a label hasn't been visited
+            // but is referenced in the code it can cause NPE from ASM (with message
+            // "Cannot read field "inputLocals" because "dstFrame" is null").
+            guardAllLabelsDeclared();
+
             this.methodVisitor.visitMaxs(0, 0);
             this.methodVisitor.visitEnd();
-
-            guardAllLabelsDeclared();
 
             return ret;
         }
@@ -168,6 +183,43 @@ class JasmAssemblingVisitor extends JasmBaseVisitor<Void> {
         }
 
         @Override
+        public Void visitInsn_ifeq(JasmParser.Insn_ifeqContext ctx) {
+            this.methodVisitor.visitJumpInsn(IFEQ, getLabel(ctx.NAME().getText()).label);
+            return super.visitInsn_ifeq(ctx);
+        }
+
+        @Override
+        public Void visitInsn_ifge(JasmParser.Insn_ifgeContext ctx) {
+            this.methodVisitor.visitJumpInsn(IFGE, getLabel(ctx.NAME().getText()).label);
+            return super.visitInsn_ifge(ctx);
+        }
+
+        @Override
+        public Void visitInsn_ifgt(JasmParser.Insn_ifgtContext ctx) {
+            this.methodVisitor.visitJumpInsn(IFGT, getLabel(ctx.NAME().getText()).label);
+            return super.visitInsn_ifgt(ctx);
+        }
+
+        @Override
+        public Void visitInsn_ifle(JasmParser.Insn_ifleContext ctx) {
+            final var label = getLabel(ctx.NAME().getText());
+            this.methodVisitor.visitJumpInsn(IFLE, label.label);
+            return super.visitInsn_ifle(ctx);
+        }
+
+        @Override
+        public Void visitInsn_iflt(JasmParser.Insn_ifltContext ctx) {
+            this.methodVisitor.visitJumpInsn(IFLT, getLabel(ctx.NAME().getText()).label);
+            return super.visitInsn_iflt(ctx);
+        }
+
+        @Override
+        public Void visitInsn_ifne(JasmParser.Insn_ifneContext ctx) {
+            this.methodVisitor.visitJumpInsn(IFNE, getLabel(ctx.NAME().getText()).label);
+            return super.visitInsn_ifne(ctx);
+        }
+
+        @Override
         public Void visitInsn_if_acmpeq(JasmParser.Insn_if_acmpeqContext ctx) {
             this.methodVisitor.visitJumpInsn(IF_ACMPEQ, getLabel(ctx.NAME().getText()).label);
             return super.visitInsn_if_acmpeq(ctx);
@@ -177,6 +229,43 @@ class JasmAssemblingVisitor extends JasmBaseVisitor<Void> {
         public Void visitInsn_if_acmpne(JasmParser.Insn_if_acmpneContext ctx) {
             this.methodVisitor.visitJumpInsn(IF_ACMPNE, getLabel(ctx.NAME().getText()).label);
             return super.visitInsn_if_acmpne(ctx);
+        }
+
+        @Override
+        public Void visitInsn_if_icmpeq(JasmParser.Insn_if_icmpeqContext ctx) {
+            this.methodVisitor.visitJumpInsn(IF_ICMPEQ, getLabel(ctx.NAME().getText()).label);
+            return super.visitInsn_if_icmpeq(ctx);
+        }
+
+        @Override
+        public Void visitInsn_if_icmpge(JasmParser.Insn_if_icmpgeContext ctx) {
+            this.methodVisitor.visitJumpInsn(IF_ICMPGE, getLabel(ctx.NAME().getText()).label);
+            return super.visitInsn_if_icmpge(ctx);
+        }
+
+        @Override
+        public Void visitInsn_if_icmpgt(JasmParser.Insn_if_icmpgtContext ctx) {
+            this.methodVisitor.visitJumpInsn(IF_ICMPGT, getLabel(ctx.NAME().getText()).label);
+            return super.visitInsn_if_icmpgt(ctx);
+        }
+
+        @Override
+        public Void visitInsn_if_icmple(JasmParser.Insn_if_icmpleContext ctx) {
+            final var label = getLabel(ctx.NAME().getText());
+            this.methodVisitor.visitJumpInsn(IF_ICMPLE, label.label);
+            return super.visitInsn_if_icmple(ctx);
+        }
+
+        @Override
+        public Void visitInsn_if_icmplt(JasmParser.Insn_if_icmpltContext ctx) {
+            this.methodVisitor.visitJumpInsn(IF_ICMPLT, getLabel(ctx.NAME().getText()).label);
+            return super.visitInsn_if_icmplt(ctx);
+        }
+
+        @Override
+        public Void visitInsn_if_icmpne(JasmParser.Insn_if_icmpneContext ctx) {
+            this.methodVisitor.visitJumpInsn(IF_ICMPNE, getLabel(ctx.NAME().getText()).label);
+            return super.visitInsn_if_icmpne(ctx);
         }
 
         @Override
@@ -332,8 +421,13 @@ class JasmAssemblingVisitor extends JasmBaseVisitor<Void> {
             final var normalName = normaliseLabelName(name);
             final var label = labels.get(normalName);
 
-            return Optional.ofNullable(label)
-                    .orElse(labels.put(normalName, new LabelHolder(new Label(), true)));
+            if (label == null) {
+                labels.put(normalName, new LabelHolder(new Label(), true));
+            } else if (!label.declared) {
+                labels.put(normalName, new LabelHolder(label.label, true));
+            }
+
+            return labels.get(normalName);
         }
 
         private void guardAllLabelsDeclared() {

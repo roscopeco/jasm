@@ -474,6 +474,393 @@ class JasmIntegrationTests {
                     MAXSTACK = 0
                     MAXLOCALS = 0
                 }
+                """),
+
+
+                /* ************************************************************************************************ */
+                Arguments.of("com/roscopeco/jasm/IfIcmpTests.jasm", """
+                // class version 61.0 (61)
+                // access flags 0x1
+                public class com/roscopeco/jasm/IfIcmpTests {
+                
+                
+                  // access flags 0x1
+                  public <init>()V
+                    ALOAD 0
+                    INVOKESPECIAL java/lang/Object.<init> ()V
+                    RETURN
+                    MAXSTACK = 0
+                    MAXLOCALS = 0
+                
+                  // access flags 0x1
+                  public testEqWhenEqualPasses()Z
+                    LDC 1
+                    LDC 1
+                    IF_ICMPEQ L0
+                    LDC 0
+                    IRETURN
+                   L0
+                    LDC 1
+                    IRETURN
+                    MAXSTACK = 0
+                    MAXLOCALS = 0
+                
+                  // access flags 0x1
+                  public testEqNotEqualPasses()Z
+                    LDC 1
+                    LDC 2
+                    IF_ICMPEQ L0
+                    LDC 1
+                    IRETURN
+                   L0
+                    LDC 0
+                    IRETURN
+                    MAXSTACK = 0
+                    MAXLOCALS = 0
+                
+                  // access flags 0x1
+                  public testGeWhenGreaterPasses()Z
+                    LDC 2
+                    LDC 1
+                    IF_ICMPGE L0
+                    LDC 0
+                    IRETURN
+                   L0
+                    LDC 1
+                    IRETURN
+                    MAXSTACK = 0
+                    MAXLOCALS = 0
+                
+                  // access flags 0x1
+                  public testGeWhenEqualPasses()Z
+                    LDC 1
+                    LDC 1
+                    IF_ICMPGE L0
+                    LDC 0
+                    IRETURN
+                   L0
+                    LDC 1
+                    IRETURN
+                    MAXSTACK = 0
+                    MAXLOCALS = 0
+                
+                  // access flags 0x1
+                  public testGeWhenLessPasses()Z
+                    LDC 1
+                    LDC 2
+                    IF_ICMPGE L0
+                    LDC 1
+                    IRETURN
+                   L0
+                    LDC 0
+                    IRETURN
+                    MAXSTACK = 0
+                    MAXLOCALS = 0
+                
+                  // access flags 0x1
+                  public testGtWhenGreaterPasses()Z
+                    LDC 2
+                    LDC 1
+                    IF_ICMPGT L0
+                    LDC 0
+                    IRETURN
+                   L0
+                    LDC 1
+                    IRETURN
+                    MAXSTACK = 0
+                    MAXLOCALS = 0
+                
+                  // access flags 0x1
+                  public testGtWhenLessPasses()Z
+                    LDC 1
+                    LDC 2
+                    IF_ICMPGT L0
+                    LDC 1
+                    IRETURN
+                   L0
+                    LDC 0
+                    IRETURN
+                    MAXSTACK = 0
+                    MAXLOCALS = 0
+                
+                  // access flags 0x1
+                  public testLeWhenGreaterPasses()Z
+                    LDC 2
+                    LDC 1
+                    IF_ICMPLE L0
+                    LDC 1
+                    IRETURN
+                   L0
+                    LDC 0
+                    IRETURN
+                    MAXSTACK = 0
+                    MAXLOCALS = 0
+                
+                  // access flags 0x1
+                  public testLeWhenEqualPasses()Z
+                    LDC 1
+                    LDC 1
+                    IF_ICMPLE L0
+                    LDC 0
+                    IRETURN
+                   L0
+                    LDC 1
+                    IRETURN
+                    MAXSTACK = 0
+                    MAXLOCALS = 0
+                
+                  // access flags 0x1
+                  public testLeWhenLessPasses()Z
+                    LDC 1
+                    LDC 2
+                    IF_ICMPLE L0
+                    LDC 0
+                    IRETURN
+                   L0
+                    LDC 1
+                    IRETURN
+                    MAXSTACK = 0
+                    MAXLOCALS = 0
+                
+                  // access flags 0x1
+                  public testLtWhenGreaterPasses()Z
+                    LDC 2
+                    LDC 1
+                    IF_ICMPLT L0
+                    LDC 1
+                    IRETURN
+                   L0
+                    LDC 0
+                    IRETURN
+                    MAXSTACK = 0
+                    MAXLOCALS = 0
+                
+                  // access flags 0x1
+                  public testLtWhenLessPasses()Z
+                    LDC 1
+                    LDC 2
+                    IF_ICMPLT L0
+                    LDC 0
+                    IRETURN
+                   L0
+                    LDC 1
+                    IRETURN
+                    MAXSTACK = 0
+                    MAXLOCALS = 0
+                
+                  // access flags 0x1
+                  public testNeWhenEqualPasses()Z
+                    LDC 1
+                    LDC 1
+                    IF_ICMPNE L0
+                    LDC 1
+                    IRETURN
+                   L0
+                    LDC 0
+                    IRETURN
+                    MAXSTACK = 0
+                    MAXLOCALS = 0
+                
+                  // access flags 0x1
+                  public testNeNotEqualPasses()Z
+                    LDC 1
+                    LDC 2
+                    IF_ICMPNE L0
+                    LDC 0
+                    IRETURN
+                   L0
+                    LDC 1
+                    IRETURN
+                    MAXSTACK = 0
+                    MAXLOCALS = 0
+                }
+                """),
+
+
+
+                /* ************************************************************************************************ */
+                Arguments.of("com/roscopeco/jasm/IfTests.jasm", """
+                // class version 61.0 (61)
+                // access flags 0x1
+                public class com/roscopeco/jasm/IfTests {
+                
+                
+                  // access flags 0x1
+                  public <init>()V
+                    ALOAD 0
+                    INVOKESPECIAL java/lang/Object.<init> ()V
+                    RETURN
+                    MAXSTACK = 0
+                    MAXLOCALS = 0
+                
+                  // access flags 0x1
+                  public testEqWhenEqualPasses()Z
+                    LDC 0
+                    IFEQ L0
+                    LDC 0
+                    IRETURN
+                   L0
+                    LDC 1
+                    IRETURN
+                    MAXSTACK = 0
+                    MAXLOCALS = 0
+                
+                  // access flags 0x1
+                  public testEqNotEqualPasses()Z
+                    LDC 1
+                    IFEQ L0
+                    LDC 1
+                    IRETURN
+                   L0
+                    LDC 0
+                    IRETURN
+                    MAXSTACK = 0
+                    MAXLOCALS = 0
+                
+                  // access flags 0x1
+                  public testGeWhenGreaterPasses()Z
+                    LDC 1
+                    IFGE L0
+                    LDC 0
+                    IRETURN
+                   L0
+                    LDC 1
+                    IRETURN
+                    MAXSTACK = 0
+                    MAXLOCALS = 0
+                
+                  // access flags 0x1
+                  public testGeWhenEqualPasses()Z
+                    LDC 0
+                    IFGE L0
+                    LDC 0
+                    IRETURN
+                   L0
+                    LDC 1
+                    IRETURN
+                    MAXSTACK = 0
+                    MAXLOCALS = 0
+                
+                  // access flags 0x1
+                  public testGeWhenLessPasses()Z
+                    LDC -1
+                    IFGE L0
+                    LDC 1
+                    IRETURN
+                   L0
+                    LDC 0
+                    IRETURN
+                    MAXSTACK = 0
+                    MAXLOCALS = 0
+                
+                  // access flags 0x1
+                  public testGtWhenGreaterPasses()Z
+                    LDC 1
+                    IFGT L0
+                    LDC 0
+                    IRETURN
+                   L0
+                    LDC 1
+                    IRETURN
+                    MAXSTACK = 0
+                    MAXLOCALS = 0
+                
+                  // access flags 0x1
+                  public testGtWhenLessPasses()Z
+                    LDC -1
+                    IFGT L0
+                    LDC 1
+                    IRETURN
+                   L0
+                    LDC 0
+                    IRETURN
+                    MAXSTACK = 0
+                    MAXLOCALS = 0
+                
+                  // access flags 0x1
+                  public testLeWhenGreaterPasses()Z
+                    LDC 1
+                    IFLE L0
+                    LDC 1
+                    IRETURN
+                   L0
+                    LDC 0
+                    IRETURN
+                    MAXSTACK = 0
+                    MAXLOCALS = 0
+                
+                  // access flags 0x1
+                  public testLeWhenEqualPasses()Z
+                    LDC 0
+                    IFLE L0
+                    LDC 0
+                    IRETURN
+                   L0
+                    LDC 1
+                    IRETURN
+                    MAXSTACK = 0
+                    MAXLOCALS = 0
+                
+                  // access flags 0x1
+                  public testLeWhenLessPasses()Z
+                    LDC -1
+                    IFLE L0
+                    LDC 0
+                    IRETURN
+                   L0
+                    LDC 1
+                    IRETURN
+                    MAXSTACK = 0
+                    MAXLOCALS = 0
+                
+                  // access flags 0x1
+                  public testLtWhenGreaterPasses()Z
+                    LDC 1
+                    IFLT L0
+                    LDC 1
+                    IRETURN
+                   L0
+                    LDC 0
+                    IRETURN
+                    MAXSTACK = 0
+                    MAXLOCALS = 0
+                
+                  // access flags 0x1
+                  public testLtWhenLessPasses()Z
+                    LDC -1
+                    IFLT L0
+                    LDC 0
+                    IRETURN
+                   L0
+                    LDC 1
+                    IRETURN
+                    MAXSTACK = 0
+                    MAXLOCALS = 0
+                
+                  // access flags 0x1
+                  public testNeWhenEqualPasses()Z
+                    LDC 0
+                    IFNE L0
+                    LDC 1
+                    IRETURN
+                   L0
+                    LDC 0
+                    IRETURN
+                    MAXSTACK = 0
+                    MAXLOCALS = 0
+                
+                  // access flags 0x1
+                  public testNeNotEqualPasses()Z
+                    LDC 1
+                    IFNE L0
+                    LDC 0
+                    IRETURN
+                   L0
+                    LDC 1
+                    IRETURN
+                    MAXSTACK = 0
+                    MAXLOCALS = 0
+                }
                 """)
         );
     }
