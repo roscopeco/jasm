@@ -6,8 +6,16 @@
 package com.roscopeco.jasm;
 
 import com.roscopeco.jasm.asserts.LexerParserAssertions;
+import lombok.NonNull;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.ArgumentsSource;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
+
+import java.util.stream.Stream;
 
 import static com.roscopeco.jasm.TestUtil.doParse;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -20,19 +28,12 @@ class ParserTests {
                 .isInstanceOf(ParseCancellationException.class);
     }
 
-    @Test
-    void shouldParseEmptyClass() {
-        final var test  = doParse("EmptyClass.jasm");
+    @ParameterizedTest
+    @ValueSource(strings = { "EmptyClass", "ClassWithEmptyBody", "com/roscopeco/jasm/EmptyClassInPackage" })
+    void shouldParseEmptyClasses(@NonNull final String testCase) {
+        final var test  = doParse(testCase + ".jasm");
 
-        LexerParserAssertions.assertClass(test).hasName("EmptyClass");
-        assertThat(test.member()).isEmpty();
-    }
-
-    @Test
-    void shouldParseClassWithEmptyBody() {
-        final var test  = doParse("ClassWithEmptyBody.jasm");
-
-        LexerParserAssertions.assertClass(test).hasName("ClassWithEmptyBody");
+        LexerParserAssertions.assertClass(test).hasName(testCase);
         assertThat(test.member()).isEmpty();
     }
 
@@ -61,14 +62,6 @@ class ParserTests {
                 .isField()
                 .hasName("someField")
                 .isInteger();
-    }
-
-    @Test
-    void shouldParseEmptyClassInPackage() {
-        final var test  = doParse("com/roscopeco/jasm/EmptyClassInPackage.jasm");
-
-        LexerParserAssertions.assertClass(test).hasName("com/roscopeco/jasm/EmptyClassInPackage");
-        assertThat(test.member()).isEmpty();
     }
 
     @Test
@@ -105,5 +98,15 @@ class ParserTests {
                     .hasCodeSequence()
                         .vreturn()
                         .noMoreCode();
+    }
+
+    @Test
+    void shouldParseClassWithSuperclassAndInterfaces() {
+        final var test  = doParse("com/roscopeco/jasm/InheritAndInterfaceTest.jasm");
+
+        LexerParserAssertions.assertClass(test)
+                .hasName("com/roscopeco/jasm/InheritAndInterfaceTest")
+                .hasSuperclass("com/roscopeco/jasm/model/Superclass")
+                .hasInterfaces("com/roscopeco/jasm/model/Interface1", "com/roscopeco/jasm/model/Interface2");
     }
 }

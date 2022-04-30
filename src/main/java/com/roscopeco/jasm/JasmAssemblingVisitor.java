@@ -10,6 +10,7 @@ import com.roscopeco.jasm.antlr.JasmParser;
 import lombok.NonNull;
 import lombok.val;
 import org.antlr.v4.runtime.RuleContext;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
@@ -62,8 +63,11 @@ class JasmAssemblingVisitor extends JasmBaseVisitor<Void> {
                 this.modifiers.mapModifiers(ctx.modifier()),
                 ctx.classname().getText(),
                 null,
-                "java/lang/Object",
-                null
+                Optional.ofNullable(ctx.extends_()).map(e -> e.QNAME().getText()).orElse("java/lang/Object"),
+                Optional.ofNullable(ctx.implements_()).stream()
+                        .flatMap(i -> i.QNAME().stream())
+                        .map(ParseTree::getText)
+                        .toArray(String[]::new)
         );
 
         final var ret= super.visitClass(ctx);

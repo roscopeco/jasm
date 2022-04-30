@@ -457,6 +457,24 @@ class JasmIntegrationTests {
                     MAXSTACK = 0
                     MAXLOCALS = 0
                 }
+                """),
+
+
+                /* ************************************************************************************************ */
+                Arguments.of("com/roscopeco/jasm/InheritAndInterfaceTest.jasm", """
+                // class version 61.0 (61)
+                // access flags 0x1
+                public class com/roscopeco/jasm/InheritAndInterfaceTest extends com/roscopeco/jasm/model/Superclass implements com/roscopeco/jasm/model/Interface1 com/roscopeco/jasm/model/Interface2 {
+                
+                
+                  // access flags 0x1
+                  public <init>()V
+                    ALOAD 0
+                    INVOKESPECIAL com/roscopeco/jasm/model/Superclass.<init> ()V
+                    RETURN
+                    MAXSTACK = 0
+                    MAXLOCALS = 0
+                }
                 """)
         );
     }

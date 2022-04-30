@@ -1,0 +1,9 @@
+public class com/roscopeco/jasm/InheritAndInterfaceTest
+extends com/roscopeco/jasm/model/Superclass
+implements com/roscopeco/jasm/model/Interface1 com/roscopeco/jasm/model/Interface2 {
+    public V <init>() {
+        aload 0
+        invokespecial com/roscopeco/jasm/model/Superclass.<init>()V
+        return
+    }
+}

@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import static com.roscopeco.jasm.TestUtil.testCaseLexer;
 import static com.roscopeco.jasm.asserts.LexerParserAssertions.assertNextToken;
+import static com.roscopeco.jasm.asserts.LexerParserAssertions.assertTokens;
 
 class LexerTests {
     @Test
@@ -196,5 +197,103 @@ class LexerTests {
 
         assertNextToken(lexer)
                 .hasType(JasmLexer.EOF);
+    }
+
+    @Test
+    @SuppressWarnings("java:S5961" /* We need to consume (and assert!) all the tokens */)
+    void shouldLexClassWithSuperclassAndInterfaces() {
+        final var lexer = testCaseLexer("com/roscopeco/jasm/InheritAndInterfaceTest.jasm");
+        
+        assertTokens(lexer, tokens -> {
+            tokens.next()
+                    .hasType(JasmLexer.PUBLIC);
+
+            tokens.next()
+                    .hasType(JasmLexer.CLASS);
+
+            tokens.next()
+                    .hasType(JasmLexer.QNAME)
+                    .hasText("com/roscopeco/jasm/InheritAndInterfaceTest");
+
+            tokens.next()
+                    .hasType(JasmLexer.EXTENDS);
+
+            tokens.next()
+                    .hasType(JasmLexer.QNAME)
+                    .hasText("com/roscopeco/jasm/model/Superclass");
+
+            tokens.next()
+                    .hasType(JasmLexer.IMPLEMENTS);
+
+            tokens.next()
+                    .hasType(JasmLexer.QNAME)
+                    .hasText("com/roscopeco/jasm/model/Interface1");
+
+            tokens.next()
+                    .hasType(JasmLexer.QNAME)
+                    .hasText("com/roscopeco/jasm/model/Interface2");
+
+            tokens.next()
+                    .hasType(JasmLexer.LBRACE);
+
+            tokens.next()
+                    .hasType(JasmLexer.PUBLIC);
+
+            tokens.next()
+                    .hasType(JasmLexer.TYPE_VOID);
+
+            tokens.next()
+                    .hasType(JasmLexer.INIT);
+
+            tokens.next()
+                    .hasType(JasmLexer.LPAREN);
+
+            tokens.next()
+                    .hasType(JasmLexer.RPAREN);
+
+            tokens.next()
+                    .hasType(JasmLexer.LBRACE);
+
+            tokens.next()
+                    .hasType(JasmLexer.ALOAD);
+
+            tokens.next()
+                    .hasType(JasmLexer.INT)
+                    .hasText("0");
+
+            tokens.next()
+                    .hasType(JasmLexer.INVOKESPECIAL);
+
+            tokens.next()
+                    .hasType(JasmLexer.QNAME)
+                    .hasText("com/roscopeco/jasm/model/Superclass");
+
+            tokens.next()
+                    .hasType(JasmLexer.DOT);
+
+            tokens.next()
+                    .hasType(JasmLexer.INIT);
+
+            tokens.next()
+                    .hasType(JasmLexer.LPAREN);
+
+            tokens.next()
+                    .hasType(JasmLexer.RPAREN);
+
+            tokens.next()
+                    .hasType(JasmLexer.TYPE_VOID);
+
+            tokens.next()
+                    .hasType(JasmLexer.RETURN);
+
+            tokens.next()
+                    .hasType(JasmLexer.RBRACE);
+
+            tokens.next()
+                    .hasType(JasmLexer.RBRACE);
+
+            tokens.next()
+                    .hasType(JasmLexer.EOF);
+        });
     }
 }

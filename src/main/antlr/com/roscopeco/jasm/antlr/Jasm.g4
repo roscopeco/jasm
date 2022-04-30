@@ -5,12 +5,20 @@ grammar Jasm;
 }
 
 class
- : modifier* CLASS classname (LBRACE member* RBRACE)?
+ : modifier* CLASS classname extends? implements? (LBRACE member* RBRACE)?
  ;
 
 classname
  : QNAME
  | NAME
+ ;
+
+extends
+ : EXTENDS QNAME
+ ;
+
+implements
+ : IMPLEMENTS QNAME QNAME*
  ;
 
 member
@@ -171,55 +179,61 @@ atom
  | string_atom
  ;
 
-int_atom: INT;
-float_atom: FLOAT;
-bool_atom: (TRUE | FALSE);
-name_atom: NAME;
+int_atom    : INT;
+float_atom  : FLOAT;
+bool_atom   : (TRUE | FALSE);
+name_atom   : NAME;
 string_atom: STRING;
 
-CLASS  : 'class';
-LPAREN : '(';
-RPAREN : ')';
-LBRACE : '{';
-RBRACE : '}';
+LPAREN  : '(';
+RPAREN  : ')';
+LBRACE  : '{';
+RBRACE  : '}';
+DOT     : '.';
+MINUS   : '-';
+SEMI    : ';';
 
-PRIVATE: 'private';
-PROTECTED: 'protected';
-PUBLIC: 'public';
-FINAL: 'final';
+CLASS       : 'class';
+EXTENDS     : 'extends';
+IMPLEMENTS  : 'implements';
+
+PRIVATE     : 'private';
+PROTECTED   : 'protected';
+PUBLIC      : 'public';
+FINAL       : 'final';
 SYNCHRONIZED: 'synchronized';
-STATIC: 'static';
+STATIC      : 'static';
 
-INIT: '<init>';
-CLINIT: '<clinit>';
+INIT        : '<init>';
+CLINIT      : '<clinit>';
 
-ACONST_NULL: 'aconstnull';
-ALOAD: 'aload';
-ARETURN: 'areturn';
-DUP: 'dup';
-FRETURN: 'freturn';
-GOTO: 'goto';
-ICONST: 'iconst';
-IFACMPEQ: 'if_acmpeq';
-IFACMPNE: 'if_acmpne';
-INVOKEINTERFACE: 'invokeinterface';
-INVOKESPECIAL: 'invokespecial';
-INVOKESTATIC: 'invokestatic';
-INVOKEVIRTUAL: 'invokevirtual';
-IRETURN: 'ireturn';
-LDC: 'ldc';
-NEW: 'new';
-RETURN: 'return';
+ACONST_NULL     : 'aconstnull';
+ALOAD           : 'aload';
+ARETURN         : 'areturn';
+DUP             : 'dup';
+FRETURN         : 'freturn';
+GOTO            : 'goto';
+ICONST          : 'iconst';
+IFACMPEQ        : 'if_acmpeq';
+IFACMPNE        : 'if_acmpne';
+INVOKEINTERFACE : 'invokeinterface';
+INVOKESPECIAL   : 'invokespecial';
+INVOKESTATIC    : 'invokestatic';
+INVOKEVIRTUAL   : 'invokevirtual';
+IRETURN         : 'ireturn';
+LDC             : 'ldc';
+NEW             : 'new';
+RETURN          : 'return';
 
-TYPE_VOID: 'V';
-TYPE_INT: 'I';
-TYPE_LONG: 'J';
-TYPE_FLOAT: 'F';
-TYPE_DOUBLE: 'D';
-TYPE_BOOL: 'Z';
+TYPE_VOID   : 'V';
+TYPE_INT    : 'I';
+TYPE_LONG   : 'J';
+TYPE_FLOAT  : 'F';
+TYPE_DOUBLE : 'D';
+TYPE_BOOL   : 'Z';
 
-TRUE : 'true';
-FALSE : 'false';
+TRUE    : 'true';
+FALSE   : 'false';
 
 LABEL
  : [a-zA-Z_] [a-zA-Z_0-9]* ':'
@@ -232,10 +246,6 @@ NAME
 QNAME
  : [a-zA-Z_] [a-zA-Z_0-9/]*
  ;
-
-DOT: '.';
-MINUS: '-';
-SEMI : ';';
 
 INT
  : MINUS? [0-9]+

@@ -9,6 +9,7 @@ import com.roscopeco.jasm.antlr.JasmLexer;
 import com.roscopeco.jasm.antlr.JasmParser;
 import lombok.NonNull;
 import org.antlr.v4.runtime.Token;
+import org.assertj.core.api.ThrowingConsumer;
 
 public class LexerParserAssertions {
     public static ClassAssert assertClass(@NonNull final JasmParser.ClassContext actual) {
@@ -23,8 +24,19 @@ public class LexerParserAssertions {
         return assertToken(lexer.nextToken());
     }
 
+    public static void assertTokens(
+            @NonNull final JasmLexer lexer,
+            @NonNull final ThrowingConsumer<TokenChainAsserter> asserter
+    ) {
+        asserter.accept(() -> new TokenAssert(lexer.nextToken()));
+    }
+
     public static MemberAssert assertMember(@NonNull final JasmParser.MemberContext actual) {
         return new MemberAssert(actual);
+    }
+
+    public interface TokenChainAsserter {
+        TokenAssert next();
     }
 }
 

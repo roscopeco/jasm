@@ -5,6 +5,9 @@
  */
 package com.roscopeco.jasm.e2e;
 
+import com.roscopeco.jasm.model.Interface1;
+import com.roscopeco.jasm.model.Interface2;
+import com.roscopeco.jasm.model.Superclass;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -224,5 +227,21 @@ class JasmE2ETests {
         assertThat(boolVoidInvoker(obj, "testEqNotEqualPasses").get()).isTrue();
         assertThat(boolVoidInvoker(obj, "testNeWhenEqualPasses").get()).isTrue();
         assertThat(boolVoidInvoker(obj, "testNeNotEqualPasses").get()).isTrue();
+    }
+
+    @Test
+    void shouldAssembleInheritanceAndInterfaceTestToValidJavaClass() {
+        final var clz = assembleAndDefine("com/roscopeco/jasm/InheritAndInterfaceTest.jasm");
+
+        assertThat(clz.getName()).isEqualTo("com.roscopeco.jasm.InheritAndInterfaceTest");
+
+        assertThat(clz.getDeclaredClasses()).isEmpty();
+        assertThat(clz.getDeclaredFields()).isEmpty();
+        assertThat(clz.getDeclaredConstructors()).hasSize(1);
+        assertThat(clz.getDeclaredMethods()).isEmpty();
+
+        assertThat(Superclass.class).isAssignableFrom(clz);
+        assertThat(Interface1.class).isAssignableFrom(clz);
+        assertThat(Interface2.class).isAssignableFrom(clz);
     }
 }
