@@ -5,10 +5,13 @@
  */
 package com.roscopeco.jasm.asserts;
 
+import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import com.roscopeco.jasm.antlr.JasmParser;
 import lombok.NonNull;
+import org.antlr.v4.runtime.RuleContext;
 import org.assertj.core.api.AbstractAssert;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,11 +39,23 @@ public class CodeSequenceAssert extends AbstractAssert<CodeSequenceAssert, JasmP
         return this.caller;
     }
 
+    public CodeSequenceAssert aconstNull() {
+        return genericNoOperandCheck("aconstnull", JasmParser.InstructionContext::insn_aconstnull);
+    }
+
     public CodeSequenceAssert aload(final int expected) {
         return genericIntOperandCheck("aload", expected,
                 JasmParser.InstructionContext::insn_aload,
                 (aload) -> aload.atom().getText()
         );
+    }
+
+    public CodeSequenceAssert areturn() {
+        return genericNoOperandCheck("areturn", JasmParser.InstructionContext::insn_areturn);
+    }
+
+    public CodeSequenceAssert freturn() {
+        return genericNoOperandCheck("freturn", JasmParser.InstructionContext::insn_freturn);
     }
 
     public CodeSequenceAssert iconst(final int expected) {
@@ -92,8 +107,24 @@ public class CodeSequenceAssert extends AbstractAssert<CodeSequenceAssert, JasmP
         return genericNoOperandCheck("ireturn", JasmParser.InstructionContext::insn_ireturn);
     }
 
+    public CodeSequenceAssert ldc(final int expected) {
+        return genericLdcCheck("" + expected, atom -> expected == Integer.parseInt(atom.getText()));
+    }
+
+    public CodeSequenceAssert ldc(final float expected) {
+        return genericLdcCheck("" + expected, atom -> expected == Float.parseFloat(atom.getText()));
+    }
+
+    public CodeSequenceAssert ldc(@NonNull final String expected) {
+        return genericLdcCheck('"' + expected + '"', atom -> expected.equals(cleanConstantString(atom.getText())));
+    }
+
     public CodeSequenceAssert vreturn() {
         return genericNoOperandCheck("vreturn", JasmParser.InstructionContext::insn_return);
+    }
+
+    private String cleanConstantString(@NonNull final String constant) {
+        return constant.substring(1, constant.length() - 1);
     }
 
     private void hasNotUnderflowed(@NonNull final String expected) {
@@ -150,6 +181,37 @@ public class CodeSequenceAssert extends AbstractAssert<CodeSequenceAssert, JasmP
                     + this.pc
                     + "), but was "
                     + stat.instruction().getText()
+            );
+        }
+
+        this.pc++;
+        return this;
+    }
+
+    private CodeSequenceAssert genericLdcCheck(
+            @NonNull final String expectedStr,
+            @NonNull final Predicate<JasmParser.AtomContext> atomPredicate
+    ) {
+        isNotNull();
+        assertThat(actual.stat()).isNotNull();
+        hasNotUnderflowed("ldc");
+
+        final var insn = actual.stat().get(this.pc).instruction();
+        if (
+                insn == null
+                        || insn.insn_ldc() == null
+                        || insn.insn_ldc().atom() == null
+                        || !atomPredicate.test(insn.insn_ldc().atom())
+        ) {
+            failWithMessage("Expected ldc("
+                    + expectedStr
+                    + ") instruction at pc("
+                    + this.pc
+                    + "), but was "
+                    + Optional.ofNullable(insn)
+                    .flatMap(i -> Optional.ofNullable(i.insn_ldc()))
+                    .map(RuleContext::getText)
+                    .orElse("<Unknown>")
             );
         }
 

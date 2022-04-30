@@ -220,6 +220,72 @@ class JasmIntegrationTests {
                     MAXSTACK = 0
                     MAXLOCALS = 0
                 }
+                """),
+
+
+                /* ************************************************************************************************ */
+                Arguments.of("com/roscopeco/jasm/insntest/Areturn.jasm", """
+                // class version 61.0 (61)
+                // access flags 0x0
+                class com/roscopeco/jasm/insntest/Areturn {
+                
+                
+                  // access flags 0x0
+                  insnTest()Ljava/lang/Object;
+                    ARETURN
+                    MAXSTACK = 0
+                    MAXLOCALS = 0
+                }
+                """),
+
+
+                /* ************************************************************************************************ */
+                Arguments.of("com/roscopeco/jasm/insntest/Freturn.jasm", """
+                // class version 61.0 (61)
+                // access flags 0x0
+                class com/roscopeco/jasm/insntest/Freturn {
+                
+                
+                  // access flags 0x0
+                  insnTest()F
+                    FRETURN
+                    MAXSTACK = 0
+                    MAXLOCALS = 0
+                }
+                """),
+
+
+                /* ************************************************************************************************ */
+                Arguments.of("com/roscopeco/jasm/insntest/AconstNull.jasm", """
+                // class version 61.0 (61)
+                // access flags 0x0
+                class com/roscopeco/jasm/insntest/AconstNull {
+                
+                
+                  // access flags 0x0
+                  insnTest()V
+                    ACONST_NULL
+                    MAXSTACK = 0
+                    MAXLOCALS = 0
+                }
+                """),
+
+
+                /* ************************************************************************************************ */
+                Arguments.of("com/roscopeco/jasm/insntest/Ldc.jasm", """
+                // class version 61.0 (61)
+                // access flags 0x0
+                class com/roscopeco/jasm/insntest/Ldc {
+                
+                
+                  // access flags 0x0
+                  insnTest()V
+                    LDC 10
+                    LDC 5.0
+                    LDC "Test string"
+                    MAXSTACK = 0
+                    MAXLOCALS = 0
+                }
                 """)
         );
     }

@@ -62,15 +62,31 @@ stat
  ;
 
 instruction
- : insn_aload
+ : insn_aconstnull
+ | insn_aload
+ | insn_areturn
+ | insn_freturn
  | insn_iconst
  | insn_invokespecial
  | insn_ireturn
+ | insn_ldc
  | insn_return
+ ;
+
+insn_aconstnull
+ : ACONST_NULL
  ;
 
 insn_aload
  : ALOAD atom
+ ;
+
+insn_areturn
+ : ARETURN
+ ;
+
+insn_freturn
+ : FRETURN
  ;
 
 insn_iconst
@@ -90,9 +106,12 @@ method_descriptor
  : LPAREN (type (SEMI type)*)* RPAREN type
  ;
 
-
 insn_ireturn
  : IRETURN
+ ;
+
+insn_ldc
+ : LDC atom
  ;
 
 insn_return
@@ -100,11 +119,18 @@ insn_return
  ;
 
 atom
- : (INT | FLOAT)  #numberAtom
- | (TRUE | FALSE) #booleanAtom
- | NAME           #nameAtom
- | STRING         #stringAtom
+ : int_atom
+ | float_atom
+ | bool_atom
+ | name_atom
+ | string_atom
  ;
+
+int_atom: INT;
+float_atom: FLOAT;
+bool_atom: (TRUE | FALSE);
+name_atom: NAME;
+string_atom: STRING;
 
 CLASS  : 'class';
 LPAREN : '(';
@@ -122,10 +148,14 @@ STATIC: 'static';
 INIT: '<init>';
 CLINIT: '<clinit>';
 
+ACONST_NULL: 'aconstnull';
 ALOAD: 'aload';
+ARETURN: 'areturn';
+FRETURN: 'freturn';
 ICONST: 'iconst';
 INVOKESPECIAL: 'invokespecial';
 IRETURN: 'ireturn';
+LDC: 'ldc';
 RETURN: 'return';
 
 TYPE_VOID: 'V';
@@ -134,6 +164,9 @@ TYPE_LONG: 'J';
 TYPE_FLOAT: 'F';
 TYPE_DOUBLE: 'D';
 TYPE_BOOL: 'Z';
+
+TRUE : 'true';
+FALSE : 'false';
 
 NAME
  : [a-zA-Z_] [a-zA-Z_0-9]*
@@ -147,17 +180,13 @@ DOT: '.';
 MINUS: '-';
 SEMI : ';';
 
-TRUE : 'true';
-FALSE : 'false';
-
 INT
- : [0-9]+
- | MINUS [0-9]+
+ : MINUS? [0-9]+
  ;
 
 FLOAT
- : [0-9]+ '.' [0-9]*
- | '.' [0-9]+
+ : MINUS? [0-9]+ '.' [0-9]*
+ | MINUS? '.' [0-9]+
  ;
 
 STRING

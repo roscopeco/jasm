@@ -5,8 +5,6 @@
  */
 package com.roscopeco.jasm;
 
-import java.util.stream.Collectors;
-
 import com.roscopeco.jasm.antlr.JasmBaseVisitor;
 import com.roscopeco.jasm.antlr.JasmParser;
 import lombok.NonNull;
@@ -14,7 +12,12 @@ import org.antlr.v4.runtime.RuleContext;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 
+import java.util.stream.Collectors;
+
+import static org.objectweb.asm.Opcodes.ACONST_NULL;
 import static org.objectweb.asm.Opcodes.ALOAD;
+import static org.objectweb.asm.Opcodes.ARETURN;
+import static org.objectweb.asm.Opcodes.FRETURN;
 import static org.objectweb.asm.Opcodes.ICONST_0;
 import static org.objectweb.asm.Opcodes.ICONST_1;
 import static org.objectweb.asm.Opcodes.ICONST_2;
@@ -97,9 +100,27 @@ class JasmAssemblingVisitor extends JasmBaseVisitor<Void> {
         }
 
         @Override
+        public Void visitInsn_aconstnull(JasmParser.Insn_aconstnullContext ctx) {
+            this.methodVisitor.visitInsn(ACONST_NULL);
+            return super.visitInsn_aconstnull(ctx);
+        }
+
+        @Override
         public Void visitInsn_aload(final JasmParser.Insn_aloadContext ctx) {
             this.methodVisitor.visitIntInsn(ALOAD, Integer.parseInt(ctx.atom().getText()));
             return super.visitInsn_aload(ctx);
+        }
+
+        @Override
+        public Void visitInsn_areturn(JasmParser.Insn_areturnContext ctx) {
+            this.methodVisitor.visitInsn(ARETURN);
+            return super.visitInsn_areturn(ctx);
+        }
+
+        @Override
+        public Void visitInsn_freturn(JasmParser.Insn_freturnContext ctx) {
+            this.methodVisitor.visitInsn(FRETURN);
+            return super.visitInsn_freturn(ctx);
         }
 
         @Override
@@ -125,6 +146,12 @@ class JasmAssemblingVisitor extends JasmBaseVisitor<Void> {
         public Void visitInsn_ireturn(final JasmParser.Insn_ireturnContext ctx) {
             this.methodVisitor.visitInsn(IRETURN);
             return super.visitInsn_ireturn(ctx);
+        }
+
+        @Override
+        public Void visitInsn_ldc(JasmParser.Insn_ldcContext ctx) {
+            this.methodVisitor.visitLdcInsn(generateLdcObject(ctx));
+            return super.visitInsn_ldc(ctx);
         }
 
         @Override
@@ -158,6 +185,26 @@ class JasmAssemblingVisitor extends JasmBaseVisitor<Void> {
             } catch (NumberFormatException e) {
                 throw new SyntaxErrorException("Invalid non-numeric operand for ICONST (found '" + ctx.getText() + "')");
             }
+        }
+
+        private Object generateLdcObject(final JasmParser.Insn_ldcContext ctx) {
+            if (ctx.atom().int_atom() != null) {
+                return Integer.parseInt(ctx.atom().getText());
+            } else if (ctx.atom().float_atom() != null) {
+                return Float.parseFloat(ctx.atom().getText());
+            } else if (ctx.atom().bool_atom() != null) {
+                return Boolean.parseBoolean(ctx.atom().getText()) ? 1 : 0;
+            } else if (ctx.atom().name_atom() != null) {
+                throw new UnsupportedOperationException("TODO");
+            } else if (ctx.atom().string_atom() != null) {
+                return unescapeConstantString(ctx.atom().getText());
+            } else {
+                throw new SyntaxErrorException("Unable to generate LDC for unknown type (" + ctx.getText() + ")");
+            }
+        }
+
+        private String unescapeConstantString(@NonNull final String constant) {
+            return constant.substring(1, constant.length() - 1).replace("\"\"", "\"");
         }
 
         private String fixDescriptor(final String languageDescriptor) {

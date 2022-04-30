@@ -5,15 +5,14 @@
  */
 package com.roscopeco.jasm.e2e;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.function.Supplier;
-
-import com.roscopeco.jasm.JasmAssembler;
 import org.junit.jupiter.api.Test;
-import org.opentest4j.AssertionFailedError;
 
-import static com.roscopeco.jasm.TestUtil.inputStreamForTestCase;
-import static com.roscopeco.jasm.TestUtil.jasmPackageLookup;
+import static com.roscopeco.jasm.TestUtil.assemble;
+import static com.roscopeco.jasm.TestUtil.boolVoidInvoker;
+import static com.roscopeco.jasm.TestUtil.floatVoidInvoker;
+import static com.roscopeco.jasm.TestUtil.instantiate;
+import static com.roscopeco.jasm.TestUtil.intVoidInvoker;
+import static com.roscopeco.jasm.TestUtil.objectVoidInvoker;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class JasmE2ETests {
@@ -108,47 +107,33 @@ class JasmE2ETests {
         assertThat(intVoidInvoker(obj, "testMethod").get()).isEqualTo(-1);
     }
 
-    private Supplier<Integer> intVoidInvoker(final Object receiver, final String name) {
-        return () -> {
-            try {
-                final var m = receiver instanceof Class<?> c
-                        ? c.getMethod(name)
-                        : receiver.getClass().getMethod(name);
+    @Test
+    void shouldAssembleAconstNullAreturnToValidJavaClass() {
+        final var clz = assemble("com/roscopeco/jasm/LdcAconstAreturn.jasm");
 
-                m.setAccessible(true);
+        assertThat(clz.getName()).isEqualTo("com.roscopeco.jasm.LdcAconstAreturn");
 
-                final var r = m.invoke(receiver instanceof Class<?> ? null : receiver);
+        assertThat(clz.getDeclaredClasses()).isEmpty();
+        assertThat(clz.getDeclaredFields()).isEmpty();
 
-                if (r instanceof Integer i) {
-                    return i;
-                } else {
-                    throw new AssertionFailedError("Method " + name + " does not return integer - it returns " + r.getClass() + " instead!");
-                }
-            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-                throw new AssertionFailedError("Failed to invoke " + name + " on receiver of class " + receiver.getClass(), e);
-            }
-        };
-    }
+        assertThat(clz.getDeclaredConstructors()).hasSize(1);
+        assertThat(clz.getDeclaredMethods()).hasSize(5);
 
-    private Object instantiate(final Class<?> clz) {
-        try {
-            final var ctor = clz.getConstructor();
-            ctor.setAccessible(true);
-            return ctor.newInstance();
-        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            throw new AssertionFailedError("Failed to instantiate class " + clz + " with default constructor", e);
-        }
-    }
+        final var obj = instantiate(clz);
 
-    private Class<?> assemble(final String testCase) {
-        return defineClass(new JasmAssembler(() -> inputStreamForTestCase(testCase)).assemble());
-    }
+        // Tests ACONST_NULL, ARETURN
+        assertThat(objectVoidInvoker(obj, "testAconstNull").get()).isNull();
 
-    private Class<?> defineClass(final byte[] bytes) {
-        try {
-            return jasmPackageLookup().defineClass(bytes);
-        } catch (IllegalAccessException e) {
-            throw new AssertionFailedError("Failed to define class", e);
-        }
+        // Tests LDC(str), ARETURN
+        assertThat(objectVoidInvoker(obj, "testLdcString").get()).isEqualTo("The test string");
+
+        // Tests LDC(int), IRETURN
+        assertThat(intVoidInvoker(obj, "testLdcInt").get()).isEqualTo(10);
+
+        // Tests LDC(float), FRETURN
+        assertThat(floatVoidInvoker(obj, "testLdcFloat").get()).isEqualTo(5.5f);
+
+        // Tests LDC(bool), IRETURN
+        assertThat(boolVoidInvoker(obj, "testLdcBool").get()).isTrue();
     }
 }

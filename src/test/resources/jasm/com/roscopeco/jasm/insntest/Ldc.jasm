@@ -1,0 +1,7 @@
+class com/roscopeco/jasm/insntest/Ldc {
+    V insnTest() {
+        ldc 10
+        ldc 5.0
+        ldc "Test string"
+    }
+}

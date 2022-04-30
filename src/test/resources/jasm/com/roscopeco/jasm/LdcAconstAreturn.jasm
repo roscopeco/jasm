@@ -1,0 +1,32 @@
+class com/roscopeco/jasm/LdcAconstAreturn {
+    public V <init>() {
+        aload 0
+        invokespecial java/lang/Object.<init>()V
+        return
+    }
+
+    Ljava/lang/Object; testAconstNull() {
+        aconstnull
+        areturn
+    }
+
+    Ljava/lang/String; testLdcString() {
+        ldc "The test string"
+        areturn
+    }
+
+    I testLdcInt() {
+        ldc 10
+        ireturn
+    }
+
+    F testLdcFloat() {
+        ldc 5.5
+        freturn
+    }
+
+    Z testLdcBool() {
+        ldc true
+        ireturn
+    }
+}
