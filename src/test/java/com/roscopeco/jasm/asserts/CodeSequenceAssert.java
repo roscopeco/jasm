@@ -65,38 +65,118 @@ public class CodeSequenceAssert extends AbstractAssert<CodeSequenceAssert, JasmP
         );
     }
 
+    public CodeSequenceAssert invokeInterface(
+            @NonNull final String owner,
+            @NonNull final String name,
+            @NonNull final String descriptor
+    ) {
+        return assertInvoke(
+                "invokeinterface",
+                owner,
+                name,
+                descriptor,
+                JasmParser.InstructionContext::insn_invokeinterface,
+                JasmParser.Insn_invokeinterfaceContext::owner,
+                JasmParser.Insn_invokeinterfaceContext::membername,
+                JasmParser.Insn_invokeinterfaceContext::method_descriptor
+        );
+    }
+
     public CodeSequenceAssert invokeSpecial(
             @NonNull final String owner,
             @NonNull final String name,
             @NonNull final String descriptor
     ) {
+        return assertInvoke(
+                "invokespecial",
+                owner,
+                name,
+                descriptor,
+                JasmParser.InstructionContext::insn_invokespecial,
+                JasmParser.Insn_invokespecialContext::owner,
+                JasmParser.Insn_invokespecialContext::membername,
+                JasmParser.Insn_invokespecialContext::method_descriptor
+        );
+    }
+
+    public CodeSequenceAssert invokeStatic(
+            @NonNull final String owner,
+            @NonNull final String name,
+            @NonNull final String descriptor
+    ) {
+        return assertInvoke(
+                "invokestatic",
+                owner,
+                name,
+                descriptor,
+                JasmParser.InstructionContext::insn_invokestatic,
+                JasmParser.Insn_invokestaticContext::owner,
+                JasmParser.Insn_invokestaticContext::membername,
+                JasmParser.Insn_invokestaticContext::method_descriptor
+        );
+    }
+
+    public CodeSequenceAssert invokeVirtual(
+            @NonNull final String owner,
+            @NonNull final String name,
+            @NonNull final String descriptor
+    ) {
+        return assertInvoke(
+                "invokevirtual",
+                owner,
+                name,
+                descriptor,
+                JasmParser.InstructionContext::insn_invokevirtual,
+                JasmParser.Insn_invokevirtualContext::owner,
+                JasmParser.Insn_invokevirtualContext::membername,
+                JasmParser.Insn_invokevirtualContext::method_descriptor
+        );
+    }
+
+    private <T> CodeSequenceAssert assertInvoke(
+            @NonNull final String invokeType,
+            @NonNull final String owner,
+            @NonNull final String name,
+            @NonNull final String descriptor,
+            @NonNull final Function<JasmParser.InstructionContext, T> invokeExtractor,
+            @NonNull final Function<T, JasmParser.OwnerContext> ownerExtractor,
+            @NonNull final Function<T, JasmParser.MembernameContext> membernameExtractor,
+            @NonNull final Function<T, JasmParser.Method_descriptorContext> descriptorExtractor
+    ) {
         final Function<JasmParser.InstructionContext, String> failMessageSupplier = (insn) ->
-                "Expected invokespecial("
-                + owner + "." + name + descriptor
-                + " instruction at pc("
-                + this.pc
-                + "), but was "
-                + insn.getText();
+                "Expected "
+                    + invokeType
+                    + owner + "." + name + descriptor
+                    + " instruction at pc("
+                    + this.pc
+                    + "), but was "
+                    + insn.getText();
 
         isNotNull();
         assertThat(actual.stat()).isNotNull();
-        hasNotUnderflowed("invokespecial");
+        hasNotUnderflowed(invokeType);
 
         final var stat = actual.stat().get(pc);
-        if (stat.instruction() == null || stat.instruction().insn_invokespecial() == null) {
+        if (stat.instruction() == null || invokeExtractor.apply(stat.instruction()) == null) {
             failWithMessage(failMessageSupplier.apply(stat.instruction()));
         }
 
-        final var insn = stat.instruction().insn_invokespecial();
+        final var insn = invokeExtractor.apply(stat.instruction());
 
-        if (!owner.equals(insn.owner().getText())) {
-            failWithMessage(failMessageSupplier.apply(stat.instruction()) + " <owner mismatch>");
+        if (!owner.equals(ownerExtractor.apply(insn).getText())) {
+            failWithMessage(failMessageSupplier.apply(stat.instruction()) + "\n"
+                    + "    <owner mismatch: '"
+                    + owner + "' vs '" + ownerExtractor.apply(insn).getText() + "'>");
         }
-        if (!name.equals(insn.membername().getText())) {
-            failWithMessage(failMessageSupplier.apply(stat.instruction()) + " <name mismatch>");
+        if (!name.equals(membernameExtractor.apply(insn).getText())) {
+            failWithMessage(failMessageSupplier.apply(stat.instruction()) + "\n"
+                    + "    <name mismatch: '"
+                    + name + "' vs '" + membernameExtractor.apply(insn).getText() + "'>");
         }
-        if (!descriptor.equals(insn.method_descriptor().getText())) {
-            failWithMessage(failMessageSupplier.apply(stat.instruction()) + " <descriptor mismatch>");
+        if (!descriptor.equals(descriptorExtractor.apply(insn).getText())) {
+            failWithMessage(failMessageSupplier.apply(stat.instruction()) + "\n"
+                    + "    <descriptor mismatch'"
+                    + descriptor + "' vs '" + descriptorExtractor.apply(insn).getText() + "'>");
         }
 
         this.pc++;

@@ -56,9 +56,33 @@ class ParserInstructionTests {
     }
 
     @Test
+    void handlesInvokeInterface() {
+        runInstructionTest("com/roscopeco/jasm/insntest/InvokeInterface.jasm", code -> code
+                .invokeInterface("java/util/List", "get", "(I)Ljava/lang/Object;")
+                .noMoreCode()
+        );
+    }
+
+    @Test
     void handlesInvokeSpecial() {
         runInstructionTest("com/roscopeco/jasm/insntest/InvokeSpecial.jasm", code -> code
                 .invokeSpecial("java/lang/Object", "<init>", "(Ljava/lang/String;I;Z)V")
+                .noMoreCode()
+        );
+    }
+
+    @Test
+    void handlesInvokeStatic() {
+        runInstructionTest("com/roscopeco/jasm/insntest/InvokeStatic.jasm", code -> code
+                .invokeStatic("java/lang/Thread", "currentThread", "()Ljava/lang/Thread;")
+                .noMoreCode()
+        );
+    }
+
+    @Test
+    void handlesInvokeVirtual() {
+        runInstructionTest("com/roscopeco/jasm/insntest/InvokeVirtual.jasm", code -> code
+                .invokeVirtual("java/lang/String", "trim", "()Ljava/lang/String;")
                 .noMoreCode()
         );
     }

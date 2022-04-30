@@ -1,0 +1,31 @@
+public class com/roscopeco/jasm/InvokeTests {
+    public V <init>() {
+        aload 0
+        invokespecial java/lang/Object.<init>()V
+        return
+    }
+
+    private static Ljava/lang/String; staticMethod() {
+        ldc "Hello World"
+        areturn
+    }
+
+    private Ljava/util/List; addStrToList(Ljava/util/List;) {
+        aload 1  // TODO use DUP when implemented!
+        invokestatic com/roscopeco/jasm/InvokeTests.staticMethod()Ljava/lang/String;
+
+        invokeinterface java/util/List.add(Ljava/lang/Object;)Z
+
+        aload 1
+        areturn
+    }
+
+    public Ljava/util/List; testMethod(Ljava/util/List;) {
+        aload 0
+        aload 1
+        invokevirtual com/roscopeco/jasm/InvokeTests.addStrToList(Ljava/util/List;)Ljava/util/List;
+
+        aload 1
+        areturn
+    }
+}

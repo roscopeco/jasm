@@ -1,0 +1,5 @@
+class com/roscopeco/jasm/insntest/InvokeStatic {
+    V insnTest() {
+        invokestatic java/lang/Thread.currentThread()Ljava/lang/Thread;
+    }
+}

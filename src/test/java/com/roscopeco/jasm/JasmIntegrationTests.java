@@ -286,6 +286,51 @@ class JasmIntegrationTests {
                     MAXSTACK = 0
                     MAXLOCALS = 0
                 }
+                """),
+
+
+                /* ************************************************************************************************ */
+                Arguments.of("com/roscopeco/jasm/InvokeTests.jasm", """
+                // class version 61.0 (61)
+                // access flags 0x1
+                public class com/roscopeco/jasm/InvokeTests {
+                
+                
+                  // access flags 0x1
+                  public <init>()V
+                    ALOAD 0
+                    INVOKESPECIAL java/lang/Object.<init> ()V
+                    RETURN
+                    MAXSTACK = 0
+                    MAXLOCALS = 0
+                    
+                  // access flags 0xA
+                  private static staticMethod()Ljava/lang/String;
+                    LDC "Hello World"
+                    ARETURN
+                    MAXSTACK = 0
+                    MAXLOCALS = 0
+                    
+                  // access flags 0x2
+                  private addStrToList(Ljava/util/List;)Ljava/util/List;
+                    ALOAD 1
+                    INVOKESTATIC com/roscopeco/jasm/InvokeTests.staticMethod ()Ljava/lang/String;
+                    INVOKEINTERFACE java/util/List.add (Ljava/lang/Object;)Z (itf)
+                    ALOAD 1
+                    ARETURN
+                    MAXSTACK = 0
+                    MAXLOCALS = 0
+                    
+                  // access flags 0x1
+                  public testMethod(Ljava/util/List;)Ljava/util/List;
+                    ALOAD 0
+                    ALOAD 1
+                    INVOKEVIRTUAL com/roscopeco/jasm/InvokeTests.addStrToList (Ljava/util/List;)Ljava/util/List;
+                    ALOAD 1
+                    ARETURN
+                    MAXSTACK = 0
+                    MAXLOCALS = 0
+                }
                 """)
         );
     }

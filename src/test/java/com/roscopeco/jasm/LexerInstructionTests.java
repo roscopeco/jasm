@@ -45,8 +45,9 @@ class LexerInstructionTests {
 
     @Test
     void shouldLexFreturn() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Freturn.jasm", lexer -> assertNextToken(lexer)
-                .hasType(JasmLexer.FRETURN));
+        runInstructionTest("com/roscopeco/jasm/insntest/Freturn.jasm", FLOAT_RETURN_TYPE_TOKEN, lexer ->
+                assertNextToken(lexer)
+                        .hasType(JasmLexer.FRETURN));
     }
 
 
@@ -66,6 +67,41 @@ class LexerInstructionTests {
     void shouldLexIreturn() {
         runInstructionTest("com/roscopeco/jasm/insntest/Ireturn.jasm", lexer -> assertNextToken(lexer)
                 .hasType(JasmLexer.IRETURN));
+    }
+
+    @Test
+    void shouldLexInvokeInterface() {
+        runInstructionTest("com/roscopeco/jasm/insntest/InvokeInterface.jasm", lexer -> {
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.INVOKEINTERFACE);
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.TYPENAME)
+                    .hasText("java/util/List");
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.DOT);
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.NAME)
+                    .hasText("get");
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.LPAREN);
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.TYPE_INT);
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.RPAREN);
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.TYPENAME)
+                    .hasText("Ljava/lang/Object");
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.SEMI);
+        });
     }
 
     @Test
@@ -112,8 +148,72 @@ class LexerInstructionTests {
     }
 
     @Test
+    void shouldLexInvokeStatic() {
+        runInstructionTest("com/roscopeco/jasm/insntest/InvokeStatic.jasm", lexer -> {
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.INVOKESTATIC);
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.TYPENAME)
+                    .hasText("java/lang/Thread");
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.DOT);
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.NAME)
+                    .hasText("currentThread");
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.LPAREN);
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.RPAREN);
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.TYPENAME)
+                    .hasText("Ljava/lang/Thread");
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.SEMI);
+        });
+    }
+
+    @Test
+    void shouldLexInvokeVirtual() {
+        runInstructionTest("com/roscopeco/jasm/insntest/InvokeVirtual.jasm", lexer -> {
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.INVOKEVIRTUAL);
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.TYPENAME)
+                    .hasText("java/lang/String");
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.DOT);
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.NAME)
+                    .hasText("trim");
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.LPAREN);
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.RPAREN);
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.TYPENAME)
+                    .hasText("Ljava/lang/String");
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.SEMI);
+        });
+    }
+
+    @Test
     void shouldLexLdc() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Ldc.jasm", REF_RETURN_TYPE_TOKEN, lexer -> {
+        runInstructionTest("com/roscopeco/jasm/insntest/Ldc.jasm", lexer -> {
             assertNextToken(lexer)
                     .hasType(JasmLexer.LDC);
 
@@ -146,6 +246,7 @@ class LexerInstructionTests {
     }
 
     private static final List<Integer> VOID_RETURN_TYPE_TOKEN = List.of(JasmLexer.TYPE_VOID);
+    private static final List<Integer> FLOAT_RETURN_TYPE_TOKEN = List.of(JasmLexer.TYPE_FLOAT);
     private static final List<Integer> REF_RETURN_TYPE_TOKEN = List.of(JasmLexer.TYPENAME, JasmLexer.SEMI);
 
     private void runInstructionTest(

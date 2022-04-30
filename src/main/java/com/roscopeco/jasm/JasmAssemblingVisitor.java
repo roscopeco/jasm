@@ -25,7 +25,10 @@ import static org.objectweb.asm.Opcodes.ICONST_3;
 import static org.objectweb.asm.Opcodes.ICONST_4;
 import static org.objectweb.asm.Opcodes.ICONST_5;
 import static org.objectweb.asm.Opcodes.ICONST_M1;
+import static org.objectweb.asm.Opcodes.INVOKEINTERFACE;
 import static org.objectweb.asm.Opcodes.INVOKESPECIAL;
+import static org.objectweb.asm.Opcodes.INVOKESTATIC;
+import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
 import static org.objectweb.asm.Opcodes.IRETURN;
 import static org.objectweb.asm.Opcodes.RETURN;
 import static org.objectweb.asm.Opcodes.V17;
@@ -130,16 +133,65 @@ class JasmAssemblingVisitor extends JasmBaseVisitor<Void> {
         }
 
         @Override
+        public Void visitInsn_invokeinterface(final JasmParser.Insn_invokeinterfaceContext ctx) {
+            visitNonDynamicInvoke(
+                    INVOKEINTERFACE,
+                    ctx.owner().getText(),
+                    ctx.membername().getText(),
+                    ctx.method_descriptor().getText(),
+                    true
+            );
+
+            return super.visitInsn_invokeinterface(ctx);
+        }
+
+        @Override
         public Void visitInsn_invokespecial(final JasmParser.Insn_invokespecialContext ctx) {
-            this.methodVisitor.visitMethodInsn(
+            visitNonDynamicInvoke(
                     INVOKESPECIAL,
                     ctx.owner().getText(),
                     ctx.membername().getText(),
-                    fixDescriptor(ctx.method_descriptor().getText()),
+                    ctx.method_descriptor().getText(),
                     false
             );
 
             return super.visitInsn_invokespecial(ctx);
+        }
+
+        @Override
+        public Void visitInsn_invokestatic(final JasmParser.Insn_invokestaticContext ctx) {
+            visitNonDynamicInvoke(
+                    INVOKESTATIC,
+                    ctx.owner().getText(),
+                    ctx.membername().getText(),
+                    ctx.method_descriptor().getText(),
+                    false
+            );
+
+            return super.visitInsn_invokestatic(ctx);
+        }
+
+        @Override
+        public Void visitInsn_invokevirtual(final JasmParser.Insn_invokevirtualContext ctx) {
+            visitNonDynamicInvoke(
+                    INVOKEVIRTUAL,
+                    ctx.owner().getText(),
+                    ctx.membername().getText(),
+                    ctx.method_descriptor().getText(),
+                    false
+            );
+
+            return super.visitInsn_invokevirtual(ctx);
+        }
+
+        private void visitNonDynamicInvoke(
+                final int opcode,
+                @NonNull final String owner,
+                @NonNull final String name,
+                @NonNull final String descriptor,
+                final boolean isInterface
+        ) {
+            this.methodVisitor.visitMethodInsn(opcode, owner, name, fixDescriptor(descriptor), isInterface);
         }
 
         @Override

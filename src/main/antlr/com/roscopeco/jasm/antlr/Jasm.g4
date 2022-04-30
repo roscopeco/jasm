@@ -67,7 +67,10 @@ instruction
  | insn_areturn
  | insn_freturn
  | insn_iconst
+ | insn_invokeinterface
  | insn_invokespecial
+ | insn_invokestatic
+ | insn_invokevirtual
  | insn_ireturn
  | insn_ldc
  | insn_return
@@ -93,8 +96,20 @@ insn_iconst
  : ICONST atom
  ;
 
+insn_invokeinterface
+ : INVOKEINTERFACE owner DOT membername method_descriptor
+ ;
+
 insn_invokespecial
  : INVOKESPECIAL owner DOT membername method_descriptor
+ ;
+
+insn_invokestatic
+ : INVOKESTATIC owner DOT membername method_descriptor
+ ;
+
+insn_invokevirtual
+ : INVOKEVIRTUAL owner DOT membername method_descriptor
  ;
 
 owner
@@ -153,7 +168,10 @@ ALOAD: 'aload';
 ARETURN: 'areturn';
 FRETURN: 'freturn';
 ICONST: 'iconst';
+INVOKEINTERFACE: 'invokeinterface';
 INVOKESPECIAL: 'invokespecial';
+INVOKESTATIC: 'invokestatic';
+INVOKEVIRTUAL: 'invokevirtual';
 IRETURN: 'ireturn';
 LDC: 'ldc';
 RETURN: 'return';

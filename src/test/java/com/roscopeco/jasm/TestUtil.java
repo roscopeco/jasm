@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import com.roscopeco.jasm.antlr.JasmLexer;
@@ -67,11 +68,11 @@ public class TestUtil {
         return parser;
     }
 
-    public static Method getAccessibleMethod(final Object receiver, final String name)
+    public static Method getAccessibleMethod(final Object receiver, final String name, Class<?>... paramTypes)
             throws NoSuchMethodException {
         final var m = receiver instanceof Class<?> c
-                ? c.getDeclaredMethod(name)
-                : receiver.getClass().getDeclaredMethod(name);
+                ? c.getDeclaredMethod(name, paramTypes)
+                : receiver.getClass().getDeclaredMethod(name, paramTypes);
 
         m.setAccessible(true);
 
@@ -141,6 +142,21 @@ public class TestUtil {
         };
     }
 
+    public static Function<Object[], Object> objectArgsInvoker(
+            final Object receiver,
+            final String name,
+            final Class<?>... paramTypes
+    ) {
+        return (args) -> {
+            try {
+                return getAccessibleMethod(receiver, name, paramTypes)
+                        .invoke(receiver instanceof Class<?> ? null : receiver, args);
+            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                throw new AssertionFailedError("Failed to invoke " + name + " on receiver of class " + receiver.getClass(), e);
+            }
+        };
+    }
+
     public static Object instantiate(final Class<?> clz) {
         try {
             final var ctor = clz.getConstructor();
@@ -151,8 +167,12 @@ public class TestUtil {
         }
     }
 
-    public static Class<?> assemble(final String testCase) {
-        return defineClass(new JasmAssembler(() -> inputStreamForTestCase(testCase)).assemble());
+    public static byte[] assemble(final String testCase) {
+        return new JasmAssembler(() -> inputStreamForTestCase(testCase)).assemble();
+    }
+
+    public static Class<?> assembleAndDefine(final String testCase) {
+        return defineClass(assemble(testCase));
     }
 
     public static Class<?> defineClass(final byte[] bytes) {

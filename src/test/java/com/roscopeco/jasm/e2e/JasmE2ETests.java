@@ -7,18 +7,28 @@ package com.roscopeco.jasm.e2e;
 
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.roscopeco.jasm.TestUtil.assemble;
+import static com.roscopeco.jasm.TestUtil.assembleAndDefine;
 import static com.roscopeco.jasm.TestUtil.boolVoidInvoker;
+import static com.roscopeco.jasm.TestUtil.defineClass;
 import static com.roscopeco.jasm.TestUtil.floatVoidInvoker;
 import static com.roscopeco.jasm.TestUtil.instantiate;
 import static com.roscopeco.jasm.TestUtil.intVoidInvoker;
+import static com.roscopeco.jasm.TestUtil.objectArgsInvoker;
 import static com.roscopeco.jasm.TestUtil.objectVoidInvoker;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class JasmE2ETests {
     @Test
     void shouldAssembleEmptyClassToValidJavaClass() {
-        final var clz = assemble("com/roscopeco/jasm/EmptyClassInPackage.jasm");
+        final var clz = assembleAndDefine("com/roscopeco/jasm/EmptyClassInPackage.jasm");
 
         assertThat(clz.getName()).isEqualTo("com.roscopeco.jasm.EmptyClassInPackage");
 
@@ -30,7 +40,7 @@ class JasmE2ETests {
 
     @Test
     void shouldAssembleBasicFieldTestsToValidJavaClass() throws NoSuchFieldException {
-        final var clz = assemble("com/roscopeco/jasm/BasicFieldTests.jasm");
+        final var clz = assembleAndDefine("com/roscopeco/jasm/BasicFieldTests.jasm");
 
         assertThat(clz.getName()).isEqualTo("com.roscopeco.jasm.BasicFieldTests");
 
@@ -56,7 +66,7 @@ class JasmE2ETests {
 
     @Test
     void shouldAssembleMinimalMethodTestToValidJavaClass() {
-        final var clz = assemble("com/roscopeco/jasm/MinimalMethodTest.jasm");
+        final var clz = assembleAndDefine("com/roscopeco/jasm/MinimalMethodTest.jasm");
 
         assertThat(clz.getName()).isEqualTo("com.roscopeco.jasm.MinimalMethodTest");
 
@@ -69,7 +79,7 @@ class JasmE2ETests {
 
     @Test
     void shouldAssembleIconstVariantsToValidJavaClass() {
-        final var clz = assemble("com/roscopeco/jasm/IconstVariants.jasm");
+        final var clz = assembleAndDefine("com/roscopeco/jasm/IconstVariants.jasm");
 
         assertThat(clz.getName()).isEqualTo("com.roscopeco.jasm.IconstVariants");
 
@@ -90,7 +100,7 @@ class JasmE2ETests {
 
     @Test
     void shouldAssembleConstructorMethodTestToValidJavaClass() {
-        final var clz = assemble("com/roscopeco/jasm/ConstructorMethodTest.jasm");
+        final var clz = assembleAndDefine("com/roscopeco/jasm/ConstructorMethodTest.jasm");
 
         assertThat(clz.getName()).isEqualTo("com.roscopeco.jasm.ConstructorMethodTest");
 
@@ -109,7 +119,7 @@ class JasmE2ETests {
 
     @Test
     void shouldAssembleAconstNullAreturnToValidJavaClass() {
-        final var clz = assemble("com/roscopeco/jasm/LdcAconstAreturn.jasm");
+        final var clz = assembleAndDefine("com/roscopeco/jasm/LdcAconstAreturn.jasm");
 
         assertThat(clz.getName()).isEqualTo("com.roscopeco.jasm.LdcAconstAreturn");
 
@@ -135,5 +145,32 @@ class JasmE2ETests {
 
         // Tests LDC(bool), IRETURN
         assertThat(boolVoidInvoker(obj, "testLdcBool").get()).isTrue();
+    }
+
+    @Test
+    void shouldAssembleInvokeTestsToValidJavaClass() throws IOException {
+        final var bytes = assemble("com/roscopeco/jasm/InvokeTests.jasm");
+
+        final var clz = defineClass(bytes);
+
+        assertThat(clz.getName()).isEqualTo("com.roscopeco.jasm.InvokeTests");
+
+        assertThat(clz.getDeclaredClasses()).isEmpty();
+        assertThat(clz.getDeclaredFields()).isEmpty();
+
+        assertThat(clz.getDeclaredConstructors()).hasSize(1);
+        assertThat(clz.getDeclaredMethods()).hasSize(3);
+
+        final var obj = instantiate(clz);
+
+        // Tests all four non-dynamic INVOKES
+        final var list = new ArrayList<String>();
+
+        assertThat(list).isEmpty();
+
+        assertThat(objectArgsInvoker(obj, "testMethod", new Class[] { List.class }).apply(new Object[] { list }))
+                .isSameAs(list);
+
+        assertThat(list).containsExactly("Hello World");
     }
 }
