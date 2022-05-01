@@ -1,0 +1,11 @@
+class com/roscopeco/jasm/insntest/InvokeDynamic {
+    insnTest()V {
+        invokedynamic dynamicMethod(I)Ljava/lang/Object; {
+            invokestatic com/example/Bootstrap.method(I;F;Ljava/lang/String;Ljava/lang/Class;Ljava/lang/invoke/MethodHandle;)Ljava/lang/invoke/CallSite;
+            [10, 5.5, "Anything", java/util/List, constdynamic DYNAMIC_CONST Ljava/lang/Object; {
+                invokeinterface com/example/Bootstrap.constsite(Ljava/lang/String;)Ljava/lang/invoke/CallSite;
+                ["Something else"]
+            }]
+        }
+    }
+}

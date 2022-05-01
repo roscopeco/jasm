@@ -8,7 +8,7 @@ package com.roscopeco.jasm
 import com.roscopeco.jasm.antlr.JasmParser.ModifierContext
 import org.objectweb.asm.Opcodes
 
-internal class Modifiers {
+class Modifiers {
     fun mapModifiers(modifiers: List<ModifierContext>): Int = modifiers
             .map { mapSingleModifierToAsm(it) }
             .fold(0) { value, modifier -> value or modifier }

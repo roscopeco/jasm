@@ -35,6 +35,7 @@ import com.roscopeco.jasm.antlr.JasmParser.Insn_if_icmpltContext
 import com.roscopeco.jasm.antlr.JasmParser.Insn_if_icmpneContext
 import com.roscopeco.jasm.antlr.JasmParser.Insn_ifnullContext
 import com.roscopeco.jasm.antlr.JasmParser.Insn_ifnonnullContext
+import com.roscopeco.jasm.antlr.JasmParser.Insn_invokedynamicContext
 import com.roscopeco.jasm.antlr.JasmParser.Insn_invokeinterfaceContext
 import com.roscopeco.jasm.antlr.JasmParser.Insn_invokespecialContext
 import com.roscopeco.jasm.antlr.JasmParser.Insn_invokestaticContext
@@ -44,14 +45,29 @@ import com.roscopeco.jasm.antlr.JasmParser.Insn_ldcContext
 import com.roscopeco.jasm.antlr.JasmParser.Insn_newContext
 import com.roscopeco.jasm.antlr.JasmParser.Insn_returnContext
 import com.roscopeco.jasm.antlr.JasmParser.AtomContext
+import com.roscopeco.jasm.antlr.JasmParser.Method_handleContext
+import com.roscopeco.jasm.antlr.JasmParser.Bootstrap_argContext
 import org.objectweb.asm.ClassVisitor
+import org.objectweb.asm.ConstantDynamic
+import org.objectweb.asm.Handle
 import org.objectweb.asm.Label
 import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes
+import org.objectweb.asm.Opcodes.H_INVOKEINTERFACE
+import org.objectweb.asm.Opcodes.H_INVOKESPECIAL
+import org.objectweb.asm.Opcodes.H_INVOKESTATIC
+import org.objectweb.asm.Opcodes.H_INVOKEVIRTUAL
+import org.objectweb.asm.Opcodes.H_NEWINVOKESPECIAL
+import org.objectweb.asm.Opcodes.H_GETFIELD
+import org.objectweb.asm.Opcodes.H_GETSTATIC
+import org.objectweb.asm.Opcodes.H_PUTFIELD
+import org.objectweb.asm.Opcodes.H_PUTSTATIC
+import org.objectweb.asm.Type
 
-internal class JasmAssemblingVisitor(
+class JasmAssemblingVisitor(
     private val visitor: ClassVisitor,
-    private val modifiers: Modifiers
+    private val modifiers: Modifiers,
+    private val unitName: String
 ) : JasmBaseVisitor<Unit>() {
 
     override fun visitClass(ctx: ClassContext) {
@@ -66,6 +82,8 @@ internal class JasmAssemblingVisitor(
                 ?.toTypedArray()
                     ?: emptyArray<String>()
         )
+
+        visitor.visitSource(unitName, "")
 
         super.visitClass(ctx)
         visitor.visitEnd()
@@ -95,7 +113,7 @@ internal class JasmAssemblingVisitor(
         private val methodVisitor: MethodVisitor = visitor.visitMethod(
             modifiers.mapModifiers(ctx.modifier()),
             ctx.membername().text,
-            generateDescriptor(ctx),
+            generateMethodDescriptor(ctx),
             null,
             null
         )
@@ -245,6 +263,60 @@ internal class JasmAssemblingVisitor(
             super.visitInsn_ifnonnull(ctx)
         }
 
+        override fun visitInsn_invokedynamic(ctx: Insn_invokedynamicContext) {
+            methodVisitor.visitInvokeDynamicInsn(
+                ctx.membername().text,
+                ctx.method_descriptor().text,
+                buildBootstrapHandle(ctx.method_handle()),
+                *buildBootstrapArgs(ctx.bootstrap_arg())
+            )
+        }
+
+        private fun buildBootstrapHandle(ctx: Method_handleContext): Handle {
+            return Handle(
+                generateTagForHandle(ctx),
+                ctx.bootstrap_spec().owner().text,
+                ctx.bootstrap_spec().membername().text,
+                fixDescriptor(ctx.bootstrap_spec().method_descriptor().text),
+                ctx.handle_tag().INVOKEINTERFACE() != null,
+            )
+        }
+
+        private fun generateTagForHandle(ctx: Method_handleContext) = when {
+            ctx.handle_tag().INVOKEINTERFACE() != null -> H_INVOKEINTERFACE
+            ctx.handle_tag().INVOKESPECIAL() != null -> H_INVOKESPECIAL
+            ctx.handle_tag().INVOKESTATIC() != null -> H_INVOKESTATIC
+            ctx.handle_tag().INVOKEVIRTUAL() != null -> H_INVOKEVIRTUAL
+            ctx.handle_tag().NEWINVOKESPECIAL() != null -> H_NEWINVOKESPECIAL
+            ctx.handle_tag().GETFIELD() != null -> H_GETFIELD
+            ctx.handle_tag().GETSTATIC() != null -> H_GETSTATIC
+            ctx.handle_tag().PUTFIELD() != null -> H_PUTFIELD
+            ctx.handle_tag().PUTSTATIC() != null -> H_PUTSTATIC
+            else -> throw SyntaxErrorException("Unknown handle tag " + ctx.handle_tag().text)
+        }
+
+        private fun buildBootstrapArgs(ctx: MutableList<Bootstrap_argContext>): Array<Any> {
+            return ctx.mapIndexed { i, arg -> buildSingleBootstrapArg(i, arg) }.toTypedArray()
+        }
+
+        private fun buildSingleBootstrapArg(idx: Int, ctx: Bootstrap_argContext): Any {
+            return when {
+                ctx.int_atom() != null -> Integer.parseInt(ctx.int_atom().text)
+                ctx.float_atom() != null -> java.lang.Float.parseFloat(ctx.float_atom().text)
+                ctx.string_atom() != null -> unescapeConstantString(ctx.string_atom().text)
+                ctx.QNAME() != null -> Type.getType("L" + ctx.QNAME().text + ";")
+                ctx.method_handle() != null -> buildBootstrapHandle(ctx.method_handle())
+                ctx.method_descriptor() != null -> Type.getMethodType(fixDescriptor(ctx.method_descriptor().text))
+                ctx.constdynamic() != null -> ConstantDynamic(
+                    ctx.constdynamic().membername().text,
+                    ctx.constdynamic().type().text,
+                    buildBootstrapHandle(ctx.constdynamic().method_handle()),
+                    *buildBootstrapArgs(ctx.constdynamic().bootstrap_arg())
+                )
+                else -> throw SyntaxErrorException("Unsupported bootstrap arg at #${idx}: " + ctx.text)
+            }
+        }
+
         override fun visitInsn_invokeinterface(ctx: Insn_invokeinterfaceContext) {
             visitNonDynamicInvoke(
                 Opcodes.INVOKEINTERFACE,
@@ -323,7 +395,7 @@ internal class JasmAssemblingVisitor(
             super.visitInsn_return(ctx)
         }
 
-        private fun generateDescriptor(ctx: MethodContext): String {
+        private fun generateMethodDescriptor(ctx: MethodContext): String {
             val type = ctx.type()
             val returnType = type[type.size - 1].text
 

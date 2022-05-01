@@ -32,6 +32,31 @@ implements com/example/SomeInterface {
 }
 ```
 
+or use advanced JVM instructions like `invokedynamic`:
+
+```java
+public doBasicInvokeDynamicTest()Ljava/lang/String; {
+    invokedynamic get()Ljava/util/function/Supplier; {
+        invokestatic java/lang/invoke/LambdaMetafactory.metafactory(
+            Ljava/lang/invoke/MethodHandles$Lookup;
+            Ljava/lang/String;
+            Ljava/lang/invoke/MethodType;
+            Ljava/lang/invoke/MethodType;
+            Ljava/lang/invoke/MethodHandle;
+            Ljava/lang/invoke/MethodType;
+        )Ljava/lang/invoke/CallSite;
+        [
+            ()Ljava/lang/Object;,
+            invokestatic com/roscopeco/jasm/model/TestBootstrap.lambdaGetImpl()Ljava/lang/String;,
+            ()Ljava/lang/String;
+        ]
+    }
+
+    invokeinterface java/util/function/Supplier.get()Ljava/lang/Object;
+    checkcast java/lang/String
+    areturn
+}
+```
 The main code and most of the test support code is written in Kotlin. Tests 
 themselves are written in Java however, because I felt like mixing it up
 (and wanted to validate the custom AssertJ stuff interop with Java was good).

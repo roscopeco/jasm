@@ -12,6 +12,7 @@ import com.roscopeco.jasm.model.IfTests;
 import com.roscopeco.jasm.model.Interface1;
 import com.roscopeco.jasm.model.Interface2;
 import com.roscopeco.jasm.model.IfNullNonNullTest;
+import com.roscopeco.jasm.model.InvokedynamicTest;
 import com.roscopeco.jasm.model.Superclass;
 import org.junit.jupiter.api.Test;
 
@@ -369,5 +370,22 @@ class JasmE2ETests {
 
         assertThatThrownBy(() -> obj.castToList(nonList))
                 .isInstanceOf(ClassCastException.class);
+    }
+
+    @Test
+    void shouldAssembleInvokeDynamicToValidJavaClass() {
+        final var clz = assembleAndDefine("com/roscopeco/jasm/InvokeDynamicTest.jasm");
+
+        assertThat(clz.getName()).isEqualTo("com.roscopeco.jasm.InvokeDynamic");
+
+        assertThat(clz.getDeclaredClasses()).isEmpty();
+        assertThat(clz.getDeclaredFields()).isEmpty();
+        assertThat(clz.getDeclaredConstructors()).hasSize(1);
+        assertThat(clz.getDeclaredMethods()).hasSize(2);
+
+        final var obj = instantiate(clz, InvokedynamicTest.class);
+
+        assertThat(obj.doBasicInvokeDynamicTest()).isEqualTo("The expected basic result");
+        assertThat(obj.doInvokeDynamicTest()).isEqualTo("The expected result");
     }
 }

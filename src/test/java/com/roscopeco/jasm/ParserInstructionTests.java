@@ -152,6 +152,15 @@ class ParserInstructionTests {
     }
 
     @Test
+    void handlesInvokeDynamic() {
+        runInstructionTest("com/roscopeco/jasm/insntest/InvokeDynamic.jasm", code -> code
+                .invokeDynamic("dynamicMethod", "(I)Ljava/lang/Object;")
+                // TODO more in-depth test here!
+                .noMoreCode()
+        );
+    }
+
+    @Test
     void handlesInvokeSpecial() {
         runInstructionTest("com/roscopeco/jasm/insntest/InvokeSpecial.jasm", code -> code
                 .invokeSpecial("java/lang/Object", "<init>", "(Ljava/lang/String;I;Z)V")

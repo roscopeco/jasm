@@ -16,6 +16,6 @@ internal open class ThrowingErrorListener(private val unitName: String) : BaseEr
         line: Int,
         charPositionInLine: Int,
         msg: String,
-        e: RecognitionException
-    ) = throw SyntaxErrorException("$unitName: line $line:$charPositionInLine $msg", e)
+        e: RecognitionException?
+    ) = throw SyntaxErrorException("$unitName: line $line:$charPositionInLine $msg", e ?: RuntimeException())
 }

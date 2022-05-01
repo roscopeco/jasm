@@ -33,6 +33,8 @@ class JasmIntegrationTests {
                 // access flags 0x0
                 class EmptyClass {
                 
+                  // compiled from: <tests>
+                  // debug info:\s
                 }
                 """),
 
@@ -43,6 +45,8 @@ class JasmIntegrationTests {
                 // access flags 0x0
                 class ClassWithEmptyBody {
                 
+                  // compiled from: <tests>
+                  // debug info:\s
                 }
                 """),
 
@@ -53,6 +57,8 @@ class JasmIntegrationTests {
                 // access flags 0x11
                 public final class PublicFinalEmptyClass {
                 
+                  // compiled from: <tests>
+                  // debug info:\s
                 }
                 """),
 
@@ -63,7 +69,9 @@ class JasmIntegrationTests {
                 // access flags 0x0
                 class ClassWithSingleField {
                 
-                
+                  // compiled from: <tests>
+                  // debug info:\s
+                  
                   // access flags 0x0
                   I someField
                 }
@@ -76,6 +84,8 @@ class JasmIntegrationTests {
                 // access flags 0x0
                 class com/roscopeco/jasm/EmptyClassInPackage {
                 
+                  // compiled from: <tests>
+                  // debug info:\s
                 }
                 """),
 
@@ -86,7 +96,9 @@ class JasmIntegrationTests {
                 // access flags 0x0
                 class ClassWithObjectField {
                 
-                
+                  // compiled from: <tests>
+                  // debug info:\s
+                  
                   // access flags 0x0
                   Ljava/lang/Object; someField
                 }
@@ -99,6 +111,8 @@ class JasmIntegrationTests {
                 // access flags 0x0
                 class com/roscopeco/jasm/MinimalMethodTest {
                 
+                  // compiled from: <tests>
+                  // debug info:\s
                 
                   // access flags 0x0
                   testMethod()V
@@ -115,6 +129,8 @@ class JasmIntegrationTests {
                 // access flags 0x0
                 class com/roscopeco/jasm/insntest/Iconst {
                 
+                  // compiled from: <tests>
+                  // debug info:\s
                 
                   // access flags 0x0
                   insnTest()V
@@ -131,6 +147,8 @@ class JasmIntegrationTests {
                 // access flags 0x0
                 class com/roscopeco/jasm/insntest/Return {
                 
+                  // compiled from: <tests>
+                  // debug info:\s
                 
                   // access flags 0x0
                   insnTest()V
@@ -147,6 +165,8 @@ class JasmIntegrationTests {
                 // access flags 0x0
                 class com/roscopeco/jasm/IconstVariants {
                 
+                  // compiled from: <tests>
+                  // debug info:\s
                 
                   // access flags 0x9
                   public static insnTestM1()I
@@ -206,6 +226,8 @@ class JasmIntegrationTests {
                 // access flags 0x0
                 class com/roscopeco/jasm/ConstructorMethodTest {
                 
+                  // compiled from: <tests>
+                  // debug info:\s
                 
                   // access flags 0x1
                   public <init>()V
@@ -231,6 +253,8 @@ class JasmIntegrationTests {
                 // access flags 0x0
                 class com/roscopeco/jasm/insntest/Areturn {
                 
+                  // compiled from: <tests>
+                  // debug info:\s
                 
                   // access flags 0x0
                   insnTest()Ljava/lang/Object;
@@ -247,6 +271,8 @@ class JasmIntegrationTests {
                 // access flags 0x0
                 class com/roscopeco/jasm/insntest/Freturn {
                 
+                  // compiled from: <tests>
+                  // debug info:\s
                 
                   // access flags 0x0
                   insnTest()F
@@ -263,6 +289,8 @@ class JasmIntegrationTests {
                 // access flags 0x0
                 class com/roscopeco/jasm/insntest/AconstNull {
                 
+                  // compiled from: <tests>
+                  // debug info:\s
                 
                   // access flags 0x0
                   insnTest()V
@@ -279,6 +307,8 @@ class JasmIntegrationTests {
                 // access flags 0x0
                 class com/roscopeco/jasm/insntest/Ldc {
                 
+                  // compiled from: <tests>
+                  // debug info:\s
                 
                   // access flags 0x0
                   insnTest()V
@@ -297,6 +327,8 @@ class JasmIntegrationTests {
                 // access flags 0x1
                 public class com/roscopeco/jasm/InvokeTests {
                 
+                  // compiled from: <tests>
+                  // debug info:\s
                 
                   // access flags 0x1
                   public <init>()V
@@ -342,6 +374,8 @@ class JasmIntegrationTests {
                 // access flags 0x0
                 class com/roscopeco/jasm/insntest/Dup {
                 
+                  // compiled from: <tests>
+                  // debug info:\s
                 
                   // access flags 0x0
                   insnTest()V
@@ -358,6 +392,8 @@ class JasmIntegrationTests {
                 // access flags 0x0
                 class com/roscopeco/jasm/insntest/New {
                 
+                  // compiled from: <tests>
+                  // debug info:\s
                 
                   // access flags 0x0
                   insnTest()V
@@ -374,6 +410,8 @@ class JasmIntegrationTests {
                 // access flags 0x1
                 public class com/roscopeco/jasm/GotoLabelTest {
                 
+                  // compiled from: <tests>
+                  // debug info:\s
                 
                   // access flags 0x9
                   public static testMethod(Ljava/util/List;)V
@@ -395,6 +433,8 @@ class JasmIntegrationTests {
                 // access flags 0x1
                 public class com/roscopeco/jasm/IfAcmpTests {
                 
+                  // compiled from: <tests>
+                  // debug info:\s
                 
                   // access flags 0x1
                   public <init>()V
@@ -465,6 +505,8 @@ class JasmIntegrationTests {
                 // access flags 0x1
                 public class com/roscopeco/jasm/InheritAndInterfaceTest extends com/roscopeco/jasm/model/Superclass implements com/roscopeco/jasm/model/Interface1 com/roscopeco/jasm/model/Interface2 {
                 
+                  // compiled from: <tests>
+                  // debug info:\s
                 
                   // access flags 0x1
                   public <init>()V
@@ -483,6 +525,8 @@ class JasmIntegrationTests {
                 // access flags 0x1
                 public class com/roscopeco/jasm/IfIcmpTests implements com/roscopeco/jasm/model/IfIcmpTests {
                 
+                  // compiled from: <tests>
+                  // debug info:\s
                 
                   // access flags 0x1
                   public <init>()V
@@ -684,6 +728,8 @@ class JasmIntegrationTests {
                 // access flags 0x1
                 public class com/roscopeco/jasm/IfTests implements com/roscopeco/jasm/model/IfTests {
                 
+                  // compiled from: <tests>
+                  // debug info:\s
                 
                   // access flags 0x1
                   public <init>()V
@@ -870,6 +916,8 @@ class JasmIntegrationTests {
                 // access flags 0x1
                 public class com/roscopeco/jasm/IfNullNonNullTests implements com/roscopeco/jasm/model/IfNullNonNullTest {
                 
+                  // compiled from: <tests>
+                  // debug info:\s
                 
                   // access flags 0x1
                   public <init>()V
@@ -936,6 +984,8 @@ class JasmIntegrationTests {
                 // access flags 0x0
                 class com/roscopeco/jasm/insntest/Athrow {
                 
+                  // compiled from: <tests>
+                  // debug info:\s
                 
                   // access flags 0x0
                   insnTest()V
@@ -952,10 +1002,39 @@ class JasmIntegrationTests {
                 // access flags 0x0
                 class com/roscopeco/jasm/insntest/Checkcast {
                 
+                  // compiled from: <tests>
+                  // debug info:\s
                 
                   // access flags 0x0
                   insnTest()V
                     CHECKCAST java/util/ArrayList
+                    MAXSTACK = 0
+                    MAXLOCALS = 0
+                }
+                """),
+
+
+                /* ************************************************************************************************ */
+                Arguments.of("com/roscopeco/jasm/insntest/Invokedynamic.jasm", """
+                // class version 61.0 (61)
+                // access flags 0x0
+                class com/roscopeco/jasm/insntest/InvokeDynamic {
+
+                  // compiled from: <tests>
+                  // debug info:\s
+
+                  // access flags 0x0
+                  insnTest()V
+                    INVOKEDYNAMIC dynamicMethod(I)Ljava/lang/Object; [
+                      // handle kind 0x6 : INVOKESTATIC
+                      com/example/Bootstrap.method(IFLjava/lang/String;Ljava/lang/Class;Ljava/lang/invoke/MethodHandle;)Ljava/lang/invoke/CallSite;
+                      // arguments:
+                      10,\s
+                      5.5,\s
+                      "Anything",\s
+                      java.util.List.class,\s
+                      DYNAMIC_CONST : Ljava/lang/Object; com/example/Bootstrap.constsite(Ljava/lang/String;)Ljava/lang/invoke/CallSite; (9 itf) [Something else]
+                    ]
                     MAXSTACK = 0
                     MAXLOCALS = 0
                 }
@@ -966,7 +1045,7 @@ class JasmIntegrationTests {
     @BeforeEach
     void setup() {
         this.baos = new ByteArrayOutputStream();
-        this.assembler = new JasmAssemblingVisitor(new TraceClassVisitor(new PrintWriter(baos)), new Modifiers());
+        this.assembler = new JasmAssemblingVisitor(new TraceClassVisitor(new PrintWriter(baos)), new Modifiers(), "<tests>");
     }
 
     @ParameterizedTest

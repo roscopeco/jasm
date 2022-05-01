@@ -132,6 +132,49 @@ class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private
             ifnonnull -> ifnonnull.NAME().text
     }
 
+    fun invokeDynamic(
+        name: String,
+        descriptor: String
+    ): CodeSequenceAssert {
+
+        val failMessageSupplier = { insn: InstructionContext ->
+            ("Expected invokedynamic "
+                    + name + descriptor
+                    + " instruction at pc("
+                    + pc
+                    + "), but was "
+                    + insn.text)
+        }
+
+        isNotNull
+        Assertions.assertThat(actual.stat()).isNotNull
+        hasNotUnderflowed("invokedynamic")
+
+        val stat = actual.stat()[pc]
+
+        if (stat.instruction()?.insn_invokedynamic() == null) {
+            failWithMessage(failMessageSupplier.invoke(stat.instruction()))
+        }
+
+        val insn = stat.instruction().insn_invokedynamic()
+        val extractedName = insn.membername().text
+        val extractedDesc = insn.method_descriptor().text
+
+        if (name != extractedName) {
+            failWithMessage(
+                "${failMessageSupplier.invoke(stat.instruction())}\n  <name mismatch: '$name' vs '${extractedName}'>"
+            )
+        }
+        if (descriptor != extractedDesc) {
+            failWithMessage(
+                "${failMessageSupplier.invoke(stat.instruction())}\n  <descriptor mismatch'$descriptor' vs '${extractedDesc}'>"
+            )
+        }
+
+        pc++
+        return this
+    }
+
     fun invokeInterface(
         owner: String,
         name: String,

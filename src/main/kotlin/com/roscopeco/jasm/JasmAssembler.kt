@@ -15,6 +15,7 @@ import org.objectweb.asm.ClassWriter
 import java.io.IOException
 import java.io.InputStream
 import java.io.UncheckedIOException
+import java.util.*
 import java.util.function.Supplier
 
 /**
@@ -38,13 +39,14 @@ class JasmAssembler(private val unitName: String, private val source: Supplier<I
                 val parser = buildParser(
                     CommonTokenStream(
                         buildLexer(
-                            CharStreams.fromStream(input)
+                            Objects.requireNonNull(CharStreams.fromStream(input),
+                                "Failed to open stream for ${unitName}")
                         )
                     )
                 )
                 val classWriter =
                     ClassWriter(ClassWriter.COMPUTE_MAXS or ClassWriter.COMPUTE_FRAMES)
-                val assembler = JasmAssemblingVisitor(classWriter, Modifiers())
+                val assembler = JasmAssemblingVisitor(classWriter, Modifiers(), unitName)
 
                 parser.class_().accept(assembler)
 

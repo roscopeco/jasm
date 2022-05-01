@@ -94,6 +94,7 @@ instruction
  | insn_if_icmpne
  | insn_ifnull
  | insn_ifnonnull
+ | insn_invokedynamic
  | insn_invokeinterface
  | insn_invokespecial
  | insn_invokestatic
@@ -205,6 +206,45 @@ insn_ifnonnull
  : IFNONNULL NAME
  ;
 
+insn_invokedynamic
+ : INVOKEDYNAMIC membername method_descriptor LBRACE method_handle (LSQUARE bootstrap_arg (COMMA bootstrap_arg)* RSQUARE)? RBRACE
+ ;
+
+method_handle
+ : handle_tag bootstrap_spec
+ ;
+
+bootstrap_spec
+ : owner DOT membername method_descriptor
+ ;
+
+handle_tag
+ : INVOKEINTERFACE
+ | INVOKESPECIAL
+ | INVOKESTATIC
+ | INVOKEVIRTUAL
+ | NEWINVOKESPECIAL
+ | GETFIELD
+ | GETSTATIC
+ | PUTFIELD
+ | PUTSTATIC
+ ;
+
+bootstrap_arg
+ : int_atom
+ | float_atom
+ | string_atom
+ | QNAME
+ | method_descriptor
+ | method_handle
+ | constdynamic
+ ;
+
+constdynamic
+ : CONSTDYNAMIC membername type LBRACE method_handle (LSQUARE bootstrap_arg (COMMA bootstrap_arg)* RSQUARE)? RBRACE
+ ;
+
+
 insn_invokeinterface
  : INVOKEINTERFACE owner DOT membername method_descriptor
  ;
@@ -268,9 +308,12 @@ LPAREN  : '(';
 RPAREN  : ')';
 LBRACE  : '{';
 RBRACE  : '}';
+LSQUARE : '[';
+RSQUARE : ']';
 DOT     : '.';
 MINUS   : '-';
 SEMI    : ';';
+COMMA   : ',';
 
 CLASS       : 'class';
 EXTENDS     : 'extends';
@@ -293,6 +336,8 @@ ATHROW          : 'athrow';
 CHECKCAST       : 'checkcast';
 DUP             : 'dup';
 FRETURN         : 'freturn';
+GETFIELD        : 'getfield';
+GETSTATIC       : 'getstatic';
 GOTO            : 'goto';
 ICONST          : 'iconst';
 IFEQ            : 'ifeq';
@@ -311,6 +356,7 @@ IFICMPGE        : 'if_icmpge';
 IFICMPNE        : 'if_icmpne';
 IFNULL          : 'ifnull';
 IFNONNULL       : 'ifnonnull';
+INVOKEDYNAMIC   : 'invokedynamic';
 INVOKEINTERFACE : 'invokeinterface';
 INVOKESPECIAL   : 'invokespecial';
 INVOKESTATIC    : 'invokestatic';
@@ -318,7 +364,12 @@ INVOKEVIRTUAL   : 'invokevirtual';
 IRETURN         : 'ireturn';
 LDC             : 'ldc';
 NEW             : 'new';
+PUTFIELD        : 'putfield';
+PUTSTATIC       : 'putstatic';
 RETURN          : 'return';
+
+NEWINVOKESPECIAL: 'newinvokespecial';
+CONSTDYNAMIC    : 'constdynamic';
 
 TYPE_VOID   : 'V';
 TYPE_INT    : 'I';
@@ -335,11 +386,11 @@ LABEL
  ;
 
 NAME
- : [a-zA-Z_] [a-zA-Z_0-9]*
+ : [a-zA-Z_$] [a-zA-Z_$0-9]*
  ;
 
 QNAME
- : [a-zA-Z_] [a-zA-Z_0-9/]*
+ : [a-zA-Z_$] [a-zA-Z_$0-9/]*
  ;
 
 INT

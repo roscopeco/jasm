@@ -14,6 +14,7 @@ import java.util.List;
 
 import static com.roscopeco.jasm.TestUtil.testCaseLexer;
 import static com.roscopeco.jasm.asserts.LexerParserAssertions.assertNextToken;
+import static com.roscopeco.jasm.asserts.LexerParserAssertions.assertTokens;
 
 class LexerInstructionTests {
     @Test
@@ -276,6 +277,198 @@ class LexerInstructionTests {
             assertNextToken(lexer)
                     .hasType(JasmLexer.RETURN);
         });
+    }
+
+    @Test
+    void shouldLexInvokeDynamic() {
+        runInstructionTest("com/roscopeco/jasm/insntest/InvokeDynamic.jasm", lexer -> assertTokens(lexer, tokens -> {
+            tokens.next()
+                    .hasType(JasmLexer.INVOKEDYNAMIC);
+
+            tokens.next()
+                    .hasType(JasmLexer.NAME)
+                    .hasText("dynamicMethod");
+
+            tokens.next()
+                    .hasType(JasmLexer.LPAREN);
+
+            tokens.next()
+                    .hasType(JasmLexer.TYPE_INT);
+
+            tokens.next()
+                    .hasType(JasmLexer.RPAREN);
+
+            tokens.next()
+                    .hasType(JasmLexer.QNAME)
+                    .hasText("Ljava/lang/Object");
+
+            tokens.next()
+                    .hasType(JasmLexer.SEMI);
+
+            tokens.next()
+                    .hasType(JasmLexer.LBRACE);
+
+            tokens.next()
+                    .hasType(JasmLexer.INVOKESTATIC);
+
+            tokens.next()
+                    .hasType(JasmLexer.QNAME)
+                    .hasText("com/example/Bootstrap");
+
+            tokens.next()
+                    .hasType(JasmLexer.DOT);
+
+            tokens.next()
+                    .hasType(JasmLexer.NAME)
+                    .hasText("method");
+
+            tokens.next()
+                    .hasType(JasmLexer.LPAREN);
+
+            tokens.next()
+                    .hasType(JasmLexer.TYPE_INT);
+
+            tokens.next()
+                    .hasType(JasmLexer.SEMI);
+
+            tokens.next()
+                    .hasType(JasmLexer.TYPE_FLOAT);
+
+            tokens.next()
+                    .hasType(JasmLexer.SEMI);
+
+            tokens.next()
+                    .hasType(JasmLexer.QNAME)
+                    .hasText("Ljava/lang/String");
+
+            tokens.next()
+                    .hasType(JasmLexer.SEMI);
+
+            tokens.next()
+                    .hasType(JasmLexer.QNAME)
+                    .hasText("Ljava/lang/Class");
+
+            tokens.next()
+                    .hasType(JasmLexer.SEMI);
+
+            tokens.next()
+                    .hasType(JasmLexer.QNAME)
+                    .hasText("Ljava/lang/invoke/MethodHandle");
+
+            tokens.next()
+                    .hasType(JasmLexer.SEMI);
+
+            tokens.next()
+                    .hasType(JasmLexer.RPAREN);
+
+            tokens.next()
+                    .hasType(JasmLexer.QNAME)
+                    .hasText("Ljava/lang/invoke/CallSite");
+
+            tokens.next()
+                    .hasType(JasmLexer.SEMI);
+
+            tokens.next()
+                    .hasType(JasmLexer.LSQUARE);
+
+            tokens.next()
+                    .hasType(JasmLexer.INT)
+                    .hasText("10");
+
+            tokens.next()
+                    .hasType(JasmLexer.COMMA);
+
+            tokens.next()
+                    .hasType(JasmLexer.FLOAT)
+                    .hasText("5.5");
+
+            tokens.next()
+                    .hasType(JasmLexer.COMMA);
+
+            tokens.next()
+                    .hasType(JasmLexer.STRING)
+                    .hasText("\"Anything\"");
+
+            tokens.next()
+                    .hasType(JasmLexer.COMMA);
+
+            tokens.next()
+                    .hasType(JasmLexer.QNAME)
+                    .hasText("java/util/List");
+
+            tokens.next()
+                    .hasType(JasmLexer.COMMA);
+
+            tokens.next()
+                    .hasType(JasmLexer.CONSTDYNAMIC);
+
+            tokens.next()
+                    .hasType(JasmLexer.NAME)
+                    .hasText("DYNAMIC_CONST");
+
+            tokens.next()
+                    .hasType(JasmLexer.QNAME)
+                    .hasText("Ljava/lang/Object");
+
+            tokens.next()
+                    .hasType(JasmLexer.SEMI);
+
+            tokens.next()
+                    .hasType(JasmLexer.LBRACE);
+
+            tokens.next()
+                    .hasType(JasmLexer.INVOKEINTERFACE);
+
+            tokens.next()
+                    .hasType(JasmLexer.QNAME)
+                    .hasText("com/example/Bootstrap");
+
+            tokens.next()
+                    .hasType(JasmLexer.DOT);
+
+            tokens.next()
+                    .hasType(JasmLexer.NAME)
+                    .hasText("constsite");
+
+            tokens.next()
+                    .hasType(JasmLexer.LPAREN);
+
+            tokens.next()
+                    .hasType(JasmLexer.QNAME)
+                    .hasText("Ljava/lang/String");
+
+            tokens.next()
+                    .hasType(JasmLexer.SEMI);
+
+            tokens.next()
+                    .hasType(JasmLexer.RPAREN);
+
+            tokens.next()
+                    .hasType(JasmLexer.QNAME)
+                    .hasText("Ljava/lang/invoke/CallSite");
+
+            tokens.next()
+                    .hasType(JasmLexer.SEMI);
+
+            tokens.next()
+                    .hasType(JasmLexer.LSQUARE);
+
+            tokens.next()
+                    .hasType(JasmLexer.STRING)
+                    .hasText("\"Something else\"");
+
+            tokens.next()
+                    .hasType(JasmLexer.RSQUARE);
+
+            tokens.next()
+                    .hasType(JasmLexer.RBRACE);
+
+            tokens.next()
+                    .hasType(JasmLexer.RSQUARE);
+
+            tokens.next()
+                    .hasType(JasmLexer.RBRACE);
+        }));
     }
 
     @Test
