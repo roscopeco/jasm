@@ -32,24 +32,30 @@ implements com/example/SomeInterface {
 }
 ```
 
+The main code and most of the test support code is written in Kotlin. Tests 
+themselves are written in Java however, because I felt like mixing it up
+(and wanted to validate the custom AssertJ stuff interop with Java was good).
+
+Lexing, parsing and syntax trees are handled by Antlr4 (https://www.antlr.org).
+Bytecode generation is done with ASM (https://asm.ow2.io). Both of these
+projects are awesome and deserve your attention.
+
 ### Why??
 
 Well, **why not**?
 
-I wrote this for fun, both in writing and using it. I release it without any 
-expectation that it will be especially _useful_, but with the hope that you
-too might find it fun.
+I wrote this for fun, which I had both in writing it and playing with it. 
+
+I release it without any expectation that it will be at all _useful_, but with 
+the sincere hope that you too might find it fun.
 
 If you really need some use-cases to justify the electrons squandered in
-pursuit of this project, how about these (mostly lifted from Jasmin's README):
+pursuit of this project, how about these (some lifted from Jasmin's README):
 
 * Curious People - Want to understand more about the way JVM bytecode works
   or the things that are possible at the bytecode level? Always wondered what 
   `invokedynamic` is for? Curious as to how `@SneakyThrows` can possibly work?
   This might help!
-
-* Teachers - Perhaps you're teaching a compiler course, you could use this
-  to introduce students to JVM bytecode, or even as an IL for the compilers.
 
 * System Implementors - If you're writing a JVM or runtime this could be useful
   for generating test classes...
@@ -63,8 +69,12 @@ pursuit of this project, how about these (mostly lifted from Jasmin's README):
 
 * Security Researchers - Create hostile classes and see if you can sneak them
   past the class verifier.
+* 
+* Teachers - Perhaps you're teaching a compiler course, maybe you could use this
+  to introduce students to JVM bytecode, or even as an IL for the compilers.
 
 ### Who? 
 
-JASM is copyright 2022 Ross Bamford (roscopeco AT gmail DOT com). See LICENSE.md
-for the gory legal stuff.
+JASM is copyright 2022 Ross Bamford (roscopeco AT gmail DOT com). 
+
+See LICENSE.md for the gory legal stuff (spoiler: MIT).

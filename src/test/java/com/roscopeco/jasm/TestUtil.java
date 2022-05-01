@@ -58,14 +58,14 @@ public class TestUtil {
     public static JasmLexer buildLexer(@NonNull final String unitName, @NonNull final CharStream input) {
         final var lexer = new JasmLexer(input);
         lexer.removeErrorListeners();
-        lexer.addErrorListener(new ThrowingErrorListener(unitName));
+        lexer.addErrorListener(new TestErrorListener(unitName));
         return lexer;
     }
 
     public static JasmParser buildParser(@NonNull final String unitName, @NonNull final TokenStream tokens) {
         final var parser = new JasmParser(tokens);
         parser.removeErrorListeners();
-        parser.addErrorListener(new ThrowingErrorListener(unitName));
+        parser.addErrorListener(new TestErrorListener(unitName));
         return parser;
     }
 
@@ -187,5 +187,4 @@ public class TestUtil {
             throw new AssertionFailedError("Failed to define class", e);
         }
     }
-
 }
