@@ -1,0 +1,5 @@
+class com/roscopeco/jasm/insntest/Istore {
+    insnTest()V {
+        istore 0
+    }
+}

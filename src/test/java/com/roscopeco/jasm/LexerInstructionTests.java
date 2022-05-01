@@ -96,6 +96,46 @@ class LexerInstructionTests {
     }
 
     @Test
+    void shouldLexBaload() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Baload.jasm", lexer ->
+                assertNextToken(lexer)
+                        .hasType(JasmLexer.BALOAD));
+    }
+
+    @Test
+    void shouldLexBastore() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Bastore.jasm", lexer ->
+                assertNextToken(lexer)
+                        .hasType(JasmLexer.BASTORE));
+    }
+
+    @Test
+    void shouldLexBipush() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Bipush.jasm", lexer -> {
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.BIPUSH);
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.INT)
+                    .hasText("100");
+        });
+    }
+
+    @Test
+    void shouldLexCaload() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Caload.jasm", lexer ->
+                assertNextToken(lexer)
+                        .hasType(JasmLexer.CALOAD));
+    }
+
+    @Test
+    void shouldLexCastore() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Castore.jasm", lexer ->
+                assertNextToken(lexer)
+                        .hasType(JasmLexer.CASTORE));
+    }
+
+    @Test
     void shouldLexCheckCast() {
         runInstructionTest("com/roscopeco/jasm/insntest/Checkcast.jasm", lexer -> {
             assertNextToken(lexer)
@@ -108,9 +148,73 @@ class LexerInstructionTests {
     }
 
     @Test
+    void shouldLexDaload() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Daload.jasm", lexer ->
+                assertNextToken(lexer)
+                        .hasType(JasmLexer.DALOAD));
+    }
+
+    @Test
+    void shouldLexDastore() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Dastore.jasm", lexer ->
+                assertNextToken(lexer)
+                        .hasType(JasmLexer.DASTORE));
+    }
+
+    @Test
+    void shouldLexDload() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Dload.jasm", lexer -> {
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.DLOAD);
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.INT)
+                    .hasText("0");
+        });
+    }
+
+    @Test
+    void shouldLexDstore() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Dstore.jasm", lexer -> {
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.DSTORE);
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.INT)
+                    .hasText("0");
+        });
+    }
+
+
+    @Test
     void shouldLexDup() {
         runInstructionTest("com/roscopeco/jasm/insntest/Dup.jasm", lexer -> assertNextToken(lexer)
                 .hasType(JasmLexer.DUP));
+    }
+
+    @Test
+    void shouldLexFaload() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Faload.jasm", lexer ->
+                assertNextToken(lexer)
+                        .hasType(JasmLexer.FALOAD));
+    }
+
+    @Test
+    void shouldLexFastore() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Fastore.jasm", lexer ->
+                assertNextToken(lexer)
+                        .hasType(JasmLexer.FASTORE));
+    }
+    @Test
+    void shouldLexFload() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Fload.jasm", lexer -> {
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.FLOAD);
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.INT)
+                    .hasText("0");
+        });
     }
 
     @Test
@@ -120,6 +224,17 @@ class LexerInstructionTests {
                         .hasType(JasmLexer.FRETURN));
     }
 
+    @Test
+    void shouldLexFstore() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Fstore.jasm", lexer -> {
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.FSTORE);
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.INT)
+                    .hasText("0");
+        });
+    }
 
     @Test
     void shouldLexGotoAndLabels() {
@@ -151,6 +266,19 @@ class LexerInstructionTests {
         });
     }
 
+    @Test
+    void shouldLexIaload() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Iaload.jasm", lexer ->
+                assertNextToken(lexer)
+                        .hasType(JasmLexer.IALOAD));
+    }
+
+    @Test
+    void shouldLexIastore() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Iastore.jasm", lexer ->
+                assertNextToken(lexer)
+                        .hasType(JasmLexer.IASTORE));
+    }
     @Test
     void shouldLexIconst() {
         runInstructionTest("com/roscopeco/jasm/insntest/Iconst.jasm", lexer -> {
@@ -321,6 +449,18 @@ class LexerInstructionTests {
 
             assertNextToken(lexer)
                     .hasType(JasmLexer.RETURN);
+        });
+    }
+
+    @Test
+    void shouldLexIload() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Iload.jasm", lexer -> {
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.ILOAD);
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.INT)
+                    .hasText("0");
         });
     }
 
@@ -665,6 +805,32 @@ class LexerInstructionTests {
     }
 
     @Test
+    void shouldLexIstore() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Istore.jasm", lexer -> {
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.ISTORE);
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.INT)
+                    .hasText("0");
+        });
+    }
+
+    @Test
+    void shouldLexLaload() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Laload.jasm", lexer ->
+                assertNextToken(lexer)
+                        .hasType(JasmLexer.LALOAD));
+    }
+
+    @Test
+    void shouldLexLastore() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Lastore.jasm", lexer ->
+                assertNextToken(lexer)
+                        .hasType(JasmLexer.LASTORE));
+    }
+
+    @Test
     void shouldLexLdc() {
         runInstructionTest("com/roscopeco/jasm/insntest/Ldc.jasm", lexer -> {
             assertNextToken(lexer)
@@ -742,6 +908,38 @@ class LexerInstructionTests {
             lexer.nextToken();
             lexer.nextToken();
             lexer.nextToken();
+        });
+    }
+
+    @Test
+    void shouldLexLload() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Lload.jasm", lexer -> {
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.LLOAD);
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.INT)
+                    .hasText("0");
+        });
+    }
+
+    @Test
+    void shouldLexLReturn() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Lreturn.jasm", lexer ->
+                assertNextToken(lexer)
+                        .hasType(JasmLexer.LRETURN)
+        );
+    }
+
+    @Test
+    void shouldLexLstore() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Lstore.jasm", lexer -> {
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.LSTORE);
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.INT)
+                    .hasText("0");
         });
     }
 

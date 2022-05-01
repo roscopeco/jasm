@@ -1,0 +1,5 @@
+class com/roscopeco/jasm/insntest/Fastore {
+    insnTest()V {
+        fastore
+    }
+}

@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class ParserInstructionTests {
     @Test
-    void handlesAaload() {
+    void shouldParseAaload() {
         runInstructionTest("com/roscopeco/jasm/insntest/Aaload.jasm", code -> code
                 .aaload()
                 .noMoreCode()
@@ -24,7 +24,7 @@ class ParserInstructionTests {
     }
 
     @Test
-    void handlesAastore() {
+    void shouldParseAastore() {
         runInstructionTest("com/roscopeco/jasm/insntest/Aastore.jasm", code -> code
                 .aastore()
                 .noMoreCode()
@@ -32,7 +32,7 @@ class ParserInstructionTests {
     }
 
     @Test
-    void handlesAconstNull() {
+    void shouldParseAconstNull() {
         runInstructionTest("com/roscopeco/jasm/insntest/AconstNull.jasm", code -> code
                 .aconstNull()
                 .noMoreCode()
@@ -40,7 +40,7 @@ class ParserInstructionTests {
     }
 
     @Test
-    void handlesAload() {
+    void shouldParseAload() {
         runInstructionTest("com/roscopeco/jasm/insntest/Aload.jasm", code -> code
                 .aload(0)
                 .noMoreCode()
@@ -48,7 +48,7 @@ class ParserInstructionTests {
     }
 
     @Test
-    void handlesAreturn() {
+    void shouldParseAreturn() {
         runInstructionTest("com/roscopeco/jasm/insntest/Areturn.jasm", code -> code
                 .areturn()
                 .noMoreCode()
@@ -56,7 +56,7 @@ class ParserInstructionTests {
     }
 
     @Test
-    void handlesArraylength() {
+    void shouldParseArraylength() {
         runInstructionTest("com/roscopeco/jasm/insntest/Arraylength.jasm", code -> code
                 .arraylength()
                 .noMoreCode()
@@ -64,7 +64,7 @@ class ParserInstructionTests {
     }
 
     @Test
-    void handlesAstore() {
+    void shouldParseAstore() {
         runInstructionTest("com/roscopeco/jasm/insntest/Astore.jasm", code -> code
                 .astore(1)
                 .noMoreCode()
@@ -72,7 +72,7 @@ class ParserInstructionTests {
     }
 
     @Test
-    void handlesAthrow() {
+    void shouldParseAthrow() {
         runInstructionTest("com/roscopeco/jasm/insntest/Athrow.jasm", code -> code
                 .athrow()
                 .noMoreCode()
@@ -80,7 +80,47 @@ class ParserInstructionTests {
     }
 
     @Test
-    void handlesCheckcast() {
+    void shouldParseBaload() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Baload.jasm", code -> code
+                .baload()
+                .noMoreCode()
+        );
+    }
+
+    @Test
+    void shouldParseBastore() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Bastore.jasm", code -> code
+                .bastore()
+                .noMoreCode()
+        );
+    }
+
+    @Test
+    void shouldParseBipush() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Bipush.jasm", code -> code
+                .bipush(100)
+                .noMoreCode()
+        );
+    }
+
+    @Test
+    void shouldParseCaload() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Caload.jasm", code -> code
+                .caload()
+                .noMoreCode()
+        );
+    }
+
+    @Test
+    void shouldParseCastore() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Castore.jasm", code -> code
+                .castore()
+                .noMoreCode()
+        );
+    }
+
+    @Test
+    void shouldParseCheckcast() {
         runInstructionTest("com/roscopeco/jasm/insntest/Checkcast.jasm", code -> code
                 .checkcast("java/util/ArrayList")
                 .noMoreCode()
@@ -88,7 +128,47 @@ class ParserInstructionTests {
     }
 
     @Test
-    void handlesDup() {
+    void shouldParseDaload() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Daload.jasm", code -> code
+                .daload()
+                .noMoreCode()
+        );
+    }
+
+    @Test
+    void shouldParseDastore() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Dastore.jasm", code -> code
+                .dastore()
+                .noMoreCode()
+        );
+    }
+
+    @Test
+    void shouldParseDload() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Dload.jasm", code -> code
+                .dload(0)
+                .noMoreCode()
+        );
+    }
+
+    @Test
+    void shouldParseDreturn() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Dreturn.jasm", code -> code
+                .dreturn()
+                .noMoreCode()
+        );
+    }
+
+    @Test
+    void shouldParseDstore() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Dstore.jasm", code -> code
+                .dstore(0)
+                .noMoreCode()
+        );
+    }
+
+    @Test
+    void shouldParseDup() {
         runInstructionTest("com/roscopeco/jasm/insntest/Dup.jasm", code -> code
                 .dup()
                 .noMoreCode()
@@ -96,7 +176,31 @@ class ParserInstructionTests {
     }
 
     @Test
-    void handlesFreturn() {
+    void shouldParseFaload() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Faload.jasm", code -> code
+                .faload()
+                .noMoreCode()
+        );
+    }
+
+    @Test
+    void shouldParseFastore() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Fastore.jasm", code -> code
+                .fastore()
+                .noMoreCode()
+        );
+    }
+
+    @Test
+    void shouldParseFload() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Fload.jasm", code -> code
+                .fload(0)
+                .noMoreCode()
+        );
+    }
+
+    @Test
+    void shouldParseFreturn() {
         runInstructionTest("com/roscopeco/jasm/insntest/Freturn.jasm", code -> code
                 .freturn()
                 .noMoreCode()
@@ -104,7 +208,15 @@ class ParserInstructionTests {
     }
 
     @Test
-    void handlesGoto() {
+    void shouldParseFstore() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Fstore.jasm", code -> code
+                .fstore(0)
+                .noMoreCode()
+        );
+    }
+
+    @Test
+    void shouldParseGoto() {
         runInstructionTest("com/roscopeco/jasm/insntest/Goto.jasm", code -> code
                 .label("infinity:")
                 ._goto("infinity")
@@ -116,7 +228,23 @@ class ParserInstructionTests {
     }
 
     @Test
-    void handlesIconst() {
+    void shouldParseIaload() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Iaload.jasm", code -> code
+                .iaload()
+                .noMoreCode()
+        );
+    }
+
+    @Test
+    void shouldParseIastore() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Iastore.jasm", code -> code
+                .iastore()
+                .noMoreCode()
+        );
+    }
+
+    @Test
+    void shouldParseIconst() {
         runInstructionTest("com/roscopeco/jasm/insntest/Iconst.jasm", code -> code
                 .iconst(0)
                 .noMoreCode()
@@ -124,7 +252,7 @@ class ParserInstructionTests {
     }
 
     @Test
-    void handlesIfs() {
+    void shouldParseIfs() {
         runInstructionTest("com/roscopeco/jasm/insntest/If.jasm", code -> code
                 .ifeq("label")
                 .ifge("label")
@@ -139,7 +267,7 @@ class ParserInstructionTests {
     }
 
     @Test
-    void handlesIfAcmps() {
+    void shouldParseIfAcmps() {
         runInstructionTest("com/roscopeco/jasm/insntest/IfAcmp.jasm", code -> code
                 .if_acmpeq("label")
                 .if_acmpne("label")
@@ -150,7 +278,7 @@ class ParserInstructionTests {
     }
 
     @Test
-    void handlesIfIcmps() {
+    void shouldParseIfIcmps() {
         runInstructionTest("com/roscopeco/jasm/insntest/IfIcmp.jasm", code -> code
                 .if_icmpeq("label")
                 .if_icmpge("label")
@@ -165,7 +293,7 @@ class ParserInstructionTests {
     }
 
     @Test
-    void handlesIfNullNonNull() {
+    void shouldParseIfNullNonNull() {
         runInstructionTest("com/roscopeco/jasm/insntest/IfNullNonNull.jasm", code -> code
                 .ifNull("label")
                 .ifNonNull("label")
@@ -176,15 +304,15 @@ class ParserInstructionTests {
     }
 
     @Test
-    void handlesInvokeInterface() {
-        runInstructionTest("com/roscopeco/jasm/insntest/InvokeInterface.jasm", code -> code
-                .invokeInterface("java/util/List", "get", "(I)Ljava/lang/Object;")
+    void shouldParseIload() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Iload.jasm", code -> code
+                .iload(0)
                 .noMoreCode()
         );
     }
 
     @Test
-    void handlesInvokeDynamic() {
+    void shouldParseInvokeDynamic() {
         runInstructionTest("com/roscopeco/jasm/insntest/InvokeDynamic.jasm", code -> code
                 .invokeDynamic("dynamicMethod", "(I)Ljava/lang/Object;")
                 // TODO more in-depth test here!
@@ -193,7 +321,15 @@ class ParserInstructionTests {
     }
 
     @Test
-    void handlesInvokeSpecial() {
+    void shouldParseInvokeInterface() {
+        runInstructionTest("com/roscopeco/jasm/insntest/InvokeInterface.jasm", code -> code
+                .invokeInterface("java/util/List", "get", "(I)Ljava/lang/Object;")
+                .noMoreCode()
+        );
+    }
+
+    @Test
+    void shouldParseInvokeSpecial() {
         runInstructionTest("com/roscopeco/jasm/insntest/InvokeSpecial.jasm", code -> code
                 .invokeSpecial("java/lang/Object", "<init>", "(Ljava/lang/String;I;Z)V")
                 .noMoreCode()
@@ -201,7 +337,7 @@ class ParserInstructionTests {
     }
 
     @Test
-    void handlesInvokeStatic() {
+    void shouldParseInvokeStatic() {
         runInstructionTest("com/roscopeco/jasm/insntest/InvokeStatic.jasm", code -> code
                 .invokeStatic("java/lang/Thread", "currentThread", "()Ljava/lang/Thread;")
                 .noMoreCode()
@@ -209,7 +345,7 @@ class ParserInstructionTests {
     }
 
     @Test
-    void handlesInvokeVirtual() {
+    void shouldParseInvokeVirtual() {
         runInstructionTest("com/roscopeco/jasm/insntest/InvokeVirtual.jasm", code -> code
                 .invokeVirtual("java/lang/String", "trim", "()Ljava/lang/String;")
                 .noMoreCode()
@@ -217,7 +353,7 @@ class ParserInstructionTests {
     }
 
     @Test
-    void handlesIreturn() {
+    void shouldParseIreturn() {
         runInstructionTest("com/roscopeco/jasm/insntest/Ireturn.jasm", code -> code
                 .ireturn()
                 .noMoreCode()
@@ -225,7 +361,31 @@ class ParserInstructionTests {
     }
 
     @Test
-    void handlesLdc() {
+    void shouldParseIstore() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Istore.jasm", code -> code
+                .istore(0)
+                .noMoreCode()
+        );
+    }
+
+    @Test
+    void shouldParseLaload() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Laload.jasm", code -> code
+                .laload()
+                .noMoreCode()
+        );
+    }
+
+    @Test
+    void shouldParseLastore() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Lastore.jasm", code -> code
+                .lastore()
+                .noMoreCode()
+        );
+    }
+
+    @Test
+    void shouldParseLdc() {
         runInstructionTest("com/roscopeco/jasm/insntest/Ldc.jasm", code -> code
                 .ldc(true)
                 .ldc(false)
@@ -241,7 +401,31 @@ class ParserInstructionTests {
     }
 
     @Test
-    void handlesNew() {
+    void shouldParseLload() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Lload.jasm", code -> code
+                .lload(0)
+                .noMoreCode()
+        );
+    }
+
+    @Test
+    void shouldParseLreturn() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Lreturn.jasm", code -> code
+                .lreturn()
+                .noMoreCode()
+        );
+    }
+
+    @Test
+    void shouldParseLstore() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Lstore.jasm", code -> code
+                .lstore(0)
+                .noMoreCode()
+        );
+    }
+
+    @Test
+    void shouldParseNew() {
         runInstructionTest("com/roscopeco/jasm/insntest/New.jasm", code -> code
                 .anew("java/util/ArrayList")
                 .noMoreCode()
@@ -249,7 +433,7 @@ class ParserInstructionTests {
     }
 
     @Test
-    void handlesReturn() {
+    void shouldParseReturn() {
         runInstructionTest("com/roscopeco/jasm/insntest/Return.jasm", code -> code
                 .vreturn()
                 .noMoreCode()

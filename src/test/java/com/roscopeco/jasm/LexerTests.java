@@ -551,9 +551,6 @@ class LexerTests {
                     .hasType(JasmLexer.TYPE_INT);
 
             tokens.next()
-                    .hasType(JasmLexer.SEMI);
-
-            tokens.next()
                     .hasType(JasmLexer.LSQUARE);
 
             tokens.next()

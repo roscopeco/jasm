@@ -1,0 +1,5 @@
+class com/roscopeco/jasm/insntest/Fload {
+    insnTest()V {
+        fload 0
+    }
+}

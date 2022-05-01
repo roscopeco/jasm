@@ -31,12 +31,12 @@ class MethodAssert internal constructor(actual: MethodContext) :
     fun isVoid(): MethodAssert {
         isNotNull
 
-        if (actual.type().TYPE_VOID() == null) {
+        if (actual.method_descriptor()?.type()?.TYPE_VOID() == null) {
             failWithMessage(
                 "Expected method "
                         + actual.membername().text
                         + " to have return type V, but is "
-                        + actual.type()
+                        + (actual.method_descriptor()?.type() ?: "unknown")
             )
         }
 
@@ -46,12 +46,12 @@ class MethodAssert internal constructor(actual: MethodContext) :
     fun isInteger(): MethodAssert {
         isNotNull
 
-        if (actual.type().TYPE_INT() == null) {
+        if (actual.method_descriptor()?.type()?.TYPE_INT() == null) {
             failWithMessage(
                 "Expected method "
                         + actual.membername().text
                         + " to have return type I, but is "
-                        + actual.type()
+                        + (actual.method_descriptor()?.type() ?: "unknown")
             )
         }
 
@@ -67,11 +67,11 @@ class MethodAssert internal constructor(actual: MethodContext) :
                     + " to have return type "
                     + expected +
                     ", but is "
-                    + (actual.type().text ?: "Unknown")
+                    + (actual.method_descriptor()?.type()?.text ?: "Unknown")
             )
         }
 
-        val type = actual.type()
+        val type = actual.method_descriptor()?.type()
         if (type?.ref_type()?.text != expected && type?.ref_array_type()?.text != expected) {
             failWithMessage(failureMessage.invoke())
         }
@@ -79,37 +79,16 @@ class MethodAssert internal constructor(actual: MethodContext) :
         return this
     }
 
-    fun hasArgumentCount(expected: Int): MethodAssert {
+    fun hasArgumentTypes(types: String): MethodAssert {
         isNotNull
 
-        if (actual.argument_type().size != expected) {
-            failWithMessage(
-                "Expected method "
-                        + actual.membername().text
-                        + " to have "
-                        + expected +
-                        " arguments, but it has "
-                        + (actual.argument_type().size)
-            )
-        }
-
-        return this
-    }
-
-    fun hasNoArguments() = hasArgumentCount(0)
-
-    fun hasArgumentTypes(vararg types: String): MethodAssert {
-        isNotNull
-
-        assertThat(actual.argument_type())
+        assertThat(actual.method_descriptor()?.method_argument())
             .isNotNull
             .isNotEmpty
 
-        assertThat(actual.argument_type().map {
-            if (it.prim_array_type() != null) it.prim_array_type().text else it.text
-        })
+        assertThat(actual.method_descriptor().method_argument().joinToString(separator = "") { it.text })
             .`as`("Method parameter types for ${actual.membername().text}")
-            .containsExactly(*types)
+            .isEqualTo(types)
 
         return this
     }

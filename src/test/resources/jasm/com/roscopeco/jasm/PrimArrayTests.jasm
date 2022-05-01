@@ -1,0 +1,97 @@
+public class com/roscopeco/jasm/PrimArrayTests implements com/roscopeco/jasm/model/PrimArrayTests {
+    public testBipushBastore([B)V {
+        aload 1
+        iconst 0
+        bipush 42
+        bastore
+        return
+    }
+
+    public testBaload([B)B {
+        aload 1
+        iconst 0
+        baload
+        ireturn
+    }
+
+    public testCastore([C)V {
+        aload 1
+        iconst 0
+        ldc 42
+        castore
+        return
+    }
+
+    public testCaload([C)C {
+        aload 1
+        iconst 0
+        caload
+        ireturn
+    }
+
+    public testDastore([DD)V {
+        aload 1
+        iconst 0
+        dload 2
+        dastore
+        return
+    }
+
+    public testDaload([D)D {
+        aload 1
+        iconst 0
+        daload
+        dreturn
+    }
+
+    public testFastore([FF)V {
+        aload 1
+        iconst 0
+        fload 2
+        fastore
+        return
+    }
+
+    public testFaload([F)F {
+        aload 1
+        iconst 0
+        faload
+        freturn
+    }
+
+    public testIastore([II)V {
+        aload 1
+        iconst 0
+        iload 2
+        iastore
+        return
+    }
+
+    public testIaload([I)I {
+        aload 1
+        iconst 0
+        iaload
+        ireturn
+    }
+
+    public testLastore([JJ)V {
+        aload 1
+        iconst 0
+        lload 2
+        lastore
+        return
+    }
+
+    public testLaload([J)J {
+        aload 1
+        iconst 0
+        laload
+        lreturn
+    }
+
+    public <init>()V {
+        aload 0
+        invokespecial java/lang/Object.<init>()V
+        return
+    }
+}

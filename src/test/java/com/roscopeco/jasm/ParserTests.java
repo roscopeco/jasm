@@ -92,10 +92,16 @@ class ParserTests {
                 .isMethod()
                     .hasName("testMethod")
                     .isVoid()
-                    .hasNoArguments()
                     .hasCodeSequence()
                         .vreturn()
                         .noMoreCode();
+    }
+
+    @Test
+    void shouldParseMethodArgumentsCorrectly() {
+        final var test = doParse("MethodArgParsingTests.jasm");
+
+        assertClass(test).hasName("MethodArgParsingTests");
     }
 
     @Test
@@ -130,14 +136,12 @@ class ParserTests {
         assertMember(test.member(2))
                 .isMethod()
                 .hasName("arrayTypesTest")
-                .hasArgumentCount(2)
-                .hasArgumentTypes("[I", "[[Ljava/lang/String;");
+                .hasArgumentTypes("[I[[Ljava/lang/String;");
 
         assertMember(test.member(3))
                 .isMethod()
                 .hasName("arrayTypesTestMultiple")
-                .hasArgumentCount(3)
-                .hasArgumentTypes("Ljava/lang/String;", "[Ljava/lang/String;", "[[Ljava/lang/String;");
+                .hasArgumentTypes("Ljava/lang/String;[Ljava/lang/String;[[Ljava/lang/String;");
 
         // Member 4 is uninteresting constructor
     }

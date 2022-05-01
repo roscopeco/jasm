@@ -31,7 +31,28 @@ field
  ;
 
 method
- : modifier* membername LPAREN argument_type* RPAREN type stat_block
+ : modifier* membername method_descriptor stat_block
+ ;
+
+method_descriptor
+ : LPAREN method_argument* RPAREN type
+ ;
+
+// TODO this is a hack - currently we just collect whatever's between the parens and concatenate it to
+//      build the descriptor :-(. Need to find a better way to do this (likely will need some sort of separator)!
+method_argument
+ : TYPE_BYTE
+ | TYPE_CHAR
+ | TYPE_INT
+ | TYPE_LONG
+ | TYPE_FLOAT
+ | TYPE_DOUBLE
+ | TYPE_SHORT
+ | TYPE_BOOL
+ | NAME
+ | QNAME
+ | SEMI
+ | LSQUARE
  ;
 
 membername
@@ -42,10 +63,13 @@ membername
 
 type
  : TYPE_VOID
+ | TYPE_BYTE
+ | TYPE_CHAR
  | TYPE_INT
  | TYPE_LONG
  | TYPE_FLOAT
  | TYPE_DOUBLE
+ | TYPE_SHORT
  | TYPE_BOOL
  | ref_type
  | prim_array_type
@@ -61,13 +85,15 @@ argument_type
  | TYPE_DOUBLE
  | TYPE_SHORT
  | TYPE_BOOL
- | ref_type
- | prim_array_type SEMI
+ | NAME
+ | QNAME
+ | prim_array_type
  | ref_array_type
  ;
 
 ref_type
  : QNAME SEMI
+ | NAME SEMI
  ;
 
 prim_array_type
@@ -113,10 +139,26 @@ instruction
  | insn_arraylength
  | insn_astore
  | insn_athrow
+ | insn_baload
+ | insn_bastore
+ | insn_bipush
+ | insn_caload
+ | insn_castore
  | insn_checkcast
+ | insn_daload
+ | insn_dastore
+ | insn_dload
+ | insn_dreturn
+ | insn_dstore
  | insn_dup
+ | insn_faload
+ | insn_fastore
+ | insn_fload
  | insn_freturn
+ | insn_fstore
  | insn_goto
+ | insn_iaload
+ | insn_iastore
  | insn_iconst
  | insn_ifeq
  | insn_ifge
@@ -134,13 +176,20 @@ instruction
  | insn_if_icmpne
  | insn_ifnull
  | insn_ifnonnull
+ | insn_iload
  | insn_invokedynamic
  | insn_invokeinterface
  | insn_invokespecial
  | insn_invokestatic
  | insn_invokevirtual
  | insn_ireturn
+ | insn_istore
+ | insn_laload
+ | insn_lastore
  | insn_ldc
+ | insn_lload
+ | insn_lreturn
+ | insn_lstore
  | insn_new
  | insn_return
  | label
@@ -182,20 +231,84 @@ insn_athrow
  : ATHROW
  ;
 
+insn_baload
+ : BALOAD
+ ;
+
+insn_bastore
+ : BASTORE
+ ;
+
+insn_bipush
+ : BIPUSH int_atom
+ ;
+
+insn_caload
+ : CALOAD
+ ;
+
+insn_castore
+ : CASTORE
+ ;
+
 insn_checkcast
  : CHECKCAST QNAME
+ ;
+
+insn_daload
+ : DALOAD
+ ;
+
+insn_dastore
+ : DASTORE
+ ;
+
+insn_dload
+ : DLOAD int_atom
+ ;
+
+insn_dreturn
+ : DRETURN
+ ;
+
+insn_dstore
+ : DSTORE int_atom
  ;
 
 insn_dup
  : DUP
  ;
 
+insn_faload
+ : FALOAD
+ ;
+
+insn_fastore
+ : FASTORE
+ ;
+
+insn_fload
+ : FLOAD int_atom
+ ;
+
 insn_freturn
  : FRETURN
  ;
 
+insn_fstore
+ : FSTORE int_atom
+ ;
+
 insn_goto
  : GOTO NAME
+ ;
+
+insn_iaload
+ : IALOAD
+ ;
+
+insn_iastore
+ : IASTORE
  ;
 
 insn_iconst
@@ -266,6 +379,10 @@ insn_ifnonnull
  : IFNONNULL NAME
  ;
 
+insn_iload
+ : ILOAD int_atom
+ ;
+
 insn_invokedynamic
  : INVOKEDYNAMIC membername method_descriptor LBRACE method_handle (LSQUARE const_arg (COMMA const_arg)* RSQUARE)? RBRACE
  ;
@@ -305,7 +422,6 @@ constdynamic
  : CONSTDYNAMIC membername type LBRACE method_handle (LSQUARE const_arg (COMMA const_arg)* RSQUARE)? RBRACE
  ;
 
-
 insn_invokeinterface
  : INVOKEINTERFACE owner DOT membername method_descriptor
  ;
@@ -331,16 +447,36 @@ owner
  | NAME
  ;
 
-method_descriptor
- : LPAREN (type (SEMI type)*)* RPAREN type
- ;
-
 insn_ireturn
  : IRETURN
  ;
 
+insn_istore
+ : ISTORE int_atom
+ ;
+
+insn_laload
+ : LALOAD
+ ;
+
+insn_lastore
+ : LASTORE
+ ;
+
 insn_ldc
  : LDC const_arg
+ ;
+
+insn_lload
+ : LLOAD int_atom
+ ;
+
+insn_lreturn
+ : LRETURN
+ ;
+
+insn_lstore
+ : LSTORE int_atom
  ;
 
 insn_new
@@ -399,12 +535,28 @@ ARETURN         : 'areturn';
 ARRAYLENGTH     : 'arraylength';
 ASTORE          : 'astore';
 ATHROW          : 'athrow';
+BALOAD          : 'baload';
+BASTORE         : 'bastore';
+BIPUSH          : 'bipush';
+CALOAD          : 'caload';
+CASTORE         : 'castore';
 CHECKCAST       : 'checkcast';
+DALOAD          : 'daload';
+DASTORE         : 'dastore';
+DLOAD           : 'dload';
+DRETURN         : 'dreturn';
+DSTORE          : 'dstore';
 DUP             : 'dup';
+FALOAD          : 'faload';
+FASTORE         : 'fastore';
+FLOAD           : 'fload';
 FRETURN         : 'freturn';
+FSTORE          : 'fstore';
 GETFIELD        : 'getfield';
 GETSTATIC       : 'getstatic';
 GOTO            : 'goto';
+IALOAD          : 'iaload';
+IASTORE         : 'iastore';
 ICONST          : 'iconst';
 IFEQ            : 'ifeq';
 IFGT            : 'ifgt';
@@ -422,13 +574,20 @@ IFICMPGE        : 'if_icmpge';
 IFICMPNE        : 'if_icmpne';
 IFNULL          : 'ifnull';
 IFNONNULL       : 'ifnonnull';
+ILOAD           : 'iload';
 INVOKEDYNAMIC   : 'invokedynamic';
 INVOKEINTERFACE : 'invokeinterface';
 INVOKESPECIAL   : 'invokespecial';
 INVOKESTATIC    : 'invokestatic';
 INVOKEVIRTUAL   : 'invokevirtual';
 IRETURN         : 'ireturn';
+ISTORE          : 'istore';
+LALOAD          : 'laload';
+LASTORE         : 'lastore';
 LDC             : 'ldc';
+LLOAD           : 'lload';
+LRETURN         : 'lreturn';
+LSTORE          : 'lstore';
 NEW             : 'new';
 PUTFIELD        : 'putfield';
 PUTSTATIC       : 'putstatic';

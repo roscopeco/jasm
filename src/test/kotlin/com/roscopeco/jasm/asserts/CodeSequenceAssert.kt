@@ -60,17 +60,54 @@ class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private
 
     fun athrow() = genericNoOperandCheck("athrow", InstructionContext::insn_athrow)
 
+    fun baload() = genericNoOperandCheck("baload", InstructionContext::insn_baload)
+    fun bastore() = genericNoOperandCheck("bastore", InstructionContext::insn_bastore)
+
+    fun bipush(expected: Int) = genericIntOperandCheck("bipush", expected, InstructionContext::insn_bipush) {
+            bipush -> bipush.int_atom().text
+    }
+
+    fun caload() = genericNoOperandCheck("caload", InstructionContext::insn_caload)
+    fun castore() = genericNoOperandCheck("castore", InstructionContext::insn_castore)
+
     fun checkcast(expected: String) = genericStringOperandCheck("checkcast", expected, InstructionContext:: insn_checkcast) {
             checkcast -> checkcast.QNAME().text
     }
 
+    fun daload() = genericNoOperandCheck("daload", InstructionContext::insn_daload)
+    fun dastore() = genericNoOperandCheck("dastore", InstructionContext::insn_dastore)
+    
+    fun dload(expected: Int) = genericIntOperandCheck("dload", expected, InstructionContext::insn_dload) {
+            dload -> dload.int_atom().text
+    }
+
+    fun dreturn() = genericNoOperandCheck("dreturn", InstructionContext::insn_dreturn)
+
+    fun dstore(expected: Int) = genericIntOperandCheck("dstore", expected, InstructionContext::insn_dstore) {
+            dstore -> dstore.int_atom().text
+    }
+    
     fun dup() = genericNoOperandCheck("dup", InstructionContext::insn_dup)
 
+    fun faload() = genericNoOperandCheck("faload", InstructionContext::insn_faload)
+    fun fastore() = genericNoOperandCheck("fastore", InstructionContext::insn_fastore)
+
+    fun fload(expected: Int) = genericIntOperandCheck("fload", expected, InstructionContext::insn_fload) {
+            fload -> fload.int_atom().text
+    }
+
     fun freturn() = genericNoOperandCheck("freturn", InstructionContext::insn_freturn)
+    
+    fun fstore(expected: Int) = genericIntOperandCheck("fstore", expected, InstructionContext::insn_fstore) {
+            fstore -> fstore.int_atom().text
+    }
 
     fun _goto(expected: String) = genericStringOperandCheck("goto", expected, InstructionContext::insn_goto) {
             _goto -> _goto.NAME().text
     }
+
+    fun iaload() = genericNoOperandCheck("iaload", InstructionContext::insn_iaload)
+    fun iastore() = genericNoOperandCheck("iastore", InstructionContext::insn_iastore)
 
     fun iconst(expected: Int) = genericIntOperandCheck("iconst", expected, InstructionContext::insn_iconst) {
             iconst -> iconst.atom().text
@@ -140,6 +177,10 @@ class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private
         expected,
         InstructionContext::insn_ifnonnull) {
             ifnonnull -> ifnonnull.NAME().text
+    }
+    
+    fun iload(expected: Int) = genericIntOperandCheck("iload", expected, InstructionContext::insn_iload) {
+            iload -> iload.int_atom().text
     }
 
     fun invokeDynamic(
@@ -247,6 +288,13 @@ class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private
 
     fun ireturn() = genericNoOperandCheck("ireturn", InstructionContext::insn_ireturn)
 
+    fun istore(expected: Int) = genericIntOperandCheck("istore", expected, InstructionContext::insn_istore) {
+            istore -> istore.int_atom().text
+    }
+
+    fun laload() = genericNoOperandCheck("laload", InstructionContext::insn_laload)
+    fun lastore() = genericNoOperandCheck("lastore", InstructionContext::insn_lastore)
+
     fun label(expected: String) = genericStringOperandCheck("label", expected, InstructionContext::label) {
             label -> label.text
     }
@@ -268,6 +316,16 @@ class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private
     }
     fun ldcStr(expected: String) = genericLdcCheck('"' + expected + '"') {
             constarg -> expected == cleanConstantString(constarg.string_atom().text)
+    }
+
+    fun lload(expected: Int) = genericIntOperandCheck("lload", expected, InstructionContext::insn_lload) {
+            lload -> lload.int_atom().text
+    }
+
+    fun lreturn() = genericNoOperandCheck("lreturn", InstructionContext::insn_lreturn)
+
+    fun lstore(expected: Int) = genericIntOperandCheck("lstore", expected, InstructionContext::insn_lstore) {
+            lstore -> lstore.int_atom().text
     }
 
     fun vreturn(): CodeSequenceAssert {

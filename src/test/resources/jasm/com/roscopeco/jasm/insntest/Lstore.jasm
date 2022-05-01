@@ -1,0 +1,5 @@
+class com/roscopeco/jasm/insntest/Lstore {
+    insnTest()V {
+        lstore 0
+    }
+}

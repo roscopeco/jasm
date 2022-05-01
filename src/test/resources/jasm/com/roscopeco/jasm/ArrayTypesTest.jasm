@@ -2,7 +2,7 @@ public class com/roscopeco/jasm/ArrayTypesTest {
     public arrayField [Ljava/lang/Object;
     public primArrayField [I
 
-    public arrayTypesTest([I;[[Ljava/lang/String;)Ljava/lang/Object; {
+    public arrayTypesTest([I[[Ljava/lang/String;)Ljava/lang/Object; {
         aload 1
         areturn
     }

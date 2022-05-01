@@ -11,4 +11,32 @@ public class com/roscopeco/jasm/LoadsAndStoresTest implements com/roscopeco/jasm
         aload 1
         areturn
     }
+
+    public testDloadDstore(D)D {
+        dload 1
+        dstore 2
+        dload 2
+        dreturn
+    }
+
+    public testFloadFstore(F)F {
+        fload 1
+        fstore 2
+        fload 2
+        freturn
+    }
+
+    public testIloadIstore(I)I {
+        iload 1
+        istore 2
+        iload 2
+        ireturn
+    }
+
+    public testLloadLstore(J)J {
+        lload 1
+        lstore 2
+        lload 2
+        lreturn
+    }
 }

@@ -15,6 +15,7 @@ import com.roscopeco.jasm.model.IfNullNonNullTest;
 import com.roscopeco.jasm.model.InvokedynamicTest;
 import com.roscopeco.jasm.model.LdcAconstAreturn;
 import com.roscopeco.jasm.model.LoadsAndStoresTest;
+import com.roscopeco.jasm.model.PrimArrayTests;
 import com.roscopeco.jasm.model.RefArrayTests;
 import com.roscopeco.jasm.model.Superclass;
 import org.junit.jupiter.api.Test;
@@ -481,9 +482,57 @@ class JasmE2ETests {
         assertThat(clz.getDeclaredClasses()).isEmpty();
         assertThat(clz.getDeclaredFields()).isEmpty();
         assertThat(clz.getDeclaredConstructors()).hasSize(1);
-        assertThat(clz.getDeclaredMethods()).hasSize(1);
+        assertThat(clz.getDeclaredMethods()).hasSize(5);
 
         final var obj = instantiate(clz, LoadsAndStoresTest.class);
         assertThat(obj.testAloadAstore()).isEqualTo("Test String");
+        assertThat(obj.testDloadDstore(42d)).isEqualTo(42d);
+        assertThat(obj.testFloadFstore(42f)).isEqualTo(42f);
+        assertThat(obj.testIloadIstore(42)).isEqualTo(42);
+        assertThat(obj.testLloadLstore(42L)).isEqualTo(42L);
+    }
+
+    @Test
+    void shouldAssemblePrimArrayTestsToValidJavaClass() {
+        final var clz = assembleAndDefine("com/roscopeco/jasm/PrimArrayTests.jasm");
+
+        assertThat(clz.getName()).isEqualTo("com.roscopeco.jasm.PrimArrayTests");
+
+        assertThat(clz.getDeclaredClasses()).isEmpty();
+        assertThat(clz.getDeclaredFields()).isEmpty();
+        assertThat(clz.getDeclaredConstructors()).hasSize(1);
+        assertThat(clz.getDeclaredMethods()).hasSize(12);
+
+        final var obj = instantiate(clz, PrimArrayTests.class);
+
+        final var bary = new byte[1];
+        obj.testBipushBastore(bary);
+        assertThat(bary[0]).isEqualTo((byte)42);
+        assertThat(obj.testBaload(bary)).isEqualTo((byte)42);
+
+        final var cary = new char[1];
+        obj.testCastore(cary);
+        assertThat(cary[0]).isEqualTo((char)42);
+        assertThat(obj.testCaload(cary)).isEqualTo((char)42);
+
+        final var dary = new double[1];
+        obj.testDastore(dary, 42.0d);
+        assertThat(dary[0]).isEqualTo(42.0d);
+        assertThat(obj.testDaload(dary)).isEqualTo(42.0d);
+
+        final var fary = new float[1];
+        obj.testFastore(fary, 42.0f);
+        assertThat(fary[0]).isEqualTo(42.0f);
+        assertThat(obj.testFaload(fary)).isEqualTo(42.0f);
+
+        final var iary = new int[1];
+        obj.testIastore(iary, 42);
+        assertThat(iary[0]).isEqualTo(42);
+        assertThat(obj.testIaload(iary)).isEqualTo(42);
+
+        final var lary = new long[1];
+        obj.testLastore(lary, 42L);
+        assertThat(lary[0]).isEqualTo(42L);
+        assertThat(obj.testLaload(lary)).isEqualTo(42L);
     }
 }
