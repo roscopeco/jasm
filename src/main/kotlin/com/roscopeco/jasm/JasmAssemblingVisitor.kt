@@ -46,7 +46,7 @@ import com.roscopeco.jasm.antlr.JasmParser.Insn_newContext
 import com.roscopeco.jasm.antlr.JasmParser.Insn_returnContext
 import com.roscopeco.jasm.antlr.JasmParser.AtomContext
 import com.roscopeco.jasm.antlr.JasmParser.Method_handleContext
-import com.roscopeco.jasm.antlr.JasmParser.Bootstrap_argContext
+import com.roscopeco.jasm.antlr.JasmParser.Const_argContext
 import org.objectweb.asm.ClassVisitor
 import org.objectweb.asm.ConstantDynamic
 import org.objectweb.asm.Handle
@@ -288,53 +288,8 @@ class JasmAssemblingVisitor(
                 ctx.membername().text,
                 ctx.method_descriptor().text,
                 buildBootstrapHandle(ctx.method_handle()),
-                *buildBootstrapArgs(ctx.bootstrap_arg())
+                *generateConstArgs(ctx.const_arg())
             )
-        }
-
-        private fun buildBootstrapHandle(ctx: Method_handleContext): Handle {
-            return Handle(
-                generateTagForHandle(ctx),
-                ctx.bootstrap_spec().owner().text,
-                ctx.bootstrap_spec().membername().text,
-                fixDescriptor(ctx.bootstrap_spec().method_descriptor().text),
-                ctx.handle_tag().INVOKEINTERFACE() != null,
-            )
-        }
-
-        private fun generateTagForHandle(ctx: Method_handleContext) = when {
-            ctx.handle_tag().INVOKEINTERFACE() != null  -> Opcodes.H_INVOKEINTERFACE
-            ctx.handle_tag().INVOKESPECIAL() != null    -> Opcodes.H_INVOKESPECIAL
-            ctx.handle_tag().INVOKESTATIC() != null     -> Opcodes.H_INVOKESTATIC
-            ctx.handle_tag().INVOKEVIRTUAL() != null    -> Opcodes.H_INVOKEVIRTUAL
-            ctx.handle_tag().NEWINVOKESPECIAL() != null -> Opcodes.H_NEWINVOKESPECIAL
-            ctx.handle_tag().GETFIELD() != null         -> Opcodes.H_GETFIELD
-            ctx.handle_tag().GETSTATIC() != null        -> Opcodes.H_GETSTATIC
-            ctx.handle_tag().PUTFIELD() != null         -> Opcodes.H_PUTFIELD
-            ctx.handle_tag().PUTSTATIC() != null        -> Opcodes.H_PUTSTATIC
-            else -> throw SyntaxErrorException("Unknown handle tag " + ctx.handle_tag().text)
-        }
-
-        private fun buildBootstrapArgs(ctx: MutableList<Bootstrap_argContext>): Array<Any> {
-            return ctx.mapIndexed { i, arg -> buildSingleBootstrapArg(i, arg) }.toTypedArray()
-        }
-
-        private fun buildSingleBootstrapArg(idx: Int, ctx: Bootstrap_argContext): Any {
-            return when {
-                ctx.int_atom() != null          -> Integer.parseInt(ctx.int_atom().text)
-                ctx.float_atom() != null        -> java.lang.Float.parseFloat(ctx.float_atom().text)
-                ctx.string_atom() != null       -> unescapeConstantString(ctx.string_atom().text)
-                ctx.QNAME() != null             -> Type.getType("L" + ctx.QNAME().text + ";")
-                ctx.method_handle() != null     -> buildBootstrapHandle(ctx.method_handle())
-                ctx.method_descriptor() != null -> Type.getMethodType(fixDescriptor(ctx.method_descriptor().text))
-                ctx.constdynamic() != null      -> ConstantDynamic(
-                    ctx.constdynamic().membername().text,
-                    ctx.constdynamic().type().text,
-                    buildBootstrapHandle(ctx.constdynamic().method_handle()),
-                    *buildBootstrapArgs(ctx.constdynamic().bootstrap_arg())
-                )
-                else -> throw SyntaxErrorException("Unsupported bootstrap arg at #${idx}: " + ctx.text)
-            }
         }
 
         override fun visitInsn_invokeinterface(ctx: Insn_invokeinterfaceContext) {
@@ -401,7 +356,7 @@ class JasmAssemblingVisitor(
         }
 
         override fun visitInsn_ldc(ctx: Insn_ldcContext) {
-            methodVisitor.visitLdcInsn(generateLdcObject(ctx))
+            methodVisitor.visitLdcInsn(generateSingleConstArg(0, ctx.const_arg()))
             super.visitInsn_ldc(ctx)
         }
 
@@ -413,6 +368,51 @@ class JasmAssemblingVisitor(
         override fun visitInsn_return(ctx: Insn_returnContext) {
             methodVisitor.visitInsn(Opcodes.RETURN)
             super.visitInsn_return(ctx)
+        }
+        private fun buildBootstrapHandle(ctx: Method_handleContext): Handle {
+            return Handle(
+                generateTagForHandle(ctx),
+                ctx.bootstrap_spec().owner().text,
+                ctx.bootstrap_spec().membername().text,
+                fixDescriptor(ctx.bootstrap_spec().method_descriptor().text),
+                ctx.handle_tag().INVOKEINTERFACE() != null,
+            )
+        }
+
+        private fun generateTagForHandle(ctx: Method_handleContext) = when {
+            ctx.handle_tag().INVOKEINTERFACE() != null  -> Opcodes.H_INVOKEINTERFACE
+            ctx.handle_tag().INVOKESPECIAL() != null    -> Opcodes.H_INVOKESPECIAL
+            ctx.handle_tag().INVOKESTATIC() != null     -> Opcodes.H_INVOKESTATIC
+            ctx.handle_tag().INVOKEVIRTUAL() != null    -> Opcodes.H_INVOKEVIRTUAL
+            ctx.handle_tag().NEWINVOKESPECIAL() != null -> Opcodes.H_NEWINVOKESPECIAL
+            ctx.handle_tag().GETFIELD() != null         -> Opcodes.H_GETFIELD
+            ctx.handle_tag().GETSTATIC() != null        -> Opcodes.H_GETSTATIC
+            ctx.handle_tag().PUTFIELD() != null         -> Opcodes.H_PUTFIELD
+            ctx.handle_tag().PUTSTATIC() != null        -> Opcodes.H_PUTSTATIC
+            else -> throw SyntaxErrorException("Unknown handle tag " + ctx.handle_tag().text)
+        }
+
+        private fun generateConstArgs(ctx: MutableList<Const_argContext>): Array<Any> {
+            return ctx.mapIndexed { i, arg -> generateSingleConstArg(i, arg) }.toTypedArray()
+        }
+
+        private fun generateSingleConstArg(idx: Int, ctx: Const_argContext): Any {
+            return when {
+                ctx.int_atom() != null          -> Integer.parseInt(ctx.int_atom().text)
+                ctx.float_atom() != null        -> java.lang.Float.parseFloat(ctx.float_atom().text)
+                ctx.string_atom() != null       -> unescapeConstantString(ctx.string_atom().text)
+                ctx.bool_atom() != null         -> if (java.lang.Boolean.parseBoolean(ctx.bool_atom().text)) 1 else 0
+                ctx.QNAME() != null             -> Type.getType("L" + ctx.QNAME().text + ";")
+                ctx.method_handle() != null     -> buildBootstrapHandle(ctx.method_handle())
+                ctx.method_descriptor() != null -> Type.getMethodType(fixDescriptor(ctx.method_descriptor().text))
+                ctx.constdynamic() != null      -> ConstantDynamic(
+                    ctx.constdynamic().membername().text,
+                    ctx.constdynamic().type().text,
+                    buildBootstrapHandle(ctx.constdynamic().method_handle()),
+                    *generateConstArgs(ctx.constdynamic().const_arg())
+                )
+                else -> throw SyntaxErrorException("Unsupported constant arg at #${idx}: " + ctx.text)
+            }
         }
 
         private fun generateMethodDescriptor(ctx: MethodContext): String {
@@ -445,21 +445,6 @@ class JasmAssemblingVisitor(
                 }
             } catch (e: NumberFormatException) {
                 throw SyntaxErrorException("Invalid non-numeric operand for ICONST (found '" + ctx.text + "')")
-            }
-
-        private fun generateLdcObject(ctx: Insn_ldcContext) =
-            if (ctx.atom().int_atom() != null) {
-                ctx.atom().text.toInt()
-            } else if (ctx.atom().float_atom() != null) {
-                ctx.atom().text.toFloat()
-            } else if (ctx.atom().bool_atom() != null) {
-                if (java.lang.Boolean.parseBoolean(ctx.atom().text)) 1 else 0
-            } else if (ctx.atom().name_atom() != null) {
-                throw UnsupportedOperationException("TODO")
-            } else if (ctx.atom().string_atom() != null) {
-                unescapeConstantString(ctx.atom().text)
-            } else {
-                throw SyntaxErrorException("Unable to generate LDC for unknown type (" + ctx.text + ")")
             }
 
         private fun unescapeConstantString(constant: String) =

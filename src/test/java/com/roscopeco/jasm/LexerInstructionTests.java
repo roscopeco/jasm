@@ -626,6 +626,18 @@ class LexerInstructionTests {
                     .hasType(JasmLexer.LDC);
 
             assertNextToken(lexer)
+                    .hasType(JasmLexer.TRUE);
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.LDC);
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.FALSE);
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.LDC);
+
+            assertNextToken(lexer)
                     .hasType(JasmLexer.INT)
                     .hasText("10");
 
@@ -642,6 +654,49 @@ class LexerInstructionTests {
             assertNextToken(lexer)
                     .hasType(JasmLexer.STRING)
                     .hasText("\"Test string\"");
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.LDC);
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.QNAME)
+                    .hasText("java/util/List");
+
+            // Skip remaining tokens, the rest of these are covered by the invokedynamic lex tests
+            lexer.nextToken();
+            lexer.nextToken();
+            lexer.nextToken();
+            lexer.nextToken();
+            lexer.nextToken();
+            lexer.nextToken();
+            lexer.nextToken();
+            lexer.nextToken();
+            lexer.nextToken();
+            lexer.nextToken();
+            lexer.nextToken();
+            lexer.nextToken();
+            lexer.nextToken();
+            lexer.nextToken();
+            lexer.nextToken();
+            lexer.nextToken();
+            lexer.nextToken();
+            lexer.nextToken();
+            lexer.nextToken();
+            lexer.nextToken();
+            lexer.nextToken();
+            lexer.nextToken();
+            lexer.nextToken();
+            lexer.nextToken();
+            lexer.nextToken();
+            lexer.nextToken();
+            lexer.nextToken();
+            lexer.nextToken();
+            lexer.nextToken();
+            lexer.nextToken();
+            lexer.nextToken();
+            lexer.nextToken();
+            lexer.nextToken();
+            lexer.nextToken();
         });
     }
 

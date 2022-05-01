@@ -195,9 +195,15 @@ class ParserInstructionTests {
     @Test
     void handlesLdc() {
         runInstructionTest("com/roscopeco/jasm/insntest/Ldc.jasm", code -> code
+                .ldc(true)
+                .ldc(false)
                 .ldc(10)
                 .ldc(5.0f)
-                .ldc("Test string")
+                .ldcStr("Test string")
+                .ldcClass("java/util/List")
+                .ldcMethodType("(java/util/String;)I")
+                .ldcMethodHandle("invokevirtualcom/roscopeco/jasm/Tests.example()V")
+                .ldcConstDynamic("constdynamicDYNAMIC_CONSTLjava/lang/Object;{invokeinterfacecom/example/Bootstrap.constsite(Ljava/lang/String;)Ljava/lang/invoke/CallSite;[\"Something else\"]}")
                 .noMoreCode()
         );
     }

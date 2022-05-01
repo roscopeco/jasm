@@ -1,32 +1,61 @@
-class com/roscopeco/jasm/LdcAconstAreturn {
+class com/roscopeco/jasm/LdcAconstAreturn implements com/roscopeco/jasm/model/LdcAconstAreturn {
     public <init>()V {
         aload 0
         invokespecial java/lang/Object.<init>()V
         return
     }
 
-    testAconstNull()Ljava/lang/Object; {
+    public testAconstNull()Ljava/lang/Object; {
         aconst_null
         areturn
     }
 
-    testLdcString()Ljava/lang/String; {
+    public testLdcString()Ljava/lang/String; {
         ldc "The test string"
         areturn
     }
 
-    testLdcInt()I {
+    public testLdcInt()I {
         ldc 10
         ireturn
     }
 
-    testLdcFloat()F {
+    public testLdcFloat()F {
         ldc 5.5
         freturn
     }
 
-    testLdcBool()Z {
+    public testLdcBool()Z {
         ldc true
         ireturn
+    }
+
+    public testLdcClass()Ljava/lang/Class; {
+        ldc java/util/List
+        areturn
+    }
+
+    public testLdcMethodType()Ljava/lang/invoke/MethodType; {
+        ldc (Ljava/util/List;)I
+        areturn
+    }
+
+    public testLdcMethodHandle()Ljava/lang/invoke/MethodHandle; {
+        ldc invokestatic com/roscopeco/jasm/model/TestBootstrap.staticForHandleTest()Ljava/lang/String;
+        areturn
+    }
+
+    public testLdcDynamicConst()Ljava/lang/String; {
+        ldc constdynamic DYNAMIC_CONST_FOR_TEST Ljava/lang/String; {
+            invokestatic java/lang/invoke/ConstantBootstraps.getStaticFinal(
+                Ljava/lang/invoke/MethodHandles$Lookup;
+                Ljava/lang/String;
+                Ljava/lang/Class;
+                Ljava/lang/Class;
+            )Ljava/lang/Object;
+            [com/roscopeco/jasm/model/TestBootstrap]
+        }
+
+        areturn
     }
 }

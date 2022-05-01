@@ -237,7 +237,7 @@ insn_ifnonnull
  ;
 
 insn_invokedynamic
- : INVOKEDYNAMIC membername method_descriptor LBRACE method_handle (LSQUARE bootstrap_arg (COMMA bootstrap_arg)* RSQUARE)? RBRACE
+ : INVOKEDYNAMIC membername method_descriptor LBRACE method_handle (LSQUARE const_arg (COMMA const_arg)* RSQUARE)? RBRACE
  ;
 
 method_handle
@@ -260,10 +260,11 @@ handle_tag
  | PUTSTATIC
  ;
 
-bootstrap_arg
+const_arg
  : int_atom
  | float_atom
  | string_atom
+ | bool_atom
  | QNAME
  | method_descriptor
  | method_handle
@@ -271,7 +272,7 @@ bootstrap_arg
  ;
 
 constdynamic
- : CONSTDYNAMIC membername type LBRACE method_handle (LSQUARE bootstrap_arg (COMMA bootstrap_arg)* RSQUARE)? RBRACE
+ : CONSTDYNAMIC membername type LBRACE method_handle (LSQUARE const_arg (COMMA const_arg)* RSQUARE)? RBRACE
  ;
 
 
@@ -309,7 +310,7 @@ insn_ireturn
  ;
 
 insn_ldc
- : LDC atom
+ : LDC const_arg
  ;
 
 insn_new

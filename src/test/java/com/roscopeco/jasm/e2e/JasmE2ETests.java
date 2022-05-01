@@ -13,6 +13,7 @@ import com.roscopeco.jasm.model.Interface1;
 import com.roscopeco.jasm.model.Interface2;
 import com.roscopeco.jasm.model.IfNullNonNullTest;
 import com.roscopeco.jasm.model.InvokedynamicTest;
+import com.roscopeco.jasm.model.LdcAconstAreturn;
 import com.roscopeco.jasm.model.Superclass;
 import org.junit.jupiter.api.Test;
 
@@ -28,6 +29,7 @@ import static com.roscopeco.jasm.TestUtil.objectArgsInvoker;
 import static com.roscopeco.jasm.TestUtil.objectVoidInvoker;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.fail;
 
 @SuppressWarnings("java:S5961" /* Some methods need to assert combinatorial explosion of multiple variants */)
 class JasmE2ETests {
@@ -132,24 +134,43 @@ class JasmE2ETests {
         assertThat(clz.getDeclaredFields()).isEmpty();
 
         assertThat(clz.getDeclaredConstructors()).hasSize(1);
-        assertThat(clz.getDeclaredMethods()).hasSize(5);
+        assertThat(clz.getDeclaredMethods()).hasSize(9);
 
-        final var obj = instantiate(clz);
+        final var obj = instantiate(clz, LdcAconstAreturn.class);
 
         // Tests ACONST_NULL, ARETURN
-        assertThat(objectVoidInvoker(obj, "testAconstNull").get()).isNull();
+        assertThat(obj.testAconstNull()).isNull();
 
         // Tests LDC(str), ARETURN
-        assertThat(objectVoidInvoker(obj, "testLdcString").get()).isEqualTo("The test string");
+        assertThat(obj.testLdcString()).isEqualTo("The test string");
 
         // Tests LDC(int), IRETURN
-        assertThat(intVoidInvoker(obj, "testLdcInt").get()).isEqualTo(10);
+        assertThat(obj.testLdcInt()).isEqualTo(10);
 
         // Tests LDC(float), FRETURN
-        assertThat(floatVoidInvoker(obj, "testLdcFloat").get()).isEqualTo(5.5f);
+        assertThat(obj.testLdcFloat()).isEqualTo(5.5f);
 
         // Tests LDC(bool), IRETURN
-        assertThat(boolVoidInvoker(obj, "testLdcBool").get()).isTrue();
+        assertThat(obj.testLdcBool()).isTrue();
+
+        // Tests LDC(class), ARETURN
+        assertThat(obj.testLdcClass()).isEqualTo(List.class);
+
+        // Tests LDC(methodtype), ARETURN
+        assertThat(obj.testLdcMethodType().returnType()).isEqualTo(int.class);
+        assertThat(obj.testLdcMethodType().parameterList()).containsExactly(List.class);
+
+        // Tests LDC(methodHandle), ARETURN, INVOKESTATIC
+        try {
+            assertThat(obj.testLdcMethodHandle().invoke()).isEqualTo("Handle is good");
+        } catch (Throwable t) {
+            fail("LDC MethodHandle test should not have thrown " + t);
+        }
+
+        // Tests LDC(constantdynamic), ARETURN, INVOKESTATIC
+        // Value here comes from DYNAMIC_CONST_FOR_TEST in TestBoostrap class, and is loaded via
+        // java.lang.invoke.ConstantBootstraps.getStaticFinal
+        assertThat(obj.testLdcDynamicConst()).isEqualTo("The expected result");
     }
 
     @Test

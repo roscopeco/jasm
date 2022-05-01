@@ -1,7 +1,16 @@
 class com/roscopeco/jasm/insntest/Ldc {
     insnTest()V {
+        ldc true        // Syntactic sugar; Translates to integer 1
+        ldc false       // Syntactic sugar; Translates to integer 0
         ldc 10
         ldc 5.0
         ldc "Test string"
+        ldc java/util/List
+        ldc (java/util/String;)I
+        ldc invokevirtual com/roscopeco/jasm/Tests.example()V
+        ldc constdynamic DYNAMIC_CONST Ljava/lang/Object; {
+            invokeinterface com/example/Bootstrap.constsite(Ljava/lang/String;)Ljava/lang/invoke/CallSite;
+            ["Something else"]
+        }
     }
 }

@@ -313,9 +313,15 @@ class JasmIntegrationTests {
                 
                   // access flags 0x0
                   insnTest()V
+                    LDC 1
+                    LDC 0
                     LDC 10
                     LDC 5.0
                     LDC "Test string"
+                    LDC Ljava/util/List;.class
+                    LDC (java/util/String;)I.class
+                    LDC com/roscopeco/jasm/Tests.example()V (5)
+                    LDC DYNAMIC_CONST : Ljava/lang/Object; com/example/Bootstrap.constsite(Ljava/lang/String;)Ljava/lang/invoke/CallSite; (9 itf) [Something else]
                     MAXSTACK = 0
                     MAXLOCALS = 0
                 }

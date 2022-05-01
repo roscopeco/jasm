@@ -16,7 +16,7 @@ import com.roscopeco.jasm.antlr.JasmParser.Method_descriptorContext
 import com.roscopeco.jasm.antlr.JasmParser.Insn_invokespecialContext
 import com.roscopeco.jasm.antlr.JasmParser.Insn_invokestaticContext
 import com.roscopeco.jasm.antlr.JasmParser.Insn_invokevirtualContext
-import com.roscopeco.jasm.antlr.JasmParser.AtomContext
+import com.roscopeco.jasm.antlr.JasmParser.Const_argContext
 
 class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private val caller: MethodAssert) :
     AbstractAssert<CodeSequenceAssert, Stat_blockContext>(actual, CodeSequenceAssert::class.java) {
@@ -241,10 +241,23 @@ class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private
             label -> label.text
     }
 
-    fun ldc(expected: Int) = genericLdcCheck("" + expected) { atom -> expected == atom.text.toInt() }
-    fun ldc(expected: Float) = genericLdcCheck("" + expected) { atom -> expected == atom.text.toFloat() }
-    fun ldc(expected: String) = genericLdcCheck('"'.toString() + expected + '"') {
-            atom -> expected == cleanConstantString(atom.text)
+    fun ldc(expected: Boolean) = genericLdcCheck("" + expected) { constarg -> expected == constarg.text.toBoolean() }
+    fun ldc(expected: Int) = genericLdcCheck("" + expected) { constarg -> expected == constarg.text.toInt() }
+    fun ldc(expected: Float) = genericLdcCheck("" + expected) { constarg -> expected == constarg.text.toFloat() }
+    fun ldcClass(expected: String) = genericLdcCheck(expected) {
+            constarg -> expected == constarg.QNAME().text
+    }
+    fun ldcMethodType(expected: String) = genericLdcCheck('"' + expected + '"') {
+            constarg -> expected == constarg.method_descriptor().text
+    }
+    fun ldcMethodHandle(expected: String) = genericLdcCheck('"' + expected + '"') {
+            constarg -> expected == constarg.method_handle().text
+    }
+    fun ldcConstDynamic(expected: String) = genericLdcCheck('"' + expected + '"') {
+            constarg -> expected == constarg.constdynamic().text
+    }
+    fun ldcStr(expected: String) = genericLdcCheck('"' + expected + '"') {
+            constarg -> expected == cleanConstantString(constarg.string_atom().text)
     }
 
     fun vreturn(): CodeSequenceAssert {
@@ -338,7 +351,7 @@ class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private
 
     private fun genericLdcCheck(
         expectedStr: String,
-        atomPredicate: (AtomContext) -> Boolean
+        atomPredicate: (Const_argContext) -> Boolean
     ): CodeSequenceAssert {
 
         isNotNull
@@ -347,7 +360,7 @@ class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private
 
         val insn = actual.stat()[pc].instruction()
 
-        if (insn?.insn_ldc()?.atom() == null || !atomPredicate.invoke(insn.insn_ldc().atom())) {
+        if (insn?.insn_ldc()?.const_arg() == null || !atomPredicate.invoke(insn.insn_ldc().const_arg())) {
             failWithMessage(
                 "Expected ldc("
                         + expectedStr
