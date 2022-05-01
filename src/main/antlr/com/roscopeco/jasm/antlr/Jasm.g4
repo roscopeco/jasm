@@ -5,7 +5,7 @@ grammar Jasm;
 }
 
 class
- : modifier* CLASS classname extends? implements? (LBRACE member* RBRACE)?
+ : type_modifier* CLASS classname extends? implements? (LBRACE member* RBRACE)?
  ;
 
 classname
@@ -27,11 +27,11 @@ member
  ;
 
 field
- : modifier* membername type
+ : field_modifier* membername type
  ;
 
 method
- : modifier* membername method_descriptor stat_block
+ : method_modifier* membername method_descriptor stat_block
  ;
 
 method_descriptor
@@ -76,21 +76,6 @@ type
  | ref_array_type
  ;
 
-argument_type
- : TYPE_BYTE
- | TYPE_CHAR
- | TYPE_INT
- | TYPE_LONG
- | TYPE_FLOAT
- | TYPE_DOUBLE
- | TYPE_SHORT
- | TYPE_BOOL
- | NAME
- | QNAME
- | prim_array_type
- | ref_array_type
- ;
-
 ref_type
  : QNAME SEMI
  | NAME SEMI
@@ -111,13 +96,46 @@ ref_array_type
  : LSQUARE+ QNAME SEMI
  ;
 
-modifier
- : PRIVATE
+type_modifier
+ : ABSTRACT
+ | ANNOTATION
+ | DEPRECATED
+ | ENUM
+ | FINAL
+ | INTERFACE
+ | PUBLIC
+ | RECORD
+ | SYNTHETIC
+ | SUPER
+ ;
+
+field_modifier
+ : DEPRECATED
+ | ENUM
+ | FINAL
+ | PRIVATE
  | PROTECTED
  | PUBLIC
- | FINAL
- | SYNCHRONIZED
  | STATIC
+ | SYNTHETIC
+ | TRANSIENT
+ | VOLATILE
+ ;
+
+method_modifier
+ : ABSTRACT
+ | BRIDGE
+ | DEPRECATED
+ | FINAL
+ | NATIVE
+ | PRIVATE
+ | PROTECTED
+ | PUBLIC
+ | STATIC
+ | STRICT
+ | SYNCHRONIZED
+ | SYNTHETIC
+ | VARARGS
  ;
 
 stat_block
@@ -516,12 +534,26 @@ CLASS       : 'class';
 EXTENDS     : 'extends';
 IMPLEMENTS  : 'implements';
 
+ABSTRACT    : 'abstract';
+ANNOTATION  : 'annotation';
+BRIDGE      : 'bridge';
+DEPRECATED  : 'deprecated';
+ENUM        : 'enum';
+FINAL       : 'final';
+INTERFACE   : 'interface';
+NATIVE      : 'native';
 PRIVATE     : 'private';
 PROTECTED   : 'protected';
 PUBLIC      : 'public';
-FINAL       : 'final';
-SYNCHRONIZED: 'synchronized';
+RECORD      : 'record';
 STATIC      : 'static';
+STRICT      : 'strict';
+SUPER       : 'super';
+SYNCHRONIZED: 'synchronized';
+SYNTHETIC   : 'synthetic';
+TRANSIENT   : 'transient';
+VARARGS     : 'varargs';
+VOLATILE    : 'volatile';
 
 INIT        : '<init>';
 CLINIT      : '<clinit>';

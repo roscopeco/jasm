@@ -42,8 +42,8 @@ class ParserTests {
         assertClass(test).hasName("PublicFinalEmptyClass");
         assertThat(test.member()).isEmpty();
 
-        assertThat(test.modifier(0).PUBLIC()).isNotNull();
-        assertThat(test.modifier(1).FINAL()).isNotNull();
+        assertThat(test.type_modifier(0).PUBLIC()).isNotNull();
+        assertThat(test.type_modifier(1).FINAL()).isNotNull();
     }
 
     @Test

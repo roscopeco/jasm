@@ -5,14 +5,12 @@
  */
 package com.roscopeco.jasm;
 
-import java.util.List;
-import java.util.function.Function;
-
 import com.roscopeco.jasm.antlr.JasmParser;
 import lombok.NonNull;
-import org.antlr.v4.runtime.tree.TerminalNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -26,69 +24,64 @@ import static org.objectweb.asm.Opcodes.ACC_SYNCHRONIZED;
 
 class ModifiersTest {
     private Modifiers modifiers;
-    private TerminalNode mockTerminal;
 
     @BeforeEach
     void setup() {
         this.modifiers = new Modifiers();
-        this.mockTerminal = mock(TerminalNode.class);
     }
 
     @Test
     void testPrivateModifier() {
-        runTest(ACC_PRIVATE, List.of(JasmParser.ModifierContext::PRIVATE));
+        runTest(ACC_PRIVATE, List.of("private"));
     }
 
     @Test
     void testProtectedModifier() {
-        runTest(ACC_PROTECTED, List.of(JasmParser.ModifierContext::PROTECTED));
+        runTest(ACC_PROTECTED, List.of("protected"));
     }
 
     @Test
     void testPublicModifier() {
-        runTest(ACC_PUBLIC, List.of(JasmParser.ModifierContext::PUBLIC));
+        runTest(ACC_PUBLIC, List.of("public"));
     }
 
     @Test
     void testFinalModifier() {
-        runTest(ACC_FINAL, List.of(JasmParser.ModifierContext::FINAL));
+        runTest(ACC_FINAL, List.of("final"));
     }
 
     @Test
     void testSynchronizedModifier() {
-        runTest(ACC_SYNCHRONIZED, List.of(JasmParser.ModifierContext::SYNCHRONIZED));
+        runTest(ACC_SYNCHRONIZED, List.of("synchronized"));
     }
 
     @Test
     void testStaticModifier() {
-        runTest(ACC_STATIC, List.of(JasmParser.ModifierContext::STATIC));
+        runTest(ACC_STATIC, List.of("static"));
     }
 
     @Test
     void testModifiersAreCombinedCorrectly() {
         runTest(ACC_PUBLIC | ACC_FINAL,
-                List.of(JasmParser.ModifierContext::PUBLIC, JasmParser.ModifierContext::FINAL)
+                List.of("public", "final")
         );
 
         runTest(ACC_PUBLIC | ACC_SYNCHRONIZED | ACC_FINAL,
-                List.of(JasmParser.ModifierContext::PUBLIC,
-                        JasmParser.ModifierContext::SYNCHRONIZED,
-                        JasmParser.ModifierContext::FINAL
+                List.of("public",
+                        "synchronized",
+                        "final"
                 )
         );
 
         runTest(ACC_PUBLIC | ACC_STATIC,
-                List.of(JasmParser.ModifierContext::PUBLIC, JasmParser.ModifierContext::STATIC)
+                List.of("public", "static")
         );
     }
 
-    private void runTest(
-            final int expectedBitmap,
-            @NonNull final List<Function<JasmParser.ModifierContext, TerminalNode>> mocks
-    ) {
+    private void runTest(final int expectedBitmap, @NonNull final List<String> mocks) {
         final var mockContexts = mocks.stream().map(mockFunc -> {
-            final var mock = mock(JasmParser.ModifierContext.class);
-            when(mockFunc.apply(mock)).thenReturn(mockTerminal);
+            final var mock = mock(JasmParser.Method_modifierContext.class);
+            when(mock.getText()).thenReturn(mockFunc);
             return mock;
         }).toList();
 

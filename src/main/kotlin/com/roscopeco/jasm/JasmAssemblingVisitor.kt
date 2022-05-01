@@ -97,7 +97,7 @@ class JasmAssemblingVisitor(
     override fun visitClass(ctx: ClassContext) {
         visitor.visit(
             Opcodes.V17,
-            modifiers.mapModifiers(ctx.modifier()),
+            modifiers.mapModifiers(ctx.type_modifier()),
             ctx.classname().text,
             null,
             ctx.extends_()?.QNAME()?.text ?: "java/lang/Object",
@@ -115,7 +115,7 @@ class JasmAssemblingVisitor(
 
     override fun visitField(ctx: FieldContext) {
         val fv = visitor.visitField(
-            modifiers.mapModifiers(ctx.modifier()),
+            modifiers.mapModifiers(ctx.field_modifier()),
             ctx.membername().text,
             ctx.type().text,
             null,
@@ -135,7 +135,7 @@ class JasmAssemblingVisitor(
 
         // Cheating slightly, but prevents us having to have an apparently-mutable visitor...
         private val methodVisitor: MethodVisitor = visitor.visitMethod(
-            modifiers.mapModifiers(ctx.modifier()),
+            modifiers.mapModifiers(ctx.method_modifier()),
             ctx.membername().text,
             generateMethodDescriptor(ctx),
             null,
