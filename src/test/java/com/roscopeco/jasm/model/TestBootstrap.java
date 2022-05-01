@@ -11,8 +11,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
 public class TestBootstrap {
-    public static final String DYNAMIC_CONST_FOR_TEST = "The expected result";
     private static final MethodHandles.Lookup lookup = MethodHandles.lookup();
+
+    /*
+     * Used as constdynamic in invokedynamic and ldc tests.
+     */
+    public static final String DYNAMIC_CONST_FOR_TEST = "The expected result";
 
     private final String theResult;
 
@@ -21,14 +25,16 @@ public class TestBootstrap {
     }
 
     /*
-      * This is the method that ultimately implements the lambda for the basic test.
+     * This is the method that ultimately implements the lambda for the basic
+     * invokedynamic test.
      */
     public static String lambdaGetImpl() {
         return "The expected basic result";
     }
 
     /*
-     * This is the static method handle used in the full test.
+     * This is the static method handle used in the full invokedynamic test.
+     * Also used in the LDC method handle test.
      */
     public static String staticForHandleTest() {
         return "Handle is good";

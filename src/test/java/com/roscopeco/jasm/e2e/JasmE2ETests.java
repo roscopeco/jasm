@@ -125,7 +125,7 @@ class JasmE2ETests {
     }
 
     @Test
-    void shouldAssembleAconstNullAreturnToValidJavaClass() {
+    void shouldAssembleLdcAconstNullAreturnToValidJavaClass() {
         final var clz = assembleAndDefine("com/roscopeco/jasm/LdcAconstAreturn.jasm");
 
         assertThat(clz.getName()).isEqualTo("com.roscopeco.jasm.LdcAconstAreturn");
