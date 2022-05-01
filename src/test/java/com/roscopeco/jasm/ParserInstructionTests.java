@@ -16,6 +16,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class ParserInstructionTests {
     @Test
+    void handlesAaload() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Aaload.jasm", code -> code
+                .aaload()
+                .noMoreCode()
+        );
+    }
+
+    @Test
+    void handlesAastore() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Aastore.jasm", code -> code
+                .aastore()
+                .noMoreCode()
+        );
+    }
+
+    @Test
     void handlesAconstNull() {
         runInstructionTest("com/roscopeco/jasm/insntest/AconstNull.jasm", code -> code
                 .aconstNull()
@@ -35,6 +51,22 @@ class ParserInstructionTests {
     void handlesAreturn() {
         runInstructionTest("com/roscopeco/jasm/insntest/Areturn.jasm", code -> code
                 .areturn()
+                .noMoreCode()
+        );
+    }
+
+    @Test
+    void handlesArraylength() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Arraylength.jasm", code -> code
+                .arraylength()
+                .noMoreCode()
+        );
+    }
+
+    @Test
+    void handlesAstore() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Astore.jasm", code -> code
+                .astore(1)
                 .noMoreCode()
         );
     }

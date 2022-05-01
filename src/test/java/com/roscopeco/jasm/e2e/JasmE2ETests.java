@@ -14,6 +14,8 @@ import com.roscopeco.jasm.model.Interface2;
 import com.roscopeco.jasm.model.IfNullNonNullTest;
 import com.roscopeco.jasm.model.InvokedynamicTest;
 import com.roscopeco.jasm.model.LdcAconstAreturn;
+import com.roscopeco.jasm.model.LoadsAndStoresTest;
+import com.roscopeco.jasm.model.RefArrayTests;
 import com.roscopeco.jasm.model.Superclass;
 import org.junit.jupiter.api.Test;
 
@@ -22,7 +24,6 @@ import java.util.List;
 
 import static com.roscopeco.jasm.TestUtil.assembleAndDefine;
 import static com.roscopeco.jasm.TestUtil.boolVoidInvoker;
-import static com.roscopeco.jasm.TestUtil.floatVoidInvoker;
 import static com.roscopeco.jasm.TestUtil.instantiate;
 import static com.roscopeco.jasm.TestUtil.intVoidInvoker;
 import static com.roscopeco.jasm.TestUtil.objectArgsInvoker;
@@ -444,6 +445,45 @@ class JasmE2ETests {
 
         assertThat(threeArg).isNotNull();
         assertThat(threeArg.getParameterTypes()).containsExactly(String.class, String[].class, String[][].class);
+    }
 
+    @Test
+    void shouldAssembleRefArrayTestsToValidJavaClass() {
+        final var clz = assembleAndDefine("com/roscopeco/jasm/RefArrayTests.jasm");
+
+        assertThat(clz.getName()).isEqualTo("com.roscopeco.jasm.RefArrayTests");
+
+        assertThat(clz.getDeclaredClasses()).isEmpty();
+        assertThat(clz.getDeclaredFields()).isEmpty();
+        assertThat(clz.getDeclaredConstructors()).hasSize(1);
+        assertThat(clz.getDeclaredMethods()).hasSize(4);
+
+        final var obj = instantiate(clz, RefArrayTests.class);
+        final var ary = obj.newSingleElementArray();
+
+        assertThat(ary).hasSize(1);
+        assertThat(ary[0]).isNull();
+
+        obj.putInArray(ary, "Testing");
+
+        assertThat(ary[0]).isEqualTo("Testing");
+        assertThat(obj.getFromArray(ary)).isEqualTo("Testing");
+
+        assertThat(obj.getArrayLength(ary)).isEqualTo(1);
+    }
+
+    @Test
+    void shouldAssembleLoadStoreTestsToValidJavaClass() {
+        final var clz = assembleAndDefine("com/roscopeco/jasm/LoadsAndStoresTest.jasm");
+
+        assertThat(clz.getName()).isEqualTo("com.roscopeco.jasm.LoadsAndStoresTest");
+
+        assertThat(clz.getDeclaredClasses()).isEmpty();
+        assertThat(clz.getDeclaredFields()).isEmpty();
+        assertThat(clz.getDeclaredConstructors()).hasSize(1);
+        assertThat(clz.getDeclaredMethods()).hasSize(1);
+
+        final var obj = instantiate(clz, LoadsAndStoresTest.class);
+        assertThat(obj.testAloadAstore()).isEqualTo("Test String");
     }
 }

@@ -18,6 +18,20 @@ import static com.roscopeco.jasm.asserts.LexerParserAssertions.assertTokens;
 
 class LexerInstructionTests {
     @Test
+    void shouldLexAaload() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Aaload.jasm", lexer ->
+                assertNextToken(lexer)
+                        .hasType(JasmLexer.AALOAD));
+    }
+
+    @Test
+    void shouldLexAastore() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Aastore.jasm", lexer ->
+                assertNextToken(lexer)
+                        .hasType(JasmLexer.AASTORE));
+    }
+
+    @Test
     void shouldLexAconstNull() {
         runInstructionTest("com/roscopeco/jasm/insntest/AconstNull.jasm", lexer ->
                 assertNextToken(lexer)
@@ -37,10 +51,41 @@ class LexerInstructionTests {
     }
 
     @Test
+    void shouldLexAnewarray() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Anewarray.jasm", lexer -> {
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.ANEWARRAY);
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.QNAME)
+                    .hasText("java/lang/String");
+        });
+    }
+
+    @Test
     void shouldLexAreturn() {
         runInstructionTest("com/roscopeco/jasm/insntest/Areturn.jasm", REF_RETURN_TYPE_TOKEN, lexer ->
                 assertNextToken(lexer)
                         .hasType(JasmLexer.ARETURN));
+    }
+
+    @Test
+    void shouldLexArraylength() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Arraylength.jasm", lexer ->
+                assertNextToken(lexer)
+                        .hasType(JasmLexer.ARRAYLENGTH));
+    }
+
+    @Test
+    void shouldLexAstore() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Astore.jasm", lexer -> {
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.ASTORE);
+
+            assertNextToken(lexer)
+                    .hasType(JasmLexer.INT)
+                    .hasText("1");
+        });
     }
 
     @Test

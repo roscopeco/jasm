@@ -36,10 +36,14 @@ class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private
         return caller
     }
 
+    fun aaload() = genericNoOperandCheck("aaload", InstructionContext::insn_aaload)
+
+    fun aastore() = genericNoOperandCheck("aastore", InstructionContext::insn_aastore)
+
     fun aconstNull() = genericNoOperandCheck("aconst_null", InstructionContext::insn_aconst_null)
 
     fun aload(expected: Int) = genericIntOperandCheck("aload", expected, InstructionContext::insn_aload) {
-            aload -> aload.atom().text
+            aload -> aload.int_atom().text
     }
 
     fun anew(expected: String) = genericStringOperandCheck("new", expected, InstructionContext::insn_new) {
@@ -47,6 +51,12 @@ class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private
     }
 
     fun areturn() = genericNoOperandCheck("areturn", InstructionContext::insn_areturn)
+
+    fun arraylength() = genericNoOperandCheck("arraylength", InstructionContext::insn_arraylength)
+
+    fun astore(expected: Int) = genericIntOperandCheck("astore", expected, InstructionContext::insn_astore) {
+            astore -> astore.int_atom().text
+    }
 
     fun athrow() = genericNoOperandCheck("athrow", InstructionContext::insn_athrow)
 

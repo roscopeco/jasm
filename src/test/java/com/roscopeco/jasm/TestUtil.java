@@ -7,6 +7,7 @@ package com.roscopeco.jasm;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -20,6 +21,8 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.TokenStream;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.util.TraceClassVisitor;
 import org.opentest4j.AssertionFailedError;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -173,7 +176,16 @@ public class TestUtil {
     }
 
     public static byte[] assemble(final String testCase) {
-        return new JasmAssembler(testCase, () -> inputStreamForTestCase(testCase)).assemble();
+        final var bytes = new JasmAssembler(testCase, () -> inputStreamForTestCase(testCase)).assemble();
+
+        if (Boolean.parseBoolean(System.getProperty("jasmTestDumpClass"))) {
+            final var classReader = new ClassReader(bytes);
+            final var tcv = new TraceClassVisitor(new PrintWriter(System.out));
+
+            classReader.accept(tcv, 0);
+        }
+
+        return bytes;
     }
 
     public static Class<?> assembleAndDefine(final String testCase) {

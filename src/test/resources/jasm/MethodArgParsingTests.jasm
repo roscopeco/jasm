@@ -1,0 +1,10 @@
+public class MethodArgParsingTests {
+    public allPrims(B;C;D;F;I;J;S;Z)V {
+    }
+
+    public allRefs(Ljava/lang/String;Ljava/lang/Object;)Ljava/util/List; {
+    }
+
+    public mixPrimsAndRefs(I;J;Ljava/lang/String;Z;Ljava/util/List;Z;Z)V {
+    }
+}

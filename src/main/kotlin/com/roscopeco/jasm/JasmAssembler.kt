@@ -55,7 +55,7 @@ class JasmAssembler(private val unitName: String, private val classFormat: Int, 
                     )
                 )
                 val classWriter =
-                    ClassWriter(ClassWriter.COMPUTE_MAXS or ClassWriter.COMPUTE_FRAMES)
+                    ClassWriter(ClassWriter.COMPUTE_FRAMES)
                 val assembler = JasmAssemblingVisitor(classWriter, unitName, classFormat)
 
                 parser.class_().accept(assembler)

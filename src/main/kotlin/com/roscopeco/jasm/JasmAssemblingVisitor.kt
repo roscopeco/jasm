@@ -6,13 +6,17 @@
 package com.roscopeco.jasm
 
 import com.roscopeco.jasm.antlr.JasmBaseVisitor
+import com.roscopeco.jasm.antlr.JasmParser
 import com.roscopeco.jasm.antlr.JasmParser.ClassContext
 import com.roscopeco.jasm.antlr.JasmParser.FieldContext
 import com.roscopeco.jasm.antlr.JasmParser.MethodContext
 import com.roscopeco.jasm.antlr.JasmParser.LabelContext
 import com.roscopeco.jasm.antlr.JasmParser.Insn_aconst_nullContext
 import com.roscopeco.jasm.antlr.JasmParser.Insn_aloadContext
+import com.roscopeco.jasm.antlr.JasmParser.Insn_anewarrayContext
 import com.roscopeco.jasm.antlr.JasmParser.Insn_areturnContext
+import com.roscopeco.jasm.antlr.JasmParser.Insn_arraylengthContext
+import com.roscopeco.jasm.antlr.JasmParser.Insn_astoreContext
 import com.roscopeco.jasm.antlr.JasmParser.Insn_athrowContext
 import com.roscopeco.jasm.antlr.JasmParser.Insn_checkcastContext
 import com.roscopeco.jasm.antlr.JasmParser.Insn_dupContext
@@ -156,19 +160,44 @@ class JasmAssemblingVisitor(
             super.visitLabel(ctx)
         }
 
+        override fun visitInsn_aaload(ctx: JasmParser.Insn_aaloadContext) {
+            methodVisitor.visitInsn(Opcodes.AALOAD)
+            super.visitInsn_aaload(ctx)
+        }
+
+        override fun visitInsn_aastore(ctx: JasmParser.Insn_aastoreContext) {
+            methodVisitor.visitInsn(Opcodes.AASTORE)
+            super.visitInsn_aastore(ctx)
+        }
+
         override fun visitInsn_aconst_null(ctx: Insn_aconst_nullContext) {
             methodVisitor.visitInsn(Opcodes.ACONST_NULL)
             super.visitInsn_aconst_null(ctx)
         }
 
         override fun visitInsn_aload(ctx: Insn_aloadContext) {
-            methodVisitor.visitIntInsn(Opcodes.ALOAD, ctx.atom().text.toInt())
+            methodVisitor.visitVarInsn(Opcodes.ALOAD, ctx.int_atom().text.toInt())
             super.visitInsn_aload(ctx)
+        }
+
+        override fun visitInsn_anewarray(ctx: Insn_anewarrayContext) {
+            methodVisitor.visitTypeInsn(Opcodes.ANEWARRAY, ctx.QNAME().text)
+            super.visitInsn_anewarray(ctx)
         }
 
         override fun visitInsn_areturn(ctx: Insn_areturnContext) {
             methodVisitor.visitInsn(Opcodes.ARETURN)
             super.visitInsn_areturn(ctx)
+        }
+
+        override fun visitInsn_arraylength(ctx: Insn_arraylengthContext) {
+            methodVisitor.visitInsn(Opcodes.ARRAYLENGTH)
+            super.visitInsn_arraylength(ctx)
+        }
+
+        override fun visitInsn_astore(ctx: Insn_astoreContext) {
+            methodVisitor.visitVarInsn(Opcodes.ASTORE, ctx.int_atom().text.toInt())
+            super.visitInsn_astore(ctx)
         }
 
         override fun visitInsn_athrow(ctx: Insn_athrowContext) {

@@ -1,0 +1,14 @@
+public class com/roscopeco/jasm/LoadsAndStoresTest implements com/roscopeco/jasm/model/LoadsAndStoresTest {
+    public <init>()V {
+        aload 0
+        invokespecial java/lang/Object.<init>()V
+        return
+    }
+
+    public testAloadAstore()Ljava/lang/Object; {
+        ldc "Test String"
+        astore 1
+        aload 1
+        areturn
+    }
+}

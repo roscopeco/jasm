@@ -1,0 +1,34 @@
+public class com/roscopeco/jasm/RefArrayTests implements com/roscopeco/jasm/model/RefArrayTests {
+    public newSingleElementArray()[Ljava/lang/String; {
+        iconst 1
+        anewarray java/lang/String
+        areturn
+    }
+
+    public putInArray([Ljava/lang/String;Ljava/lang/String;)V {
+        aload 1
+        iconst 0
+        aload 2
+        aastore
+        return
+    }
+
+    public getFromArray([Ljava/lang/String;)Ljava/lang/String; {
+        aload 1
+        iconst 0
+        aaload
+        areturn
+    }
+
+    public getArrayLength([Ljava/lang/String;)I {
+        aload 1
+        arraylength
+        ireturn
+    }
+
+    public <init>()V {
+        aload 0
+        invokespecial java/lang/Object.<init>()V
+        return
+    }
+}

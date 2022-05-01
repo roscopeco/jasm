@@ -203,6 +203,189 @@ class LexerTests {
     }
 
     @Test
+    void shouldLexMethodArgumentsCorrectly() {
+        final var lexer = testCaseLexer("MethodArgParsingTests.jasm");
+
+        assertTokens(lexer, tokens -> {
+            tokens.next()
+                    .hasType(JasmLexer.PUBLIC);
+
+            tokens.next()
+                    .hasType(JasmLexer.CLASS);
+
+            tokens.next()
+                    .hasType(JasmLexer.NAME)
+                    .hasText("MethodArgParsingTests");
+
+            tokens.next()
+                    .hasType(JasmLexer.LBRACE);
+
+            /* All primitives method */
+            tokens.next()
+                    .hasType(JasmLexer.PUBLIC);
+
+            tokens.next()
+                    .hasType(JasmLexer.NAME)
+                    .hasText("allPrims");
+
+            tokens.next()
+                    .hasType(JasmLexer.LPAREN);
+
+            tokens.next()
+                    .hasType(JasmLexer.TYPE_BYTE);
+            tokens.next()
+                    .hasType(JasmLexer.SEMI);
+
+            tokens.next()
+                    .hasType(JasmLexer.TYPE_CHAR);
+            tokens.next()
+                    .hasType(JasmLexer.SEMI);
+
+            tokens.next()
+                    .hasType(JasmLexer.TYPE_DOUBLE);
+            tokens.next()
+                    .hasType(JasmLexer.SEMI);
+
+            tokens.next()
+                    .hasType(JasmLexer.TYPE_FLOAT);
+            tokens.next()
+                    .hasType(JasmLexer.SEMI);
+
+            tokens.next()
+                    .hasType(JasmLexer.TYPE_INT);
+            tokens.next()
+                    .hasType(JasmLexer.SEMI);
+
+            tokens.next()
+                    .hasType(JasmLexer.TYPE_LONG);
+            tokens.next()
+                    .hasType(JasmLexer.SEMI);
+
+            tokens.next()
+                    .hasType(JasmLexer.TYPE_SHORT);
+            tokens.next()
+                    .hasType(JasmLexer.SEMI);
+
+            tokens.next()
+                    .hasType(JasmLexer.TYPE_BOOL);
+
+            tokens.next()
+                    .hasType(JasmLexer.RPAREN);
+
+            tokens.next()
+                    .hasType(JasmLexer.TYPE_VOID);
+
+            tokens.next()
+                    .hasType(JasmLexer.LBRACE);
+
+            tokens.next()
+                    .hasType(JasmLexer.RBRACE);
+
+            /* All references method */
+            tokens.next()
+                    .hasType(JasmLexer.PUBLIC);
+
+            tokens.next()
+                    .hasType(JasmLexer.NAME)
+                    .hasText("allRefs");
+
+            tokens.next()
+                    .hasType(JasmLexer.LPAREN);
+
+            tokens.next()
+                    .hasType(JasmLexer.QNAME)
+                    .hasText("Ljava/lang/String");
+            tokens.next()
+                    .hasType(JasmLexer.SEMI);
+
+            tokens.next()
+                    .hasType(JasmLexer.QNAME)
+                    .hasText("Ljava/lang/Object");
+            tokens.next()
+                    .hasType(JasmLexer.SEMI);
+
+            tokens.next()
+                    .hasType(JasmLexer.RPAREN);
+
+            tokens.next()
+                    .hasType(JasmLexer.QNAME)
+                    .hasText("Ljava/util/List");
+            tokens.next()
+                    .hasType(JasmLexer.SEMI);
+
+            tokens.next()
+                    .hasType(JasmLexer.LBRACE);
+
+            tokens.next()
+                    .hasType(JasmLexer.RBRACE);
+
+            /* Mixed prims and references method */
+            tokens.next()
+                    .hasType(JasmLexer.PUBLIC);
+
+            tokens.next()
+                    .hasType(JasmLexer.NAME)
+                    .hasText("mixPrimsAndRefs");
+
+            tokens.next()
+                    .hasType(JasmLexer.LPAREN);
+
+            tokens.next()
+                    .hasType(JasmLexer.TYPE_INT);
+            tokens.next()
+                    .hasType(JasmLexer.SEMI);
+
+            tokens.next()
+                    .hasType(JasmLexer.TYPE_LONG);
+            tokens.next()
+                    .hasType(JasmLexer.SEMI);
+
+            tokens.next()
+                    .hasType(JasmLexer.QNAME)
+                    .hasText("Ljava/lang/String");
+            tokens.next()
+                    .hasType(JasmLexer.SEMI);
+
+            tokens.next()
+                    .hasType(JasmLexer.TYPE_BOOL);
+            tokens.next()
+                    .hasType(JasmLexer.SEMI);
+
+            tokens.next()
+                    .hasType(JasmLexer.QNAME)
+                    .hasText("Ljava/util/List");
+            tokens.next()
+                    .hasType(JasmLexer.SEMI);
+
+            tokens.next()
+                    .hasType(JasmLexer.TYPE_BOOL);
+            tokens.next()
+                    .hasType(JasmLexer.SEMI);
+
+            tokens.next()
+                    .hasType(JasmLexer.TYPE_BOOL);
+
+            tokens.next()
+                    .hasType(JasmLexer.RPAREN);
+
+            tokens.next()
+                    .hasType(JasmLexer.TYPE_VOID);
+
+            tokens.next()
+                    .hasType(JasmLexer.LBRACE);
+
+            tokens.next()
+                    .hasType(JasmLexer.RBRACE);
+
+            tokens.next()
+                    .hasType(JasmLexer.RBRACE);
+
+            tokens.next()
+                    .hasType(JasmLexer.EOF);
+        });
+    }
+
+    @Test
     @SuppressWarnings("java:S5961" /* We need to consume (and assert!) all the tokens */)
     void shouldLexClassWithSuperclassAndInterfaces() {
         final var lexer = testCaseLexer("com/roscopeco/jasm/InheritAndInterfaceTest.jasm");

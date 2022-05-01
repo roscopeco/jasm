@@ -53,11 +53,13 @@ type
  ;
 
 argument_type
- : TYPE_VOID
+ : TYPE_BYTE
+ | TYPE_CHAR
  | TYPE_INT
  | TYPE_LONG
  | TYPE_FLOAT
  | TYPE_DOUBLE
+ | TYPE_SHORT
  | TYPE_BOOL
  | ref_type
  | prim_array_type SEMI
@@ -69,10 +71,13 @@ ref_type
  ;
 
 prim_array_type
- : LSQUARE+ TYPE_INT
+ : LSQUARE+ TYPE_BYTE
+ | LSQUARE+ TYPE_CHAR
+ | LSQUARE+ TYPE_INT
  | LSQUARE+ TYPE_LONG
  | LSQUARE+ TYPE_FLOAT
  | LSQUARE+ TYPE_DOUBLE
+ | LSQUARE+ TYPE_SHORT
  | LSQUARE+ TYPE_BOOL
  ;
 
@@ -99,9 +104,14 @@ stat
  ;
 
 instruction
- : insn_aconst_null
+ : insn_aaload
+ | insn_aastore
+ | insn_aconst_null
  | insn_aload
+ | insn_anewarray
  | insn_areturn
+ | insn_arraylength
+ | insn_astore
  | insn_athrow
  | insn_checkcast
  | insn_dup
@@ -136,16 +146,36 @@ instruction
  | label
  ;
 
+insn_aaload
+ : AALOAD
+ ;
+
+insn_aastore
+ : AASTORE
+ ;
+
 insn_aconst_null
  : ACONST_NULL
  ;
 
 insn_aload
- : ALOAD atom
+ : ALOAD int_atom
+ ;
+
+insn_anewarray
+ : ANEWARRAY QNAME
  ;
 
 insn_areturn
  : ARETURN
+ ;
+
+insn_arraylength
+ : ARRAYLENGTH
+ ;
+
+insn_astore
+ : ASTORE int_atom
  ;
 
 insn_athrow
@@ -360,9 +390,14 @@ STATIC      : 'static';
 INIT        : '<init>';
 CLINIT      : '<clinit>';
 
+AALOAD          : 'aaload';
+AASTORE         : 'aastore';
 ACONST_NULL     : 'aconst_null';
 ALOAD           : 'aload';
+ANEWARRAY       : 'anewarray';
 ARETURN         : 'areturn';
+ARRAYLENGTH     : 'arraylength';
+ASTORE          : 'astore';
 ATHROW          : 'athrow';
 CHECKCAST       : 'checkcast';
 DUP             : 'dup';
@@ -403,10 +438,13 @@ NEWINVOKESPECIAL: 'newinvokespecial';
 CONSTDYNAMIC    : 'constdynamic';
 
 TYPE_VOID   : 'V';
+TYPE_BYTE   : 'B';
+TYPE_CHAR   : 'C';
+TYPE_DOUBLE : 'D';
+TYPE_FLOAT  : 'F';
 TYPE_INT    : 'I';
 TYPE_LONG   : 'J';
-TYPE_FLOAT  : 'F';
-TYPE_DOUBLE : 'D';
+TYPE_SHORT  : 'S';
 TYPE_BOOL   : 'Z';
 
 TRUE    : 'true';
