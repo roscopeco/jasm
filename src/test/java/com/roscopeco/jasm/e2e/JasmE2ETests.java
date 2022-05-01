@@ -388,4 +388,41 @@ class JasmE2ETests {
         assertThat(obj.doBasicInvokeDynamicTest()).isEqualTo("The expected basic result");
         assertThat(obj.doInvokeDynamicTest()).isEqualTo("The expected result");
     }
+
+    @Test
+    void shouldAssembleArrayTypesParamsValidJavaClass() throws NoSuchFieldException, NoSuchMethodException {
+        final var clz = assembleAndDefine("com/roscopeco/jasm/ArrayTypesTest.jasm");
+
+        assertThat(clz.getName()).isEqualTo("com.roscopeco.jasm.ArrayTypesTest");
+
+        assertThat(clz.getDeclaredClasses()).isEmpty();
+        assertThat(clz.getDeclaredFields()).hasSize(2);
+        assertThat(clz.getDeclaredConstructors()).hasSize(1);
+        assertThat(clz.getDeclaredMethods()).hasSize(2);
+
+        final var arrayField = clz.getDeclaredField("arrayField");
+        final var primArrayField = clz.getDeclaredField("primArrayField");
+        final var oneArg = clz.getDeclaredMethod("arrayTypesTest", int[].class, String[][].class);
+        final var threeArg = clz.getDeclaredMethod(
+                "arrayTypesTestMultiple",
+                String.class,
+                String[].class,
+                String[][].class
+        );
+
+        assertThat(arrayField).isNotNull();
+        assertThat(arrayField.getType()).isEqualTo(Object[].class);
+
+        assertThat(primArrayField).isNotNull();
+        assertThat(primArrayField.getType()).isEqualTo(int[].class);
+
+        // Probably don't actually need these, getDeclaredMethod would have failed if they weren't true,
+        // but here for clarity and to prevent warnings...
+        assertThat(oneArg).isNotNull();
+        assertThat(oneArg.getParameterTypes()).containsExactly(int[].class, String[][].class);
+
+        assertThat(threeArg).isNotNull();
+        assertThat(threeArg.getParameterTypes()).containsExactly(String.class, String[].class, String[][].class);
+
+    }
 }

@@ -53,22 +53,42 @@ import org.objectweb.asm.Handle
 import org.objectweb.asm.Label
 import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes
-import org.objectweb.asm.Opcodes.H_INVOKEINTERFACE
-import org.objectweb.asm.Opcodes.H_INVOKESPECIAL
-import org.objectweb.asm.Opcodes.H_INVOKESTATIC
-import org.objectweb.asm.Opcodes.H_INVOKEVIRTUAL
-import org.objectweb.asm.Opcodes.H_NEWINVOKESPECIAL
-import org.objectweb.asm.Opcodes.H_GETFIELD
-import org.objectweb.asm.Opcodes.H_GETSTATIC
-import org.objectweb.asm.Opcodes.H_PUTFIELD
-import org.objectweb.asm.Opcodes.H_PUTSTATIC
 import org.objectweb.asm.Type
 
+/**
+ * The main visitor which does the code generation to an ASM {@code ClassVisitor}.
+ *
+ * @param visitor An ASM class visitor to do generation with
+ * @param modifiers An instance of the {@link Modifiers} class to handle modifier-related stuff
+ * @param unitName The name of the compilation unit (shows up in errors and as an attribute in the class)
+ * @param classFormat One of the ASM {@code Vxx} constants from the {@code org.objectweb.asm. class
+ */
 class JasmAssemblingVisitor(
     private val visitor: ClassVisitor,
     private val modifiers: Modifiers,
-    private val unitName: String
+    private val unitName: String,
+    private val classFormat: Int
 ) : JasmBaseVisitor<Unit>() {
+
+    /**
+     * Convenience constructor which will use the class format for Java 17 (61.0) and a default
+     * Modifiers instance.
+     *
+     * @param visitor An ASM class visitor to do generation with
+     * @param unitName The name of the compilation unit (shows up in errors and as an attribute in the class)
+     */
+    constructor(visitor: ClassVisitor, unitName: String) : this(visitor, unitName, Opcodes.V17)
+
+    /**
+     * Convenience constructor which will use the specified class format and a default
+     * Modifiers instance.
+     *
+     * @param visitor An ASM class visitor to do generation with
+     * @param unitName The name of the compilation unit (shows up in errors and as an attribute in the class)
+     * @param classFormat One of the ASM {@code Vxx} constants from the {@code org.objectweb.asm. class
+     */
+    constructor(visitor: ClassVisitor, unitName: String, classFormat: Int)
+            : this(visitor, Modifiers(), unitName, classFormat)
 
     override fun visitClass(ctx: ClassContext) {
         visitor.visit(
@@ -283,15 +303,15 @@ class JasmAssemblingVisitor(
         }
 
         private fun generateTagForHandle(ctx: Method_handleContext) = when {
-            ctx.handle_tag().INVOKEINTERFACE() != null -> H_INVOKEINTERFACE
-            ctx.handle_tag().INVOKESPECIAL() != null -> H_INVOKESPECIAL
-            ctx.handle_tag().INVOKESTATIC() != null -> H_INVOKESTATIC
-            ctx.handle_tag().INVOKEVIRTUAL() != null -> H_INVOKEVIRTUAL
-            ctx.handle_tag().NEWINVOKESPECIAL() != null -> H_NEWINVOKESPECIAL
-            ctx.handle_tag().GETFIELD() != null -> H_GETFIELD
-            ctx.handle_tag().GETSTATIC() != null -> H_GETSTATIC
-            ctx.handle_tag().PUTFIELD() != null -> H_PUTFIELD
-            ctx.handle_tag().PUTSTATIC() != null -> H_PUTSTATIC
+            ctx.handle_tag().INVOKEINTERFACE() != null  -> Opcodes.H_INVOKEINTERFACE
+            ctx.handle_tag().INVOKESPECIAL() != null    -> Opcodes.H_INVOKESPECIAL
+            ctx.handle_tag().INVOKESTATIC() != null     -> Opcodes.H_INVOKESTATIC
+            ctx.handle_tag().INVOKEVIRTUAL() != null    -> Opcodes.H_INVOKEVIRTUAL
+            ctx.handle_tag().NEWINVOKESPECIAL() != null -> Opcodes.H_NEWINVOKESPECIAL
+            ctx.handle_tag().GETFIELD() != null         -> Opcodes.H_GETFIELD
+            ctx.handle_tag().GETSTATIC() != null        -> Opcodes.H_GETSTATIC
+            ctx.handle_tag().PUTFIELD() != null         -> Opcodes.H_PUTFIELD
+            ctx.handle_tag().PUTSTATIC() != null        -> Opcodes.H_PUTSTATIC
             else -> throw SyntaxErrorException("Unknown handle tag " + ctx.handle_tag().text)
         }
 
@@ -301,13 +321,13 @@ class JasmAssemblingVisitor(
 
         private fun buildSingleBootstrapArg(idx: Int, ctx: Bootstrap_argContext): Any {
             return when {
-                ctx.int_atom() != null -> Integer.parseInt(ctx.int_atom().text)
-                ctx.float_atom() != null -> java.lang.Float.parseFloat(ctx.float_atom().text)
-                ctx.string_atom() != null -> unescapeConstantString(ctx.string_atom().text)
-                ctx.QNAME() != null -> Type.getType("L" + ctx.QNAME().text + ";")
-                ctx.method_handle() != null -> buildBootstrapHandle(ctx.method_handle())
+                ctx.int_atom() != null          -> Integer.parseInt(ctx.int_atom().text)
+                ctx.float_atom() != null        -> java.lang.Float.parseFloat(ctx.float_atom().text)
+                ctx.string_atom() != null       -> unescapeConstantString(ctx.string_atom().text)
+                ctx.QNAME() != null             -> Type.getType("L" + ctx.QNAME().text + ";")
+                ctx.method_handle() != null     -> buildBootstrapHandle(ctx.method_handle())
                 ctx.method_descriptor() != null -> Type.getMethodType(fixDescriptor(ctx.method_descriptor().text))
-                ctx.constdynamic() != null -> ConstantDynamic(
+                ctx.constdynamic() != null      -> ConstantDynamic(
                     ctx.constdynamic().membername().text,
                     ctx.constdynamic().type().text,
                     buildBootstrapHandle(ctx.constdynamic().method_handle()),
@@ -396,10 +416,18 @@ class JasmAssemblingVisitor(
         }
 
         private fun generateMethodDescriptor(ctx: MethodContext): String {
-            val type = ctx.type()
-            val returnType = type[type.size - 1].text
+            val returnType = ctx.type().text
 
-            val paramTypes = type.subList(0, type.size - 1).joinToString { it.text }
+            val paramTypes = ctx.argument_type().joinToString(separator = "") {
+                if (it.prim_array_type() != null) {
+                    // TODO this is a bit crufty; primitive array types will have a semi in the text
+                    //      because of it being the separator, but we don't want it in the descriptor.
+                    //      Could probably clean this up properly in the grammar....
+                    it.prim_array_type().text
+                } else {
+                    it.text
+                }
+            }
 
             return "($paramTypes)$returnType"
         }

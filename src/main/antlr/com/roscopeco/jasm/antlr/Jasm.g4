@@ -31,7 +31,7 @@ field
  ;
 
 method
- : modifier* membername LPAREN type* RPAREN type stat_block
+ : modifier* membername LPAREN argument_type* RPAREN type stat_block
  ;
 
 membername
@@ -47,7 +47,37 @@ type
  | TYPE_FLOAT
  | TYPE_DOUBLE
  | TYPE_BOOL
- | QNAME SEMI
+ | ref_type
+ | prim_array_type
+ | ref_array_type
+ ;
+
+argument_type
+ : TYPE_VOID
+ | TYPE_INT
+ | TYPE_LONG
+ | TYPE_FLOAT
+ | TYPE_DOUBLE
+ | TYPE_BOOL
+ | ref_type
+ | prim_array_type SEMI
+ | ref_array_type
+ ;
+
+ref_type
+ : QNAME SEMI
+ ;
+
+prim_array_type
+ : LSQUARE+ TYPE_INT
+ | LSQUARE+ TYPE_LONG
+ | LSQUARE+ TYPE_FLOAT
+ | LSQUARE+ TYPE_DOUBLE
+ | LSQUARE+ TYPE_BOOL
+ ;
+
+ref_array_type
+ : LSQUARE+ QNAME SEMI
  ;
 
 modifier

@@ -1,11 +1,11 @@
-## JASM Java Assembler for the modern age
+## JASM - A JVM Assembler for the modern age
 
 ### What?
 
 JASM is an assembler for JVM bytecode. It is similar in spirit to the venerable 
 [Jasmin](https://github.com/davidar/jasmin) (which I help maintain via code shelter),
-though has a different syntax, and is built on modern tools and targets modern JVMs 
-(currently 17 by default).
+though has a different syntax, supports modern things like `invokedynamic`, is built
+on modern tools and generates code targeting modern JVMs (currently 17 by default).
 
 It lets you write code like this:
 

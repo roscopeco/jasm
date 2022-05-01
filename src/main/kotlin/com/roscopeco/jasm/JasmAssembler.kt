@@ -12,6 +12,7 @@ import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.TokenStream
 import org.objectweb.asm.ClassWriter
+import org.objectweb.asm.Opcodes
 import java.io.IOException
 import java.io.InputStream
 import java.io.UncheckedIOException
@@ -26,7 +27,16 @@ import java.util.function.Supplier
  * @param unitName The (display) name of the compilation unit
  * @param source A supplier of `InputStream`
  */
-class JasmAssembler(private val unitName: String, private val source: Supplier<InputStream>) {
+class JasmAssembler(private val unitName: String, private val classFormat: Int, private val source: Supplier<InputStream>) {
+
+    /**
+     * Convenience constructor which will use the class format for Java 17 (61.0).
+     *
+     * @param unitName The name of the compilation unit (shows up in errors and as an attribute in the class)
+     * @param source A supplier of `InputStream`
+     */
+    constructor(unitName: String, source: Supplier<InputStream>)
+            : this(unitName, Opcodes.V17, source)
 
     /**
      * Assemble to Java bytecode.
@@ -46,7 +56,7 @@ class JasmAssembler(private val unitName: String, private val source: Supplier<I
                 )
                 val classWriter =
                     ClassWriter(ClassWriter.COMPUTE_MAXS or ClassWriter.COMPUTE_FRAMES)
-                val assembler = JasmAssemblingVisitor(classWriter, Modifiers(), unitName)
+                val assembler = JasmAssemblingVisitor(classWriter, unitName, classFormat)
 
                 parser.class_().accept(assembler)
 

@@ -8,9 +8,12 @@ package com.roscopeco.jasm;
 import com.roscopeco.jasm.antlr.JasmLexer;
 import org.junit.jupiter.api.Test;
 
+import static com.roscopeco.jasm.TestUtil.doParse;
 import static com.roscopeco.jasm.TestUtil.testCaseLexer;
+import static com.roscopeco.jasm.asserts.LexerParserAssertions.assertClass;
 import static com.roscopeco.jasm.asserts.LexerParserAssertions.assertNextToken;
 import static com.roscopeco.jasm.asserts.LexerParserAssertions.assertTokens;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class LexerTests {
     @Test
@@ -203,7 +206,7 @@ class LexerTests {
     @SuppressWarnings("java:S5961" /* We need to consume (and assert!) all the tokens */)
     void shouldLexClassWithSuperclassAndInterfaces() {
         final var lexer = testCaseLexer("com/roscopeco/jasm/InheritAndInterfaceTest.jasm");
-        
+
         assertTokens(lexer, tokens -> {
             tokens.next()
                     .hasType(JasmLexer.PUBLIC);
@@ -294,6 +297,103 @@ class LexerTests {
 
             tokens.next()
                     .hasType(JasmLexer.EOF);
+        });
+    }
+
+    @Test
+    void shouldLexClassWithArrayTypes() {
+        final var lexer = testCaseLexer("com/roscopeco/jasm/ArrayTypesTest.jasm");
+
+        assertTokens(lexer, tokens -> {
+            tokens.next()
+                    .hasType(JasmLexer.PUBLIC);
+
+            tokens.next()
+                    .hasType(JasmLexer.CLASS);
+
+            tokens.next()
+                    .hasType(JasmLexer.QNAME)
+                    .hasText("com/roscopeco/jasm/ArrayTypesTest");
+
+            tokens.next()
+                    .hasType(JasmLexer.LBRACE);
+
+            // Field 1
+            tokens.next()
+                    .hasType(JasmLexer.PUBLIC);
+
+            tokens.next()
+                    .hasType(JasmLexer.NAME)
+                    .hasText("arrayField");
+
+            tokens.next()
+                    .hasType(JasmLexer.LSQUARE);
+
+            tokens.next()
+                    .hasType(JasmLexer.QNAME)
+                    .hasText("Ljava/lang/Object");
+
+            tokens.next()
+                    .hasType(JasmLexer.SEMI);
+
+            // Field 2
+            tokens.next()
+                    .hasType(JasmLexer.PUBLIC);
+
+            tokens.next()
+                    .hasType(JasmLexer.NAME)
+                    .hasText("primArrayField");
+
+            tokens.next()
+                    .hasType(JasmLexer.LSQUARE);
+
+            tokens.next()
+                    .hasType(JasmLexer.TYPE_INT);
+
+            // Method
+            tokens.next()
+                    .hasType(JasmLexer.PUBLIC);
+
+            tokens.next()
+                    .hasType(JasmLexer.NAME)
+                    .hasText("arrayTypesTest");
+
+            tokens.next()
+                    .hasType(JasmLexer.LPAREN);
+
+            tokens.next()
+                    .hasType(JasmLexer.LSQUARE);
+
+            tokens.next()
+                    .hasType(JasmLexer.TYPE_INT);
+
+            tokens.next()
+                    .hasType(JasmLexer.SEMI);
+
+            tokens.next()
+                    .hasType(JasmLexer.LSQUARE);
+
+            tokens.next()
+                    .hasType(JasmLexer.LSQUARE);
+
+            tokens.next()
+                    .hasType(JasmLexer.QNAME)
+                    .hasText("Ljava/lang/String");
+
+            tokens.next()
+                    .hasType(JasmLexer.SEMI);
+
+            tokens.next()
+                    .hasType(JasmLexer.RPAREN);
+
+            tokens.next()
+                    .hasType(JasmLexer.QNAME)
+                    .hasText("Ljava/lang/Object");
+
+            tokens.next()
+                    .hasType(JasmLexer.SEMI);
+
+            /* no need to go further */
         });
     }
 }

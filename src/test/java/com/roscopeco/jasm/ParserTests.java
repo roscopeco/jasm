@@ -5,14 +5,15 @@
  */
 package com.roscopeco.jasm;
 
-import com.roscopeco.jasm.asserts.LexerParserAssertions;
 import lombok.NonNull;
-import org.antlr.v4.runtime.misc.ParseCancellationException;
+import org.antlr.v4.runtime.RuleContext;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static com.roscopeco.jasm.TestUtil.doParse;
+import static com.roscopeco.jasm.asserts.LexerParserAssertions.assertClass;
+import static com.roscopeco.jasm.asserts.LexerParserAssertions.assertMember;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -30,7 +31,7 @@ class ParserTests {
     void shouldParseEmptyClasses(@NonNull final String testCase) {
         final var test  = doParse(testCase + ".jasm");
 
-        LexerParserAssertions.assertClass(test).hasName(testCase);
+        assertClass(test).hasName(testCase);
         assertThat(test.member()).isEmpty();
     }
 
@@ -38,7 +39,7 @@ class ParserTests {
     void shouldParsePublicFinalEmptyClass() {
         final var test  = doParse("PublicFinalEmptyClass.jasm");
 
-        LexerParserAssertions.assertClass(test).hasName("PublicFinalEmptyClass");
+        assertClass(test).hasName("PublicFinalEmptyClass");
         assertThat(test.member()).isEmpty();
 
         assertThat(test.modifier(0).PUBLIC()).isNotNull();
@@ -49,12 +50,12 @@ class ParserTests {
     void shouldParseClassWithSingleField() {
         final var test  = doParse("ClassWithSingleField.jasm");
 
-        LexerParserAssertions.assertClass(test).hasName("ClassWithSingleField");
+        assertClass(test).hasName("ClassWithSingleField");
 
         assertThat(test.member()).hasSize(1);
         final var member = test.member(0);
 
-        LexerParserAssertions.assertMember(member)
+        assertMember(member)
                 .isNotNull()
                 .isField()
                 .hasName("someField")
@@ -65,12 +66,12 @@ class ParserTests {
     void shouldParseClassWithObjectField() {
         final var test  = doParse("ClassWithObjectField.jasm");
 
-        LexerParserAssertions.assertClass(test).hasName("ClassWithObjectField");
+        assertClass(test).hasName("ClassWithObjectField");
 
         assertThat(test.member()).hasSize(1);
         final var member = test.member(0);
 
-        LexerParserAssertions.assertMember(member)
+        assertMember(member)
                 .isNotNull()
                 .isField()
                     .hasName("someField")
@@ -81,12 +82,12 @@ class ParserTests {
     void shouldParseClassWithMinimalMethod() {
         final var test  = doParse("com/roscopeco/jasm/MinimalMethodTest.jasm");
 
-        LexerParserAssertions.assertClass(test).hasName("com/roscopeco/jasm/MinimalMethodTest");
+        assertClass(test).hasName("com/roscopeco/jasm/MinimalMethodTest");
 
         assertThat(test.member()).hasSize(1);
         final var member = test.member(0);
 
-        LexerParserAssertions.assertMember(member)
+        assertMember(member)
                 .isNotNull()
                 .isMethod()
                     .hasName("testMethod")
@@ -101,9 +102,43 @@ class ParserTests {
     void shouldParseClassWithSuperclassAndInterfaces() {
         final var test  = doParse("com/roscopeco/jasm/InheritAndInterfaceTest.jasm");
 
-        LexerParserAssertions.assertClass(test)
+        assertClass(test)
                 .hasName("com/roscopeco/jasm/InheritAndInterfaceTest")
                 .hasSuperclass("com/roscopeco/jasm/model/Superclass")
                 .hasInterfaces("com/roscopeco/jasm/model/Interface1", "com/roscopeco/jasm/model/Interface2");
+    }
+
+    @Test
+    void shouldParseClassWithArrayTypes() {
+        final var test = doParse("com/roscopeco/jasm/ArrayTypesTest.jasm");
+
+        assertClass(test)
+                .hasName("com/roscopeco/jasm/ArrayTypesTest");
+
+        assertThat(test.member()).hasSize(5);
+
+        assertMember(test.member(0))
+                .isField()
+                .hasName("arrayField")
+                .isReference("[Ljava/lang/Object;");
+
+        assertMember(test.member(1))
+                .isField()
+                .hasName("primArrayField")
+                .isPrimitiveArray("[I");
+
+        assertMember(test.member(2))
+                .isMethod()
+                .hasName("arrayTypesTest")
+                .hasArgumentCount(2)
+                .hasArgumentTypes("[I", "[[Ljava/lang/String;");
+
+        assertMember(test.member(3))
+                .isMethod()
+                .hasName("arrayTypesTestMultiple")
+                .hasArgumentCount(3)
+                .hasArgumentTypes("Ljava/lang/String;", "[Ljava/lang/String;", "[[Ljava/lang/String;");
+
+        // Member 4 is uninteresting constructor
     }
 }

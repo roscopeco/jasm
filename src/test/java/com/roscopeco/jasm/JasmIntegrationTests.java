@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.util.TraceClassVisitor;
 
 import static com.roscopeco.jasm.TestUtil.testCaseParser;
@@ -1038,14 +1039,55 @@ class JasmIntegrationTests {
                     MAXSTACK = 0
                     MAXLOCALS = 0
                 }
-                """)
+                """),
+
+
+                /* ************************************************************************************************ */
+                Arguments.of("com/roscopeco/jasm/ArrayTypesTest.jasm", """
+                        // class version 61.0 (61)
+                        // access flags 0x1
+                        public class com/roscopeco/jasm/ArrayTypesTest {
+
+                          // compiled from: <tests>
+                          // debug info:\s
+
+                          // access flags 0x1
+                          public [Ljava/lang/Object; arrayField
+ 
+                          // access flags 0x1
+                          public [I primArrayField
+
+                          // access flags 0x1
+                          public arrayTypesTest([I[[Ljava/lang/String;)Ljava/lang/Object;
+                            ALOAD 1
+                            ARETURN
+                            MAXSTACK = 0
+                            MAXLOCALS = 0
+
+                          // access flags 0x1
+                          public arrayTypesTestMultiple(Ljava/lang/String;[Ljava/lang/String;[[Ljava/lang/String;)Ljava/lang/Object;
+                            ALOAD 1
+                            ARETURN
+                            MAXSTACK = 0
+                            MAXLOCALS = 0
+
+                          // access flags 0x1
+                          public <init>()V
+                            ALOAD 0
+                            INVOKESPECIAL java/lang/Object.<init> ()V
+                            RETURN
+                            MAXSTACK = 0
+                            MAXLOCALS = 0
+                        }
+                        """)
         );
     }
 
     @BeforeEach
     void setup() {
         this.baos = new ByteArrayOutputStream();
-        this.assembler = new JasmAssemblingVisitor(new TraceClassVisitor(new PrintWriter(baos)), new Modifiers(), "<tests>");
+        this.assembler = new JasmAssemblingVisitor(
+                new TraceClassVisitor(new PrintWriter(baos)), "<tests>", Opcodes.V17);
     }
 
     @ParameterizedTest

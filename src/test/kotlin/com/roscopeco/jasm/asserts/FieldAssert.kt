@@ -45,7 +45,7 @@ class FieldAssert internal constructor(actual: FieldContext) :
     fun isReference(typeName: String): FieldAssert {
         isNotNull
 
-        if (actual.type().QNAME() == null) {
+        if (actual.type().ref_type() == null && actual.type().ref_array_type() == null) {
             failWithMessage(
                 "Expected field "
                         + actual.membername().text
@@ -61,6 +61,31 @@ class FieldAssert internal constructor(actual: FieldContext) :
                         + typeName +
                         ", but is "
                         + actual.type().text
+            )
+        }
+
+        return this
+    }
+
+    fun isPrimitiveArray(typeName: String): FieldAssert {
+        isNotNull
+
+        if (actual.type().prim_array_type() == null) {
+            failWithMessage(
+                "Expected field "
+                        + actual.membername().text
+                        + " to be of type [<primitive>, but is "
+                        + actual.type().text
+            )
+        }
+        if (typeName != actual.type().prim_array_type().text) {
+            failWithMessage(
+                "Expected field "
+                        + actual.membername().text
+                        + " to be of type "
+                        + typeName +
+                        ", but is "
+                        + actual.type().prim_array_type().text
             )
         }
 

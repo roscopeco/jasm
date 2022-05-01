@@ -7,6 +7,7 @@ package com.roscopeco.jasm.asserts
 
 import com.roscopeco.jasm.antlr.JasmParser.MethodContext
 import org.assertj.core.api.AbstractAssert
+import org.assertj.core.api.Assertions.assertThat
 
 class MethodAssert internal constructor(actual: MethodContext) :
     AbstractAssert<MethodAssert, MethodContext>(actual, MethodAssert::class.java) {
@@ -16,7 +17,7 @@ class MethodAssert internal constructor(actual: MethodContext) :
 
         if (expected != actual.membername().text) {
             failWithMessage(
-                "Expected field to have name '"
+                "Expected method to have name '"
                         + expected
                         + "', but was '"
                         + actual.membername().text
@@ -30,12 +31,12 @@ class MethodAssert internal constructor(actual: MethodContext) :
     fun isVoid(): MethodAssert {
         isNotNull
 
-        if (actual.type().size == 0 || actual.type()[0].TYPE_VOID() == null) {
+        if (actual.type().TYPE_VOID() == null) {
             failWithMessage(
                 "Expected method "
                         + actual.membername().text
                         + " to have return type V, but is "
-                        + actual.type()[0]
+                        + actual.type()
             )
         }
 
@@ -45,12 +46,12 @@ class MethodAssert internal constructor(actual: MethodContext) :
     fun isInteger(): MethodAssert {
         isNotNull
 
-        if (actual.type().size == 0 || actual.type()[0].TYPE_INT() == null) {
+        if (actual.type().TYPE_INT() == null) {
             failWithMessage(
                 "Expected method "
                         + actual.membername().text
                         + " to have return type I, but is "
-                        + actual.type()[0]
+                        + actual.type()
             )
         }
 
@@ -66,11 +67,12 @@ class MethodAssert internal constructor(actual: MethodContext) :
                     + " to have return type "
                     + expected +
                     ", but is "
-                    + (actual.type().last()?.text ?: "Unknown")
+                    + (actual.type().text ?: "Unknown")
             )
         }
 
-        if (actual.type().last()?.QNAME()?.text != expected) {
+        val type = actual.type()
+        if (type?.ref_type()?.text != expected && type?.ref_array_type()?.text != expected) {
             failWithMessage(failureMessage.invoke())
         }
 
@@ -80,14 +82,14 @@ class MethodAssert internal constructor(actual: MethodContext) :
     fun hasArgumentCount(expected: Int): MethodAssert {
         isNotNull
 
-        if (actual.type().size != expected + 1) {
+        if (actual.argument_type().size != expected) {
             failWithMessage(
                 "Expected method "
                         + actual.membername().text
                         + " to have "
                         + expected +
                         " arguments, but it has "
-                        + (actual.type().size - 1)
+                        + (actual.argument_type().size)
             )
         }
 
@@ -95,6 +97,23 @@ class MethodAssert internal constructor(actual: MethodContext) :
     }
 
     fun hasNoArguments() = hasArgumentCount(0)
+
+    fun hasArgumentTypes(vararg types: String): MethodAssert {
+        isNotNull
+
+        assertThat(actual.argument_type())
+            .isNotNull
+            .isNotEmpty
+
+        assertThat(actual.argument_type().map {
+            if (it.prim_array_type() != null) it.prim_array_type().text else it.text
+        })
+            .`as`("Method parameter types for ${actual.membername().text}")
+            .containsExactly(*types)
+
+        return this
+    }
+
 
     fun hasCodeSequence() = CodeSequenceAssert(actual.stat_block(), this)
 }
