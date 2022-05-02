@@ -1,13 +1,13 @@
 public class com/roscopeco/jasm/ArrayTypesTest {
-    public arrayField [Ljava/lang/Object;
+    public arrayField [java/lang/Object
     public primArrayField [I
 
-    public arrayTypesTest([I[[Ljava/lang/String;)Ljava/lang/Object; {
+    public arrayTypesTest([I, [[java/lang/String) java/lang/Object {
         aload 1
         areturn
     }
 
-    public arrayTypesTestMultiple(Ljava/lang/String;[Ljava/lang/String;[[Ljava/lang/String;)Ljava/lang/Object; {
+    public arrayTypesTestMultiple(java/lang/String, [java/lang/String, [[java/lang/String) java/lang/Object {
         aload 1
         areturn
     }

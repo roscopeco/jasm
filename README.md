@@ -2,12 +2,30 @@
 
 ### What?
 
-JASM is an assembler for JVM bytecode. It is similar in spirit to the venerable 
-[Jasmin](https://github.com/davidar/jasmin) (which I help maintain via code shelter),
-though has a different syntax, supports modern things like `invokedynamic`, is built
-on modern tools and generates code targeting modern JVMs (currently 17 by default).
+JASM is an assembler for JVM bytecode. Because how many times have you needed
+_that_ already today?
 
-It lets you write code like this:
+It shares some things with other similar projects, but has a few advantages:
+
+* It has a nicer syntax than most (YMMV)
+* It's written from the ground up in modern tools
+* It supports all the cool new JVM features that, as a Java programmer, you never got to see
+* It's easily extensible, even I might manage to keep it somewhat up-to-date!
+
+Let's just get this out of the way, shall we?
+
+```java
+public class com/example/HelloWorld {
+    public static main([java/lang/String)V {
+        getstatic java/lang/System.out
+        ldc "Hello, World"
+        invokevirtual java/io/PrintStream.println(java/lang/String)V
+        return
+    }
+}
+```
+
+All your favourite instructions (and some you probably forgot about) are supported:
 
 ```java
 public class com/example/MyClass
@@ -19,12 +37,12 @@ implements com/example/SomeInterface {
         return
     }
 
-    public dontAddCanary(Ljava/util/List;)V {
+    public dontAddCanary(java/util/List)V {
         goto skipAdd
 
         aload 1
         ldc "CANARY"
-        invokeinterface java/util/List.add(Ljava/lang/Object;)Z 
+        invokeinterface java/util/List.add(Ljava/lang/Object)Z 
         
     skipAdd:
         return
@@ -32,31 +50,54 @@ implements com/example/SomeInterface {
 }
 ```
 
-or use advanced JVM instructions like `invokedynamic`:
+And you can use advanced JVM features like `invokedynamic` and dynamic constants that aren't 
+directly available in the Java language:
 
 ```java
-public doBasicInvokeDynamicTest()Ljava/lang/String; {
-    invokedynamic get()Ljava/util/function/Supplier; {
+public doBasicInvokeDynamicTest()Ljava/lang/String {
+    invokedynamic get()Ljava/util/function/Supplier {
         invokestatic java/lang/invoke/LambdaMetafactory.metafactory(
-            Ljava/lang/invoke/MethodHandles$Lookup;
-            Ljava/lang/String;
-            Ljava/lang/invoke/MethodType;
-            Ljava/lang/invoke/MethodType;
-            Ljava/lang/invoke/MethodHandle;
-            Ljava/lang/invoke/MethodType;
-        )Ljava/lang/invoke/CallSite;
+            Ljava/lang/invoke/MethodHandles$Lookup,
+            Ljava/lang/String,
+            Ljava/lang/invoke/MethodType,
+            Ljava/lang/invoke/MethodType,
+            Ljava/lang/invoke/MethodHandle,
+            Ljava/lang/invoke/MethodType
+        )Ljava/lang/invoke/CallSite
         [
-            ()Ljava/lang/Object;,
-            invokestatic com/roscopeco/jasm/model/TestBootstrap.lambdaGetImpl()Ljava/lang/String;,
-            ()Ljava/lang/String;
+            ()Ljava/lang/Object,
+            invokestatic com/roscopeco/jasm/model/TestBootstrap.lambdaGetImpl()Ljava/lang/String,
+            ()Ljava/lang/String
         ]
     }
 
-    invokeinterface java/util/function/Supplier.get()Ljava/lang/Object;
+    invokeinterface java/util/function/Supplier.get()Ljava/lang/Object
     checkcast java/lang/String
     areturn
 }
 ```
+
+If you're familiar with method descriptors at this level, you'll notice I've
+had to take some license with them for the poor lexer's sake. This way makes
+it nicer to read (and hand-write) the descriptors though, so I'm keeping it.
+
+Also FWIW there's a smidge of syntactic sugar around types in case you just can't 
+get used to the JVM internal names (for primitives), so you can do e.g. :
+
+```java
+public myGreatMethod(int, long, java/util/List) java/util/List {
+    
+    // cool assembly stuff...
+        
+}
+```
+
+(Note though that you still have to use binary names for classes, and descriptors
+still follow the JVM internal ordering. You're free to mix the longhand names 
+with shorthand ones though, and there's no L; needed on reference types :-) ).
+
+### How??
+
 The main code and most of the test support code is written in Kotlin. Tests 
 themselves are written in Java however, because I felt like mixing it up
 (and wanted to validate the custom AssertJ stuff interop with Java was good).
@@ -65,7 +106,7 @@ Lexing, parsing and syntax trees are handled by Antlr4 (https://www.antlr.org).
 Bytecode generation is done with ASM (https://asm.ow2.io). Both of these
 projects are awesome and deserve your attention.
 
-### Why??
+### Why??!?
 
 Well, **why not**?
 
@@ -98,7 +139,7 @@ pursuit of this project, how about these (some lifted from Jasmin's README):
 * Teachers - Perhaps you're teaching a compiler course, maybe you could use this
   to introduce students to JVM bytecode, or even as an IL for the compilers.
 
-### Who? 
+### Who???!1
 
 JASM is copyright 2022 Ross Bamford (roscopeco AT gmail DOT com). 
 

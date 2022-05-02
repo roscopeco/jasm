@@ -5,6 +5,7 @@
  */
 package com.roscopeco.jasm.asserts
 
+import com.roscopeco.jasm.TypeVisitor
 import com.roscopeco.jasm.antlr.JasmParser.MethodContext
 import org.assertj.core.api.AbstractAssert
 import org.assertj.core.api.Assertions.assertThat
@@ -31,12 +32,12 @@ class MethodAssert internal constructor(actual: MethodContext) :
     fun isVoid(): MethodAssert {
         isNotNull
 
-        if (actual.method_descriptor()?.type()?.TYPE_VOID() == null) {
+        if (actual.method_descriptor()?.type()?.void_type()?.TYPE_VOID() == null) {
             failWithMessage(
                 "Expected method "
                         + actual.membername().text
                         + " to have return type V, but is "
-                        + (actual.method_descriptor()?.type() ?: "unknown")
+                        + (actual.method_descriptor()?.type()?.text ?: "unknown")
             )
         }
 
@@ -46,7 +47,7 @@ class MethodAssert internal constructor(actual: MethodContext) :
     fun isInteger(): MethodAssert {
         isNotNull
 
-        if (actual.method_descriptor()?.type()?.TYPE_INT() == null) {
+        if (actual.method_descriptor()?.type()?.prim_type()?.TYPE_INT() == null) {
             failWithMessage(
                 "Expected method "
                         + actual.membername().text
@@ -72,21 +73,21 @@ class MethodAssert internal constructor(actual: MethodContext) :
         }
 
         val type = actual.method_descriptor()?.type()
-        if (type?.ref_type()?.text != expected && type?.ref_array_type()?.text != expected) {
+        if (type?.ref_type()?.text != expected && type?.array_type()?.ref_type()?.text != expected) {
             failWithMessage(failureMessage.invoke())
         }
 
         return this
     }
 
-    fun hasArgumentTypes(types: String): MethodAssert {
+    fun hasDescriptor(types: String): MethodAssert {
         isNotNull
 
-        assertThat(actual.method_descriptor()?.method_argument())
+        assertThat(actual.method_descriptor()?.method_arguments()?.method_argument())
             .isNotNull
             .isNotEmpty
 
-        assertThat(actual.method_descriptor().method_argument().joinToString(separator = "") { it.text })
+        assertThat(TypeVisitor().visitMethod_descriptor(actual.method_descriptor()))
             .`as`("Method parameter types for ${actual.membername().text}")
             .isEqualTo(types)
 

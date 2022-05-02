@@ -5,7 +5,7 @@ public class com/roscopeco/jasm/AthrowTest implements com/roscopeco/jasm/model/A
         return
     }
 
-    public sneakyThrow(Ljava/lang/Throwable;)V {
+    public sneakyThrow(java/lang/Throwable)V {
         aload 1
         athrow
     }

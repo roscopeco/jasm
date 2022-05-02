@@ -1,10 +1,16 @@
 public class MethodArgParsingTests {
-    public allPrims(B;C;D;F;I;J;S;Z)V {
+    // All primitives, shorthand
+    public allPrims(B,C,D,F,I,J,S,Z)V {
     }
 
-    public allRefs(Ljava/lang/String;Ljava/lang/Object;)Ljava/util/List; {
+    // All primitives, longhand
+    public allPrimsLong(byte, char, double, float, int, long, short, boolean) void {
     }
 
-    public mixPrimsAndRefs(I;J;Ljava/lang/String;Z;Ljava/util/List;Z;Z)V {
+    // All refs
+    public allRefs(java/lang/String, java/lang/Object) java/util/List {
+    }
+
+    public mixPrimsAndRefsLongAndShort(I, long, java/lang/String, Z, java/util/List, boolean, Z) java/util/List {
     }
 }

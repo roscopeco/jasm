@@ -1,5 +1,5 @@
 class com/roscopeco/jasm/insntest/InvokeVirtual {
     insnTest()V {
-        invokevirtual java/lang/String.trim()Ljava/lang/String;
+        invokevirtual java/lang/String.trim()java/lang/String
     }
 }

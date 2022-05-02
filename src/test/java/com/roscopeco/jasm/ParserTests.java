@@ -6,7 +6,6 @@
 package com.roscopeco.jasm;
 
 import lombok.NonNull;
-import org.antlr.v4.runtime.RuleContext;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -75,7 +74,7 @@ class ParserTests {
                 .isNotNull()
                 .isField()
                     .hasName("someField")
-                    .isReference("Ljava/lang/Object;");
+                    .isReference("java/lang/Object");
     }
 
     @Test
@@ -102,6 +101,36 @@ class ParserTests {
         final var test = doParse("MethodArgParsingTests.jasm");
 
         assertClass(test).hasName("MethodArgParsingTests");
+
+        assertThat(test.member()).hasSize(4);
+
+        assertMember(test.member(0))
+                .isNotNull()
+                .isMethod()
+                .hasName("allPrims")
+                .isVoid()
+                .hasDescriptor("(BCDFIJSZ)V");
+
+        assertMember(test.member(1))
+                .isNotNull()
+                .isMethod()
+                .hasName("allPrimsLong")
+                .isVoid()
+                .hasDescriptor("(BCDFIJSZ)V");
+
+        assertMember(test.member(2))
+                .isNotNull()
+                .isMethod()
+                .hasName("allRefs")
+                .isReference("java/util/List")
+                .hasDescriptor("(Ljava/lang/String;Ljava/lang/Object;)Ljava/util/List;");
+
+        assertMember(test.member(3))
+                .isNotNull()
+                .isMethod()
+                .hasName("mixPrimsAndRefsLongAndShort")
+                .isReference("java/util/List")
+                .hasDescriptor("(IJLjava/lang/String;ZLjava/util/List;ZZ)Ljava/util/List;");
     }
 
     @Test
@@ -126,7 +155,7 @@ class ParserTests {
         assertMember(test.member(0))
                 .isField()
                 .hasName("arrayField")
-                .isReference("[Ljava/lang/Object;");
+                .isReference("[java/lang/Object");
 
         assertMember(test.member(1))
                 .isField()
@@ -136,12 +165,12 @@ class ParserTests {
         assertMember(test.member(2))
                 .isMethod()
                 .hasName("arrayTypesTest")
-                .hasArgumentTypes("[I[[Ljava/lang/String;");
+                .hasDescriptor("([I[[Ljava/lang/String;)Ljava/lang/Object;");
 
         assertMember(test.member(3))
                 .isMethod()
                 .hasName("arrayTypesTestMultiple")
-                .hasArgumentTypes("Ljava/lang/String;[Ljava/lang/String;[[Ljava/lang/String;");
+                .hasDescriptor("(Ljava/lang/String;[Ljava/lang/String;[[Ljava/lang/String;)Ljava/lang/Object;");
 
         // Member 4 is uninteresting constructor
     }

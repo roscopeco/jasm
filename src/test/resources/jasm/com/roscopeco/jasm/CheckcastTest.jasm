@@ -5,7 +5,7 @@ public class com/roscopeco/jasm/CheckcastTest implements com/roscopeco/jasm/mode
         return
     }
 
-    public castToList(Ljava/lang/Object;)Ljava/util/List; {
+    public castToList(java/lang/Object)java/util/List {
         aload 1
         checkcast java/util/List
         areturn

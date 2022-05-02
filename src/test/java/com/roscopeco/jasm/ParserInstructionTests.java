@@ -331,7 +331,7 @@ class ParserInstructionTests {
     @Test
     void shouldParseInvokeSpecial() {
         runInstructionTest("com/roscopeco/jasm/insntest/InvokeSpecial.jasm", code -> code
-                .invokeSpecial("java/lang/Object", "<init>", "(Ljava/lang/String;I;Z)V")
+                .invokeSpecial("java/lang/Object", "<init>", "(Ljava/lang/String;IZ)V")
                 .noMoreCode()
         );
     }
@@ -393,9 +393,9 @@ class ParserInstructionTests {
                 .ldc(5.0f)
                 .ldcStr("Test string")
                 .ldcClass("java/util/List")
-                .ldcMethodType("(java/util/String;)I")
+                .ldcMethodType("(java/util/String)I")
                 .ldcMethodHandle("invokevirtualcom/roscopeco/jasm/Tests.example()V")
-                .ldcConstDynamic("constdynamicDYNAMIC_CONSTLjava/lang/Object;{invokeinterfacecom/example/Bootstrap.constsite(Ljava/lang/String;)Ljava/lang/invoke/CallSite;[\"Something else\"]}")
+                .ldcConstDynamic("constdynamicDYNAMIC_CONSTjava/lang/Object{invokeinterfacecom/example/Bootstrap.constsite(java/lang/String)java/lang/invoke/CallSite[\"Something else\"]}")
                 .noMoreCode()
         );
     }

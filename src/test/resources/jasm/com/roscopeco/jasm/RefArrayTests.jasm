@@ -1,11 +1,11 @@
 public class com/roscopeco/jasm/RefArrayTests implements com/roscopeco/jasm/model/RefArrayTests {
-    public newSingleElementArray()[Ljava/lang/String; {
+    public newSingleElementArray()[java/lang/String {
         iconst 1
         anewarray java/lang/String
         areturn
     }
 
-    public putInArray([Ljava/lang/String;Ljava/lang/String;)V {
+    public putInArray([java/lang/String, java/lang/String)V {
         aload 1
         iconst 0
         aload 2
@@ -13,14 +13,14 @@ public class com/roscopeco/jasm/RefArrayTests implements com/roscopeco/jasm/mode
         return
     }
 
-    public getFromArray([Ljava/lang/String;)Ljava/lang/String; {
+    public getFromArray([java/lang/String)java/lang/String {
         aload 1
         iconst 0
         aaload
         areturn
     }
 
-    public getArrayLength([Ljava/lang/String;)I {
+    public getArrayLength([java/lang/String)I {
         aload 1
         arraylength
         ireturn

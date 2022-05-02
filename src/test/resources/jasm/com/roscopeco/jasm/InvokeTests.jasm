@@ -5,25 +5,25 @@ public class com/roscopeco/jasm/InvokeTests {
         return
     }
 
-    private static staticMethod() Ljava/lang/String; {
+    private static staticMethod() java/lang/String {
         ldc "Hello World"
         areturn
     }
 
-    private addStrToList(Ljava/util/List;) Ljava/util/List; {
+    private addStrToList(java/util/List) java/util/List {
         aload 1  // TODO use DUP when implemented!
-        invokestatic com/roscopeco/jasm/InvokeTests.staticMethod()Ljava/lang/String;
+        invokestatic com/roscopeco/jasm/InvokeTests.staticMethod()java/lang/String
 
-        invokeinterface java/util/List.add(Ljava/lang/Object;)Z
+        invokeinterface java/util/List.add(java/lang/Object)Z
 
         aload 1
         areturn
     }
 
-    public testMethod(Ljava/util/List;) Ljava/util/List; {
+    public testMethod(java/util/List) java/util/List {
         aload 0
         aload 1
-        invokevirtual com/roscopeco/jasm/InvokeTests.addStrToList(Ljava/util/List;)Ljava/util/List;
+        invokevirtual com/roscopeco/jasm/InvokeTests.addStrToList(java/util/List)java/util/List
 
         aload 1
         areturn

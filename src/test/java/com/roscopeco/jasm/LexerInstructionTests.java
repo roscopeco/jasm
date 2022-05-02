@@ -485,10 +485,7 @@ class LexerInstructionTests {
 
             tokens.next()
                     .hasType(JasmLexer.QNAME)
-                    .hasText("Ljava/lang/Object");
-
-            tokens.next()
-                    .hasType(JasmLexer.SEMI);
+                    .hasText("java/lang/Object");
 
             tokens.next()
                     .hasType(JasmLexer.LBRACE);
@@ -514,44 +511,38 @@ class LexerInstructionTests {
                     .hasType(JasmLexer.TYPE_INT);
 
             tokens.next()
-                    .hasType(JasmLexer.SEMI);
+                    .hasType(JasmLexer.COMMA);
 
             tokens.next()
                     .hasType(JasmLexer.TYPE_FLOAT);
 
             tokens.next()
-                    .hasType(JasmLexer.SEMI);
+                    .hasType(JasmLexer.COMMA);
 
             tokens.next()
                     .hasType(JasmLexer.QNAME)
-                    .hasText("Ljava/lang/String");
+                    .hasText("java/lang/String");
 
             tokens.next()
-                    .hasType(JasmLexer.SEMI);
-
-            tokens.next()
-                    .hasType(JasmLexer.QNAME)
-                    .hasText("Ljava/lang/Class");
-
-            tokens.next()
-                    .hasType(JasmLexer.SEMI);
+                    .hasType(JasmLexer.COMMA);
 
             tokens.next()
                     .hasType(JasmLexer.QNAME)
-                    .hasText("Ljava/lang/invoke/MethodHandle");
+                    .hasText("java/lang/Class");
 
             tokens.next()
-                    .hasType(JasmLexer.SEMI);
+                    .hasType(JasmLexer.COMMA);
+
+            tokens.next()
+                    .hasType(JasmLexer.QNAME)
+                    .hasText("java/lang/invoke/MethodHandle");
 
             tokens.next()
                     .hasType(JasmLexer.RPAREN);
 
             tokens.next()
                     .hasType(JasmLexer.QNAME)
-                    .hasText("Ljava/lang/invoke/CallSite");
-
-            tokens.next()
-                    .hasType(JasmLexer.SEMI);
+                    .hasText("java/lang/invoke/CallSite");
 
             tokens.next()
                     .hasType(JasmLexer.LSQUARE);
@@ -593,10 +584,7 @@ class LexerInstructionTests {
 
             tokens.next()
                     .hasType(JasmLexer.QNAME)
-                    .hasText("Ljava/lang/Object");
-
-            tokens.next()
-                    .hasType(JasmLexer.SEMI);
+                    .hasText("java/lang/Object");
 
             tokens.next()
                     .hasType(JasmLexer.LBRACE);
@@ -620,20 +608,14 @@ class LexerInstructionTests {
 
             tokens.next()
                     .hasType(JasmLexer.QNAME)
-                    .hasText("Ljava/lang/String");
-
-            tokens.next()
-                    .hasType(JasmLexer.SEMI);
+                    .hasText("java/lang/String");
 
             tokens.next()
                     .hasType(JasmLexer.RPAREN);
 
             tokens.next()
                     .hasType(JasmLexer.QNAME)
-                    .hasText("Ljava/lang/invoke/CallSite");
-
-            tokens.next()
-                    .hasType(JasmLexer.SEMI);
+                    .hasText("java/lang/invoke/CallSite");
 
             tokens.next()
                     .hasType(JasmLexer.LSQUARE);
@@ -684,10 +666,7 @@ class LexerInstructionTests {
 
             assertNextToken(lexer)
                     .hasType(JasmLexer.QNAME)
-                    .hasText("Ljava/lang/Object");
-
-            assertNextToken(lexer)
-                    .hasType(JasmLexer.SEMI);
+                    .hasText("java/lang/Object");
         });
     }
 
@@ -712,16 +691,16 @@ class LexerInstructionTests {
 
             assertNextToken(lexer)
                     .hasType(JasmLexer.QNAME)
-                    .hasText("Ljava/lang/String");
+                    .hasText("java/lang/String");
 
             assertNextToken(lexer)
-                    .hasType(JasmLexer.SEMI);
+                    .hasType(JasmLexer.COMMA);
 
             assertNextToken(lexer)
                     .hasType(JasmLexer.TYPE_INT);
 
             assertNextToken(lexer)
-                    .hasType(JasmLexer.SEMI);
+                    .hasType(JasmLexer.COMMA);
 
             assertNextToken(lexer)
                     .hasType(JasmLexer.TYPE_BOOL);
@@ -759,10 +738,7 @@ class LexerInstructionTests {
 
             assertNextToken(lexer)
                     .hasType(JasmLexer.QNAME)
-                    .hasText("Ljava/lang/Thread");
-
-            assertNextToken(lexer)
-                    .hasType(JasmLexer.SEMI);
+                    .hasText("java/lang/Thread");
         });
     }
 
@@ -791,10 +767,7 @@ class LexerInstructionTests {
 
             assertNextToken(lexer)
                     .hasType(JasmLexer.QNAME)
-                    .hasText("Ljava/lang/String");
-
-            assertNextToken(lexer)
-                    .hasType(JasmLexer.SEMI);
+                    .hasText("java/lang/String");
         });
     }
 
@@ -904,10 +877,6 @@ class LexerInstructionTests {
             lexer.nextToken();
             lexer.nextToken();
             lexer.nextToken();
-            lexer.nextToken();
-            lexer.nextToken();
-            lexer.nextToken();
-            lexer.nextToken();
         });
     }
 
@@ -965,7 +934,7 @@ class LexerInstructionTests {
 
     private static final List<Integer> VOID_RETURN_TYPE_TOKEN = List.of(JasmLexer.TYPE_VOID);
     private static final List<Integer> FLOAT_RETURN_TYPE_TOKEN = List.of(JasmLexer.TYPE_FLOAT);
-    private static final List<Integer> REF_RETURN_TYPE_TOKEN = List.of(JasmLexer.QNAME, JasmLexer.SEMI);
+    private static final List<Integer> REF_RETURN_TYPE_TOKEN = List.of(JasmLexer.QNAME);
 
     private void runInstructionTest(
             @NonNull final String testCase,

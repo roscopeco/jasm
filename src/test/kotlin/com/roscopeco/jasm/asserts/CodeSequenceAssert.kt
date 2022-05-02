@@ -5,6 +5,7 @@
  */
 package com.roscopeco.jasm.asserts
 
+import com.roscopeco.jasm.TypeVisitor
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.AbstractAssert
 import com.roscopeco.jasm.antlr.JasmParser.Stat_blockContext
@@ -209,7 +210,7 @@ class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private
 
         val insn = stat.instruction().insn_invokedynamic()
         val extractedName = insn.membername().text
-        val extractedDesc = insn.method_descriptor().text
+        val extractedDesc = TypeVisitor().visitMethod_descriptor(insn.method_descriptor())
 
         if (name != extractedName) {
             failWithMessage(
@@ -477,7 +478,7 @@ class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private
         val insn = invokeExtractor.invoke(stat.instruction())
         val extractedOwner = ownerExtractor.invoke(insn).text
         val extractedName = membernameExtractor.invoke(insn).text
-        val extractedDesc = descriptorExtractor.invoke(insn).text
+        val extractedDesc = TypeVisitor().visitMethod_descriptor(descriptorExtractor.invoke(insn))
 
         if (owner != extractedOwner) {
             failWithMessage(

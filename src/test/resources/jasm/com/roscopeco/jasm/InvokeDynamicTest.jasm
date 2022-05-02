@@ -14,24 +14,24 @@ public class com/roscopeco/jasm/InvokeDynamic implements com/roscopeco/jasm/mode
     // This is broadly similar to what javac would do if you passed
     // () -> "some string" as a Supplier<String> parameter.
     //
-    public doBasicInvokeDynamicTest()Ljava/lang/String; {
-        invokedynamic get()Ljava/util/function/Supplier; {
+    public doBasicInvokeDynamicTest()java/lang/String {
+        invokedynamic get()java/util/function/Supplier {
             invokestatic java/lang/invoke/LambdaMetafactory.metafactory(
-                Ljava/lang/invoke/MethodHandles$Lookup;
-                Ljava/lang/String;
-                Ljava/lang/invoke/MethodType;
-                Ljava/lang/invoke/MethodType;
-                Ljava/lang/invoke/MethodHandle;
-                Ljava/lang/invoke/MethodType;
-            )Ljava/lang/invoke/CallSite;
+                java/lang/invoke/MethodHandles$Lookup,
+                java/lang/String,
+                java/lang/invoke/MethodType,
+                java/lang/invoke/MethodType,
+                java/lang/invoke/MethodHandle,
+                java/lang/invoke/MethodType,
+            )java/lang/invoke/CallSite
             [
-                ()Ljava/lang/Object;,
-                invokestatic com/roscopeco/jasm/model/TestBootstrap.lambdaGetImpl()Ljava/lang/String;,
-                ()Ljava/lang/String;
+                ()java/lang/Object,
+                invokestatic com/roscopeco/jasm/model/TestBootstrap.lambdaGetImpl()java/lang/String,
+                ()java/lang/String
             ]
         }
 
-        invokeinterface java/util/function/Supplier.get()Ljava/lang/Object;
+        invokeinterface java/util/function/Supplier.get()java/lang/Object
         checkcast java/lang/String
         areturn
     }
@@ -47,7 +47,7 @@ public class com/roscopeco/jasm/InvokeDynamic implements com/roscopeco/jasm/mode
     //   * A String ("Bootstrap test", passed statically here)
     //   * A Class (java.util.List, passed statically here)
     //   * A MethodHandle (an invokestatic of TestBootstrap#staticForHandleTest, passed statically here)
-    //   * A MethodType ( (Ljava/lang/String;)I, passed statically here)
+    //   * A MethodType ( (java/lang/String;)I, passed statically here)
     //   * Another String, passed via a CONSTDYNAMIC lookup using java.lang.invoke.ConstantBootstraps#getStaticFinal
     //     * The value for this comes from the DYNAMIC_CONST_FOR_TEST field on TestBootstrap
     //     * The JVM does a static call to ConstantBootstraps#getStaticFinal to actually get the value
@@ -56,34 +56,34 @@ public class com/roscopeco/jasm/InvokeDynamic implements com/roscopeco/jasm/mode
     // * And return a ConstCallSite for the TestBootstrap.getImpl method, bound to that instance
     // * getImpl returns the String from the instance (which came from the dynamic const).
     //
-    public doInvokeDynamicTest()Ljava/lang/Object; {
-        invokedynamic get()Ljava/lang/Object; {
+    public doInvokeDynamicTest()java/lang/Object {
+        invokedynamic get()java/lang/Object {
             invokestatic com/roscopeco/jasm/model/TestBootstrap.testBootstrap(
-                Ljava/lang/invoke/MethodHandles$Lookup;
-                Ljava/lang/String;
-                Ljava/lang/invoke/MethodType;
-                I;
-                F;
-                Ljava/lang/String;
-                Ljava/lang/Class;
-                Ljava/lang/invoke/MethodHandle;
-                Ljava/lang/invoke/MethodType;
-                Ljava/lang/String;
-            )Ljava/lang/invoke/CallSite;
+                java/lang/invoke/MethodHandles$Lookup,
+                java/lang/String,
+                java/lang/invoke/MethodType,
+                I,
+                F,
+                java/lang/String,
+                java/lang/Class,
+                java/lang/invoke/MethodHandle,
+                java/lang/invoke/MethodType,
+                java/lang/String,
+            )java/lang/invoke/CallSite
             [
                 42,                                                                                             // Static int
                 10.0,                                                                                           // Static float
                 "Bootstrap test",                                                                               // Static string
                 java/util/List,                                                                                 // Static class
-                invokestatic com/roscopeco/jasm/model/TestBootstrap.staticForHandleTest()Ljava/lang/String;,    // Static MethodHandle
-                (Ljava/lang/String;)I,                                                                          // Static MethodType
-                constdynamic DYNAMIC_CONST_FOR_TEST Ljava/lang/String; {                                        // Dynamic const
+                invokestatic com/roscopeco/jasm/model/TestBootstrap.staticForHandleTest()java/lang/String,      // Static MethodHandle
+                (java/lang/String)I,                                                                            // Static MethodType
+                constdynamic DYNAMIC_CONST_FOR_TEST java/lang/String {                                          // Dynamic const
                     invokestatic java/lang/invoke/ConstantBootstraps.getStaticFinal(
-                        Ljava/lang/invoke/MethodHandles$Lookup;
-                        Ljava/lang/String;
-                        Ljava/lang/Class;
-                        Ljava/lang/Class;
-                    )Ljava/lang/Object;
+                        java/lang/invoke/MethodHandles$Lookup,
+                        java/lang/String,
+                        java/lang/Class,
+                        java/lang/Class
+                    )java/lang/Object
                     [com/roscopeco/jasm/model/TestBootstrap]
                 }
             ]

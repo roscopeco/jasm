@@ -6,10 +6,10 @@ class com/roscopeco/jasm/insntest/Ldc {
         ldc 5.0
         ldc "Test string"
         ldc java/util/List
-        ldc (java/util/String;)I
+        ldc (java/util/String)I
         ldc invokevirtual com/roscopeco/jasm/Tests.example()V
-        ldc constdynamic DYNAMIC_CONST Ljava/lang/Object; {
-            invokeinterface com/example/Bootstrap.constsite(Ljava/lang/String;)Ljava/lang/invoke/CallSite;
+        ldc constdynamic DYNAMIC_CONST java/lang/Object {
+            invokeinterface com/example/Bootstrap.constsite(java/lang/String)java/lang/invoke/CallSite
             ["Something else"]
         }
     }

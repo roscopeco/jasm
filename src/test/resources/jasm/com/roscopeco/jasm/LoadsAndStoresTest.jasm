@@ -5,7 +5,7 @@ public class com/roscopeco/jasm/LoadsAndStoresTest implements com/roscopeco/jasm
         return
     }
 
-    public testAloadAstore()Ljava/lang/Object; {
+    public testAloadAstore()java/lang/Object {
         ldc "Test String"
         astore 1
         aload 1

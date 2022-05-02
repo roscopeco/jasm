@@ -1,10 +1,10 @@
 public class com/roscopeco/jasm/GotoLabelTest {
-    public static testMethod(Ljava/util/List;)V {
+    public static testMethod(java/util/List)V {
         goto skipAdd
 
         aload 0
         ldc "CANARY"
-        invokeinterface java/util/List.add(Ljava/lang/Object;)Z
+        invokeinterface java/util/List.add(java/lang/Object)Z
 
     skipAdd:
         return

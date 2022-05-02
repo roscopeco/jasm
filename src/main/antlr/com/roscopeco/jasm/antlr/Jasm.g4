@@ -35,24 +35,17 @@ method
  ;
 
 method_descriptor
- : LPAREN method_argument* RPAREN type
+ : LPAREN method_arguments COMMA? RPAREN type
  ;
 
-// TODO this is a hack - currently we just collect whatever's between the parens and concatenate it to
-//      build the descriptor :-(. Need to find a better way to do this (likely will need some sort of separator)!
+method_arguments
+ : (method_argument (COMMA method_argument)*)?
+ ;
+
 method_argument
- : TYPE_BYTE
- | TYPE_CHAR
- | TYPE_INT
- | TYPE_LONG
- | TYPE_FLOAT
- | TYPE_DOUBLE
- | TYPE_SHORT
- | TYPE_BOOL
- | NAME
- | QNAME
- | SEMI
- | LSQUARE
+ : prim_type
+ | ref_type
+ | array_type
  ;
 
 membername
@@ -62,8 +55,23 @@ membername
  ;
 
 type
+ : void_type
+ | prim_type
+ | ref_type
+ | array_type
+ ;
+
+void_type
  : TYPE_VOID
- | TYPE_BYTE
+ ;
+
+array_type
+ : LSQUARE+ prim_type
+ | LSQUARE+ ref_type
+ ;
+
+prim_type
+ : TYPE_BYTE
  | TYPE_CHAR
  | TYPE_INT
  | TYPE_LONG
@@ -71,29 +79,11 @@ type
  | TYPE_DOUBLE
  | TYPE_SHORT
  | TYPE_BOOL
- | ref_type
- | prim_array_type
- | ref_array_type
  ;
 
 ref_type
- : QNAME SEMI
- | NAME SEMI
- ;
-
-prim_array_type
- : LSQUARE+ TYPE_BYTE
- | LSQUARE+ TYPE_CHAR
- | LSQUARE+ TYPE_INT
- | LSQUARE+ TYPE_LONG
- | LSQUARE+ TYPE_FLOAT
- | LSQUARE+ TYPE_DOUBLE
- | LSQUARE+ TYPE_SHORT
- | LSQUARE+ TYPE_BOOL
- ;
-
-ref_array_type
- : LSQUARE+ QNAME SEMI
+ : QNAME
+ | NAME
  ;
 
 type_modifier
@@ -628,15 +618,50 @@ RETURN          : 'return';
 NEWINVOKESPECIAL: 'newinvokespecial';
 CONSTDYNAMIC    : 'constdynamic';
 
-TYPE_VOID   : 'V';
-TYPE_BYTE   : 'B';
-TYPE_CHAR   : 'C';
-TYPE_DOUBLE : 'D';
-TYPE_FLOAT  : 'F';
-TYPE_INT    : 'I';
-TYPE_LONG   : 'J';
-TYPE_SHORT  : 'S';
-TYPE_BOOL   : 'Z';
+TYPE_VOID
+ : 'V'
+ | 'void'
+ ;
+
+TYPE_BYTE
+ : 'B'
+ | 'byte'
+ ;
+
+TYPE_CHAR
+ : 'C'
+ | 'char'
+ ;
+
+TYPE_DOUBLE
+ : 'D'
+ | 'double'
+ ;
+
+TYPE_FLOAT
+ : 'F'
+ | 'float'
+ ;
+
+TYPE_INT
+ : 'I'
+ | 'int'
+ ;
+
+TYPE_LONG
+ : 'J'
+ | 'long'
+ ;
+
+TYPE_SHORT
+ : 'S'
+ | 'short'
+ ;
+
+TYPE_BOOL
+ : 'Z'
+ | 'boolean'
+ ;
 
 TRUE    : 'true';
 FALSE   : 'false';

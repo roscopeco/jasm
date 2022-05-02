@@ -29,7 +29,7 @@ public class com/roscopeco/jasm/PrimArrayTests implements com/roscopeco/jasm/mod
         ireturn
     }
 
-    public testDastore([DD)V {
+    public testDastore([D, D)V {
         aload 1
         iconst 0
         dload 2
@@ -44,7 +44,7 @@ public class com/roscopeco/jasm/PrimArrayTests implements com/roscopeco/jasm/mod
         dreturn
     }
 
-    public testFastore([FF)V {
+    public testFastore([F, F)V {
         aload 1
         iconst 0
         fload 2
@@ -59,7 +59,7 @@ public class com/roscopeco/jasm/PrimArrayTests implements com/roscopeco/jasm/mod
         freturn
     }
 
-    public testIastore([II)V {
+    public testIastore([I, I)V {
         aload 1
         iconst 0
         iload 2
@@ -74,7 +74,7 @@ public class com/roscopeco/jasm/PrimArrayTests implements com/roscopeco/jasm/mod
         ireturn
     }
 
-    public testLastore([JJ)V {
+    public testLastore([J, J)V {
         aload 1
         iconst 0
         lload 2

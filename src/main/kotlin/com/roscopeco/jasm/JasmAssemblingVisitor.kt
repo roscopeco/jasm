@@ -117,7 +117,7 @@ class JasmAssemblingVisitor(
         val fv = visitor.visitField(
             modifiers.mapModifiers(ctx.field_modifier()),
             ctx.membername().text,
-            ctx.type().text,
+            TypeVisitor().visitType(ctx.type()),
             null,
             null
         )
@@ -137,7 +137,7 @@ class JasmAssemblingVisitor(
         private val methodVisitor: MethodVisitor = visitor.visitMethod(
             modifiers.mapModifiers(ctx.method_modifier()),
             ctx.membername().text,
-            generateMethodDescriptor(ctx),
+            TypeVisitor().visitMethod_descriptor(ctx.method_descriptor()),
             null,
             null
         )
@@ -401,7 +401,7 @@ class JasmAssemblingVisitor(
         override fun visitInsn_invokedynamic(ctx: Insn_invokedynamicContext) {
             methodVisitor.visitInvokeDynamicInsn(
                 ctx.membername().text,
-                ctx.method_descriptor().text,
+                TypeVisitor().visitMethod_descriptor(ctx.method_descriptor()),
                 buildBootstrapHandle(ctx.method_handle()),
                 *generateConstArgs(ctx.const_arg())
             )
@@ -412,7 +412,7 @@ class JasmAssemblingVisitor(
                 Opcodes.INVOKEINTERFACE,
                 ctx.owner().text,
                 ctx.membername().text,
-                ctx.method_descriptor().text,
+                TypeVisitor().visitMethod_descriptor(ctx.method_descriptor()),
                 true
             )
 
@@ -424,7 +424,7 @@ class JasmAssemblingVisitor(
                 Opcodes.INVOKESPECIAL,
                 ctx.owner().text,
                 ctx.membername().text,
-                ctx.method_descriptor().text,
+                TypeVisitor().visitMethod_descriptor(ctx.method_descriptor()),
                 false
             )
 
@@ -436,7 +436,7 @@ class JasmAssemblingVisitor(
                 Opcodes.INVOKESTATIC,
                 ctx.owner().text,
                 ctx.membername().text,
-                ctx.method_descriptor().text,
+                TypeVisitor().visitMethod_descriptor(ctx.method_descriptor()),
                 false
             )
 
@@ -448,7 +448,7 @@ class JasmAssemblingVisitor(
                 Opcodes.INVOKEVIRTUAL,
                 ctx.owner().text,
                 ctx.membername().text,
-                ctx.method_descriptor().text,
+                TypeVisitor().visitMethod_descriptor(ctx.method_descriptor()),
                 false
             )
 
@@ -462,7 +462,7 @@ class JasmAssemblingVisitor(
             descriptor: String,
             isInterface: Boolean
         ) {
-            methodVisitor.visitMethodInsn(opcode, owner, name, fixDescriptor(descriptor), isInterface)
+            methodVisitor.visitMethodInsn(opcode, owner, name, descriptor, isInterface)
         }
 
         override fun visitInsn_ireturn(ctx: Insn_ireturnContext) {
@@ -519,7 +519,7 @@ class JasmAssemblingVisitor(
                 generateTagForHandle(ctx),
                 ctx.bootstrap_spec().owner().text,
                 ctx.bootstrap_spec().membername().text,
-                fixDescriptor(ctx.bootstrap_spec().method_descriptor().text),
+                TypeVisitor().visitMethod_descriptor(ctx.bootstrap_spec().method_descriptor()),
                 ctx.handle_tag().INVOKEINTERFACE() != null,
             )
         }
@@ -549,21 +549,15 @@ class JasmAssemblingVisitor(
                 ctx.bool_atom() != null         -> if (java.lang.Boolean.parseBoolean(ctx.bool_atom().text)) 1 else 0
                 ctx.QNAME() != null             -> Type.getType("L" + ctx.QNAME().text + ";")
                 ctx.method_handle() != null     -> buildBootstrapHandle(ctx.method_handle())
-                ctx.method_descriptor() != null -> Type.getMethodType(fixDescriptor(ctx.method_descriptor().text))
+                ctx.method_descriptor() != null -> Type.getMethodType(TypeVisitor().visitMethod_descriptor(ctx.method_descriptor()))
                 ctx.constdynamic() != null      -> ConstantDynamic(
                     ctx.constdynamic().membername().text,
-                    ctx.constdynamic().type().text,
+                    TypeVisitor().visitType(ctx.constdynamic().type()),
                     buildBootstrapHandle(ctx.constdynamic().method_handle()),
                     *generateConstArgs(ctx.constdynamic().const_arg())
                 )
                 else -> throw SyntaxErrorException("Unsupported constant arg at #${idx}: " + ctx.text)
             }
-        }
-
-        private fun generateMethodDescriptor(ctx: MethodContext): String {
-            val returnType = ctx.method_descriptor().type().text
-            val paramTypes = ctx.method_descriptor().method_argument().joinToString(separator = "") { it.text }
-            return "($paramTypes)$returnType"
         }
 
         private fun generateIconstOpcode(ctx: AtomContext): Int = try {
@@ -583,9 +577,6 @@ class JasmAssemblingVisitor(
 
         private fun unescapeConstantString(constant: String) =
             constant.substring(1, constant.length - 1).replace("\"\"", "\"")
-
-        private fun fixDescriptor(languageDescriptor: String) =
-            languageDescriptor.replace("([IJFDZV]);".toRegex(), "$1")
 
         private fun normaliseLabelName(labelName: String) =
             if (labelName.endsWith(":")) {

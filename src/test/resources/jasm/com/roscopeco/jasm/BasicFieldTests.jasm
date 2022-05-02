@@ -4,5 +4,5 @@ class com/roscopeco/jasm/BasicFieldTests {
     final finalFloatField  F
     defaultDoubleField     D
     defaultBoolField       Z
-    defaultRefField        Ljava/lang/Object;
+    defaultRefField        java/lang/Object
 }

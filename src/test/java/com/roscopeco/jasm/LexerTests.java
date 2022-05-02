@@ -146,10 +146,7 @@ class LexerTests {
 
         assertNextToken(lexer)
                 .hasType(JasmLexer.QNAME)
-                .hasText("Ljava/lang/Object");
-
-        assertNextToken(lexer)
-                .hasType(JasmLexer.SEMI);
+                .hasText("java/lang/Object");
 
         assertNextToken(lexer)
                 .hasType(JasmLexer.RBRACE);
@@ -234,37 +231,98 @@ class LexerTests {
             tokens.next()
                     .hasType(JasmLexer.TYPE_BYTE);
             tokens.next()
-                    .hasType(JasmLexer.SEMI);
+                    .hasType(JasmLexer.COMMA);
 
             tokens.next()
                     .hasType(JasmLexer.TYPE_CHAR);
             tokens.next()
-                    .hasType(JasmLexer.SEMI);
+                    .hasType(JasmLexer.COMMA);
 
             tokens.next()
                     .hasType(JasmLexer.TYPE_DOUBLE);
             tokens.next()
-                    .hasType(JasmLexer.SEMI);
+                    .hasType(JasmLexer.COMMA);
 
             tokens.next()
                     .hasType(JasmLexer.TYPE_FLOAT);
             tokens.next()
-                    .hasType(JasmLexer.SEMI);
+                    .hasType(JasmLexer.COMMA);
 
             tokens.next()
                     .hasType(JasmLexer.TYPE_INT);
             tokens.next()
-                    .hasType(JasmLexer.SEMI);
+                    .hasType(JasmLexer.COMMA);
 
             tokens.next()
                     .hasType(JasmLexer.TYPE_LONG);
             tokens.next()
-                    .hasType(JasmLexer.SEMI);
+                    .hasType(JasmLexer.COMMA);
 
             tokens.next()
                     .hasType(JasmLexer.TYPE_SHORT);
             tokens.next()
-                    .hasType(JasmLexer.SEMI);
+                    .hasType(JasmLexer.COMMA);
+
+            tokens.next()
+                    .hasType(JasmLexer.TYPE_BOOL);
+
+            tokens.next()
+                    .hasType(JasmLexer.RPAREN);
+
+            tokens.next()
+                    .hasType(JasmLexer.TYPE_VOID);
+
+            tokens.next()
+                    .hasType(JasmLexer.LBRACE);
+
+            tokens.next()
+                    .hasType(JasmLexer.RBRACE);
+
+            /* All primitives method (longhand) */
+            tokens.next()
+                    .hasType(JasmLexer.PUBLIC);
+
+            tokens.next()
+                    .hasType(JasmLexer.NAME)
+                    .hasText("allPrimsLong");
+
+            tokens.next()
+                    .hasType(JasmLexer.LPAREN);
+
+            tokens.next()
+                    .hasType(JasmLexer.TYPE_BYTE);
+            tokens.next()
+                    .hasType(JasmLexer.COMMA);
+
+            tokens.next()
+                    .hasType(JasmLexer.TYPE_CHAR);
+            tokens.next()
+                    .hasType(JasmLexer.COMMA);
+
+            tokens.next()
+                    .hasType(JasmLexer.TYPE_DOUBLE);
+            tokens.next()
+                    .hasType(JasmLexer.COMMA);
+
+            tokens.next()
+                    .hasType(JasmLexer.TYPE_FLOAT);
+            tokens.next()
+                    .hasType(JasmLexer.COMMA);
+
+            tokens.next()
+                    .hasType(JasmLexer.TYPE_INT);
+            tokens.next()
+                    .hasType(JasmLexer.COMMA);
+
+            tokens.next()
+                    .hasType(JasmLexer.TYPE_LONG);
+            tokens.next()
+                    .hasType(JasmLexer.COMMA);
+
+            tokens.next()
+                    .hasType(JasmLexer.TYPE_SHORT);
+            tokens.next()
+                    .hasType(JasmLexer.COMMA);
 
             tokens.next()
                     .hasType(JasmLexer.TYPE_BOOL);
@@ -294,24 +352,20 @@ class LexerTests {
 
             tokens.next()
                     .hasType(JasmLexer.QNAME)
-                    .hasText("Ljava/lang/String");
+                    .hasText("java/lang/String");
             tokens.next()
-                    .hasType(JasmLexer.SEMI);
+                    .hasType(JasmLexer.COMMA);
 
             tokens.next()
                     .hasType(JasmLexer.QNAME)
-                    .hasText("Ljava/lang/Object");
-            tokens.next()
-                    .hasType(JasmLexer.SEMI);
+                    .hasText("java/lang/Object");
 
             tokens.next()
                     .hasType(JasmLexer.RPAREN);
 
             tokens.next()
                     .hasType(JasmLexer.QNAME)
-                    .hasText("Ljava/util/List");
-            tokens.next()
-                    .hasType(JasmLexer.SEMI);
+                    .hasText("java/util/List");
 
             tokens.next()
                     .hasType(JasmLexer.LBRACE);
@@ -325,7 +379,7 @@ class LexerTests {
 
             tokens.next()
                     .hasType(JasmLexer.NAME)
-                    .hasText("mixPrimsAndRefs");
+                    .hasText("mixPrimsAndRefsLongAndShort");
 
             tokens.next()
                     .hasType(JasmLexer.LPAREN);
@@ -333,34 +387,34 @@ class LexerTests {
             tokens.next()
                     .hasType(JasmLexer.TYPE_INT);
             tokens.next()
-                    .hasType(JasmLexer.SEMI);
+                    .hasType(JasmLexer.COMMA);
 
             tokens.next()
                     .hasType(JasmLexer.TYPE_LONG);
             tokens.next()
-                    .hasType(JasmLexer.SEMI);
+                    .hasType(JasmLexer.COMMA);
 
             tokens.next()
                     .hasType(JasmLexer.QNAME)
-                    .hasText("Ljava/lang/String");
+                    .hasText("java/lang/String");
             tokens.next()
-                    .hasType(JasmLexer.SEMI);
+                    .hasType(JasmLexer.COMMA);
 
             tokens.next()
                     .hasType(JasmLexer.TYPE_BOOL);
             tokens.next()
-                    .hasType(JasmLexer.SEMI);
+                    .hasType(JasmLexer.COMMA);
 
             tokens.next()
                     .hasType(JasmLexer.QNAME)
-                    .hasText("Ljava/util/List");
+                    .hasText("java/util/List");
             tokens.next()
-                    .hasType(JasmLexer.SEMI);
+                    .hasType(JasmLexer.COMMA);
 
             tokens.next()
                     .hasType(JasmLexer.TYPE_BOOL);
             tokens.next()
-                    .hasType(JasmLexer.SEMI);
+                    .hasType(JasmLexer.COMMA);
 
             tokens.next()
                     .hasType(JasmLexer.TYPE_BOOL);
@@ -369,7 +423,8 @@ class LexerTests {
                     .hasType(JasmLexer.RPAREN);
 
             tokens.next()
-                    .hasType(JasmLexer.TYPE_VOID);
+                    .hasType(JasmLexer.QNAME)
+                    .hasText("java/util/List");
 
             tokens.next()
                     .hasType(JasmLexer.LBRACE);
@@ -514,10 +569,7 @@ class LexerTests {
 
             tokens.next()
                     .hasType(JasmLexer.QNAME)
-                    .hasText("Ljava/lang/Object");
-
-            tokens.next()
-                    .hasType(JasmLexer.SEMI);
+                    .hasText("java/lang/Object");
 
             // Field 2
             tokens.next()
@@ -551,6 +603,9 @@ class LexerTests {
                     .hasType(JasmLexer.TYPE_INT);
 
             tokens.next()
+                    .hasType(JasmLexer.COMMA);
+
+            tokens.next()
                     .hasType(JasmLexer.LSQUARE);
 
             tokens.next()
@@ -558,20 +613,14 @@ class LexerTests {
 
             tokens.next()
                     .hasType(JasmLexer.QNAME)
-                    .hasText("Ljava/lang/String");
-
-            tokens.next()
-                    .hasType(JasmLexer.SEMI);
+                    .hasText("java/lang/String");
 
             tokens.next()
                     .hasType(JasmLexer.RPAREN);
 
             tokens.next()
                     .hasType(JasmLexer.QNAME)
-                    .hasText("Ljava/lang/Object");
-
-            tokens.next()
-                    .hasType(JasmLexer.SEMI);
+                    .hasText("java/lang/Object");
 
             /* no need to go further */
         });

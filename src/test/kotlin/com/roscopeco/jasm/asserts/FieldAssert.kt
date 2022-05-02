@@ -30,7 +30,7 @@ class FieldAssert internal constructor(actual: FieldContext) :
     fun isInteger(): FieldAssert {
         isNotNull
 
-        if (actual.type().TYPE_INT() == null) {
+        if (actual.type().prim_type()?.TYPE_INT() == null) {
             failWithMessage(
                 "Expected field "
                         + actual.membername().text
@@ -45,7 +45,7 @@ class FieldAssert internal constructor(actual: FieldContext) :
     fun isReference(typeName: String): FieldAssert {
         isNotNull
 
-        if (actual.type().ref_type() == null && actual.type().ref_array_type() == null) {
+        if (actual.type().ref_type() == null && actual.type().array_type() == null) {
             failWithMessage(
                 "Expected field "
                         + actual.membername().text
@@ -70,7 +70,7 @@ class FieldAssert internal constructor(actual: FieldContext) :
     fun isPrimitiveArray(typeName: String): FieldAssert {
         isNotNull
 
-        if (actual.type().prim_array_type() == null) {
+        if (actual.type()?.array_type()?.prim_type() == null) {
             failWithMessage(
                 "Expected field "
                         + actual.membername().text
@@ -78,14 +78,14 @@ class FieldAssert internal constructor(actual: FieldContext) :
                         + actual.type().text
             )
         }
-        if (typeName != actual.type().prim_array_type().text) {
+        if (typeName != actual.type().text) {
             failWithMessage(
                 "Expected field "
                         + actual.membername().text
                         + " to be of type "
                         + typeName +
                         ", but is "
-                        + actual.type().prim_array_type().text
+                        + actual.type().text
             )
         }
 
