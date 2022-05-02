@@ -9,7 +9,7 @@ import org.antlr.v4.runtime.ParserRuleContext
 import org.objectweb.asm.Opcodes
 
 class Modifiers {
-    val modifierMap = mapOf(
+    private val modifierMap = mapOf(
         "abstract"      to Opcodes.ACC_ABSTRACT,
         "annotation"    to Opcodes.ACC_ANNOTATION,
         "bridge"        to Opcodes.ACC_BRIDGE,
@@ -33,6 +33,6 @@ class Modifiers {
     )
 
     fun mapModifiers(modifiers: List<ParserRuleContext>): Int = modifiers
-            .map { mod -> println("!!!!!!!!!!!!! ${mod.text}") ;  modifierMap[mod.text]!! }
+            .map { mod -> modifierMap[mod.text]!! }
             .fold(0) { value, modifier -> value or modifier }
 }
