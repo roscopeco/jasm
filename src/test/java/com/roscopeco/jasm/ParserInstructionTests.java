@@ -128,6 +128,38 @@ class ParserInstructionTests {
     }
 
     @Test
+    void shouldParseD2f() {
+        runInstructionTest("com/roscopeco/jasm/insntest/D2f.jasm", code -> code
+            .d2f()
+            .noMoreCode()
+        );
+    }
+
+    @Test
+    void shouldParseD2i() {
+        runInstructionTest("com/roscopeco/jasm/insntest/D2i.jasm", code -> code
+            .d2i()
+            .noMoreCode()
+        );
+    }
+
+    @Test
+    void shouldParseD2l() {
+        runInstructionTest("com/roscopeco/jasm/insntest/D2l.jasm", code -> code
+            .d2l()
+            .noMoreCode()
+        );
+    }
+
+    @Test
+    void shouldParseDadd() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Dadd.jasm", code -> code
+            .dadd()
+            .noMoreCode()
+        );
+    }
+
+    @Test
     void shouldParseDaload() {
         runInstructionTest("com/roscopeco/jasm/insntest/Daload.jasm", code -> code
                 .daload()

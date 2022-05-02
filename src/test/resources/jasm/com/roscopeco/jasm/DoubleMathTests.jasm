@@ -1,0 +1,32 @@
+public class com/roscopeco/jasm/DoubleMathTests implements com/roscopeco/jasm/model/DoubleMathTests {
+    public testD2f(D)F {
+        dload 1
+        d2f
+        freturn
+    }
+
+    public testD2i(D)I {
+        dload 1
+        d2i
+        ireturn
+    }
+
+    public testD2l(D)J {
+        dload 1
+        d2l
+        lreturn
+    }
+
+    public testDadd(D, D)D {
+        dload 1
+        dload 3
+        dadd
+        dreturn
+    }
+
+    public <init>()V {
+        aload 0
+        invokespecial java/lang/Object.<init>()V
+        return
+    }
+}

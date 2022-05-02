@@ -153,6 +153,10 @@ instruction
  | insn_caload
  | insn_castore
  | insn_checkcast
+ | insn_d2f
+ | insn_d2i
+ | insn_d2l
+ | insn_dadd
  | insn_daload
  | insn_dastore
  | insn_dload
@@ -261,6 +265,22 @@ insn_castore
 
 insn_checkcast
  : CHECKCAST QNAME
+ ;
+
+insn_d2f
+ : D2F
+ ;
+
+insn_d2i
+ : D2I
+ ;
+
+insn_d2l
+ : D2L
+ ;
+
+insn_dadd
+ : DADD
  ;
 
 insn_daload
@@ -563,6 +583,10 @@ BIPUSH          : 'bipush';
 CALOAD          : 'caload';
 CASTORE         : 'castore';
 CHECKCAST       : 'checkcast';
+D2F             : 'd2f';
+D2I             : 'd2i';
+D2L             : 'd2l';
+DADD            : 'dadd';
 DALOAD          : 'daload';
 DASTORE         : 'dastore';
 DLOAD           : 'dload';

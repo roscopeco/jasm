@@ -244,8 +244,27 @@ class JasmAssemblingVisitor(
             methodVisitor.visitInsn(Opcodes.DASTORE)
             super.visitInsn_dastore(ctx)
         }
-        
 
+        override fun visitInsn_d2f(ctx: JasmParser.Insn_d2fContext) {
+            methodVisitor.visitInsn(Opcodes.D2F)
+            super.visitInsn_d2f(ctx)
+        }
+
+        override fun visitInsn_d2i(ctx: JasmParser.Insn_d2iContext) {
+            methodVisitor.visitInsn(Opcodes.D2I)
+            super.visitInsn_d2i(ctx)
+        }
+
+        override fun visitInsn_d2l(ctx: JasmParser.Insn_d2lContext) {
+            methodVisitor.visitInsn(Opcodes.D2L)
+            super.visitInsn_d2l(ctx)
+        }
+
+        override fun visitInsn_dadd(ctx: JasmParser.Insn_daddContext) {
+            methodVisitor.visitInsn(Opcodes.DADD)
+            super.visitInsn_dadd(ctx)
+        }
+        
         override fun visitInsn_dload(ctx: JasmParser.Insn_dloadContext) {
             methodVisitor.visitVarInsn(Opcodes.DLOAD, ctx.int_atom().text.toInt())
             super.visitInsn_dload(ctx)

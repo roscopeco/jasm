@@ -148,6 +148,30 @@ class LexerInstructionTests {
     }
 
     @Test
+    void shouldLexD2f() {
+        runInstructionTest("com/roscopeco/jasm/insntest/D2f.jasm", lexer -> assertNextToken(lexer)
+            .hasType(JasmLexer.D2F));
+    }
+
+    @Test
+    void shouldLexD2i() {
+        runInstructionTest("com/roscopeco/jasm/insntest/D2i.jasm", lexer -> assertNextToken(lexer)
+            .hasType(JasmLexer.D2I));
+    }
+
+    @Test
+    void shouldLexD2l() {
+        runInstructionTest("com/roscopeco/jasm/insntest/D2l.jasm", lexer -> assertNextToken(lexer)
+            .hasType(JasmLexer.D2L));
+    }
+
+    @Test
+    void shouldLexDadd() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Dadd.jasm", lexer -> assertNextToken(lexer)
+            .hasType(JasmLexer.DADD));
+    }
+
+    @Test
     void shouldLexDaload() {
         runInstructionTest("com/roscopeco/jasm/insntest/Daload.jasm", lexer ->
                 assertNextToken(lexer)

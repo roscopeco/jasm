@@ -7,6 +7,7 @@ package com.roscopeco.jasm.e2e;
 
 import com.roscopeco.jasm.model.AthrowTest;
 import com.roscopeco.jasm.model.CheckcastTest;
+import com.roscopeco.jasm.model.DoubleMathTests;
 import com.roscopeco.jasm.model.IfIcmpTests;
 import com.roscopeco.jasm.model.IfTests;
 import com.roscopeco.jasm.model.Interface1;
@@ -534,5 +535,25 @@ class JasmE2ETests {
         obj.testLastore(lary, 42L);
         assertThat(lary[0]).isEqualTo(42L);
         assertThat(obj.testLaload(lary)).isEqualTo(42L);
+    }
+
+    @Test
+    void shouldAssembleDoubleMathTestsToValidJavaClass() {
+        final var clz = assembleAndDefine("com/roscopeco/jasm/DoubleMathTests.jasm");
+
+        assertThat(clz.getName()).isEqualTo("com.roscopeco.jasm.DoubleMathTests");
+
+        assertThat(clz.getDeclaredClasses()).isEmpty();
+        assertThat(clz.getDeclaredFields()).isEmpty();
+        assertThat(clz.getDeclaredConstructors()).hasSize(1);
+        assertThat(clz.getDeclaredMethods()).hasSize(4);
+
+        final var obj = instantiate(clz, DoubleMathTests.class);
+
+        assertThat(obj.testD2f(10.0d)).isEqualTo(10.0f);
+        assertThat(obj.testD2i(10.0d)).isEqualTo(10);
+        assertThat(obj.testD2l(10.0d)).isEqualTo(10);
+
+        assertThat(obj.testDadd(10.0, 5.0)).isEqualTo(15.0);
     }
 }
