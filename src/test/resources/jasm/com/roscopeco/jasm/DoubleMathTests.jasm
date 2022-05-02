@@ -24,6 +24,34 @@ public class com/roscopeco/jasm/DoubleMathTests implements com/roscopeco/jasm/mo
         dreturn
     }
 
+    public testDconst0()D {
+        dconst 0
+        dreturn
+    }
+
+    public testDconst1()D {
+        dconst 1
+        dreturn
+    }
+
+    public testDcmpg(D, D)I {
+        dload 1
+        dload 3
+
+        dcmpg
+
+        ireturn
+    }
+
+    public testDcmpl(D, D)I {
+        dload 1
+        dload 3
+
+        dcmpl
+
+        ireturn
+    }
+
     public <init>()V {
         aload 0
         invokespecial java/lang/Object.<init>()V

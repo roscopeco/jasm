@@ -1,0 +1,5 @@
+class com/roscopeco/jasm/insntest/Dconst {
+    insnTest()V {
+        dconst 0
+    }
+}

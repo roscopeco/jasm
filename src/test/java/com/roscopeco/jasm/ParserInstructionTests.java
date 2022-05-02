@@ -176,6 +176,30 @@ class ParserInstructionTests {
     }
 
     @Test
+    void shouldParseDcmpg() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Dcmpg.jasm", code -> code
+            .dcmpg()
+            .noMoreCode()
+        );
+    }
+
+    @Test
+    void shouldParseDcmpl() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Dcmpl.jasm", code -> code
+            .dcmpl()
+            .noMoreCode()
+        );
+    }
+
+    @Test
+    void shouldParseDconst() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Dconst.jasm", code -> code
+            .dconst(0)
+            .noMoreCode()
+        );
+    }
+
+    @Test
     void shouldParseDload() {
         runInstructionTest("com/roscopeco/jasm/insntest/Dload.jasm", code -> code
                 .dload(0)

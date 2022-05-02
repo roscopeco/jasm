@@ -6,4 +6,8 @@ public interface DoubleMathTests {
     long testD2l(final double in);
 
     double testDadd(final double d1, final double d2);
+    double testDconst0();
+    double testDconst1();
+    int testDcmpg(final double a, final double b);
+    int testDcmpl(final double a, final double b);
 }

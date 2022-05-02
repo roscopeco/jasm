@@ -159,6 +159,9 @@ instruction
  | insn_dadd
  | insn_daload
  | insn_dastore
+ | insn_dcmpg
+ | insn_dcmpl
+ | insn_dconst
  | insn_dload
  | insn_dreturn
  | insn_dstore
@@ -289,6 +292,18 @@ insn_daload
 
 insn_dastore
  : DASTORE
+ ;
+
+insn_dcmpg
+ : DCMPG
+ ;
+
+insn_dcmpl
+ : DCMPL
+ ;
+
+insn_dconst
+ : DCONST int_atom
  ;
 
 insn_dload
@@ -589,6 +604,9 @@ D2L             : 'd2l';
 DADD            : 'dadd';
 DALOAD          : 'daload';
 DASTORE         : 'dastore';
+DCMPG           : 'dcmpg';
+DCMPL           : 'dcmpl';
+DCONST          : 'dconst';
 DLOAD           : 'dload';
 DRETURN         : 'dreturn';
 DSTORE          : 'dstore';

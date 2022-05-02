@@ -546,14 +546,26 @@ class JasmE2ETests {
         assertThat(clz.getDeclaredClasses()).isEmpty();
         assertThat(clz.getDeclaredFields()).isEmpty();
         assertThat(clz.getDeclaredConstructors()).hasSize(1);
-        assertThat(clz.getDeclaredMethods()).hasSize(4);
+        assertThat(clz.getDeclaredMethods()).hasSize(8);
 
         final var obj = instantiate(clz, DoubleMathTests.class);
 
         assertThat(obj.testD2f(10.0d)).isEqualTo(10.0f);
         assertThat(obj.testD2i(10.0d)).isEqualTo(10);
         assertThat(obj.testD2l(10.0d)).isEqualTo(10);
-
         assertThat(obj.testDadd(10.0, 5.0)).isEqualTo(15.0);
+
+        assertThat(obj.testDconst0()).isEqualTo(0.0);
+        assertThat(obj.testDconst1()).isEqualTo(1.0);
+
+        assertThat(obj.testDcmpg(10d, 1d)).isEqualTo(1);
+        assertThat(obj.testDcmpg(1d, 10d)).isEqualTo(-1);
+        assertThat(obj.testDcmpg(1d, 1d)).isEqualTo(0);
+        assertThat(obj.testDcmpg(Double.NaN, 1d)).isEqualTo(1);
+
+        assertThat(obj.testDcmpl(10d, 1d)).isEqualTo(1);
+        assertThat(obj.testDcmpl(1d, 10d)).isEqualTo(-1);
+        assertThat(obj.testDcmpl(1d, 1d)).isEqualTo(0);
+        assertThat(obj.testDcmpl(Double.NaN, 1d)).isEqualTo(-1);
     }
 }

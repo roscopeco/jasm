@@ -86,7 +86,15 @@ class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private
     fun dadd() = genericNoOperandCheck("dadd", InstructionContext::insn_dadd)
 
     fun dastore() = genericNoOperandCheck("dastore", InstructionContext::insn_dastore)
-    
+
+    fun dcmpg() = genericNoOperandCheck("dcmpg", InstructionContext::insn_dcmpg)
+
+    fun dcmpl() = genericNoOperandCheck("dcmpl", InstructionContext::insn_dcmpl)
+
+    fun dconst(expected: Int) = genericIntOperandCheck("dconst", expected, InstructionContext::insn_dconst) {
+            dconst -> dconst.int_atom().text
+    }
+
     fun dload(expected: Int) = genericIntOperandCheck("dload", expected, InstructionContext::insn_dload) {
             dload -> dload.int_atom().text
     }

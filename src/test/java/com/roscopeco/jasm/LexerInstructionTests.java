@@ -181,8 +181,34 @@ class LexerInstructionTests {
     @Test
     void shouldLexDastore() {
         runInstructionTest("com/roscopeco/jasm/insntest/Dastore.jasm", lexer ->
-                assertNextToken(lexer)
-                        .hasType(JasmLexer.DASTORE));
+            assertNextToken(lexer)
+                .hasType(JasmLexer.DASTORE));
+    }
+
+    @Test
+    void shouldLexDcmpg() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Dcmpg.jasm", lexer ->
+            assertNextToken(lexer)
+                .hasType(JasmLexer.DCMPG));
+    }
+
+    @Test
+    void shouldLexDcmpl() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Dcmpl.jasm", lexer ->
+            assertNextToken(lexer)
+                .hasType(JasmLexer.DCMPL));
+    }
+
+    @Test
+    void shouldLexDconst() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Dconst.jasm", lexer -> {
+            assertNextToken(lexer)
+                .hasType(JasmLexer.DCONST);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.INT)
+                .hasText("0");
+        });
     }
 
     @Test

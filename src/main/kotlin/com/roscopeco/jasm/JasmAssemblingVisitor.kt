@@ -235,16 +235,6 @@ class JasmAssemblingVisitor(
             super.visitInsn_checkcast(ctx)
         }
 
-        override fun visitInsn_daload(ctx: JasmParser.Insn_daloadContext) {
-            methodVisitor.visitInsn(Opcodes.DALOAD)
-            super.visitInsn_daload(ctx)
-        }
-
-        override fun visitInsn_dastore(ctx: JasmParser.Insn_dastoreContext) {
-            methodVisitor.visitInsn(Opcodes.DASTORE)
-            super.visitInsn_dastore(ctx)
-        }
-
         override fun visitInsn_d2f(ctx: JasmParser.Insn_d2fContext) {
             methodVisitor.visitInsn(Opcodes.D2F)
             super.visitInsn_d2f(ctx)
@@ -264,7 +254,37 @@ class JasmAssemblingVisitor(
             methodVisitor.visitInsn(Opcodes.DADD)
             super.visitInsn_dadd(ctx)
         }
+
+        override fun visitInsn_daload(ctx: JasmParser.Insn_daloadContext) {
+            methodVisitor.visitInsn(Opcodes.DALOAD)
+            super.visitInsn_daload(ctx)
+        }
+
+        override fun visitInsn_dastore(ctx: JasmParser.Insn_dastoreContext) {
+            methodVisitor.visitInsn(Opcodes.DASTORE)
+            super.visitInsn_dastore(ctx)
+        }
         
+        override fun visitInsn_dcmpg(ctx: JasmParser.Insn_dcmpgContext) {
+            methodVisitor.visitInsn(Opcodes.DCMPG)
+            super.visitInsn_dcmpg(ctx)
+        }
+
+        override fun visitInsn_dcmpl(ctx: JasmParser.Insn_dcmplContext) {
+            methodVisitor.visitInsn(Opcodes.DCMPL)
+            super.visitInsn_dcmpl(ctx)
+        }
+
+        override fun visitInsn_dconst(ctx: JasmParser.Insn_dconstContext) {
+            when (ctx.int_atom().text.toInt()) {
+                0 -> methodVisitor.visitInsn(Opcodes.DCONST_0)
+                1 -> methodVisitor.visitInsn(Opcodes.DCONST_1)
+                else -> throw SyntaxErrorException("Invalid operand to DCONST: ${ctx.int_atom().text} (expecting 0 or 1)")
+            }
+
+            super.visitInsn_dconst(ctx)
+        }
+
         override fun visitInsn_dload(ctx: JasmParser.Insn_dloadContext) {
             methodVisitor.visitVarInsn(Opcodes.DLOAD, ctx.int_atom().text.toInt())
             super.visitInsn_dload(ctx)
