@@ -1,0 +1,20 @@
+// Test that we can use instruction mnemonics as member names
+public class com/roscopeco/jasm/InstructionsAsNames {
+    iconst I
+    public ldc java/lang/String
+
+    public static new()java/util/List {
+        new java/util/ArrayList
+        dup
+        invokespecial java/util/ArrayList.<init>()V
+        areturn
+    }
+
+    fconst()V {
+        return
+    }
+
+    d2i()V {
+        return
+    }
+}

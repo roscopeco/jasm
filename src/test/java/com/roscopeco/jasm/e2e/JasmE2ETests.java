@@ -568,4 +568,16 @@ class JasmE2ETests {
         assertThat(obj.testDcmpl(1d, 1d)).isEqualTo(0);
         assertThat(obj.testDcmpl(Double.NaN, 1d)).isEqualTo(-1);
     }
+
+    @Test
+    void shouldAssembleInstructionsAsMemberNamesToValidJavaClass() {
+        final var clz = assembleAndDefine("com/roscopeco/jasm/InstructionsAsNames.jasm");
+
+        assertThat(clz.getName()).isEqualTo("com.roscopeco.jasm.InstructionsAsNames");
+
+        assertThat(clz.getDeclaredClasses()).isEmpty();
+        assertThat(clz.getDeclaredFields()).hasSize(2);
+        assertThat(clz.getDeclaredConstructors()).isEmpty();
+        assertThat(clz.getDeclaredMethods()).hasSize(3);
+    }
 }
