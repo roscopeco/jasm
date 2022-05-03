@@ -27,6 +27,10 @@ coming from the verifier. In these cases:
 * If related to reference types, you might need to add a `checkcast` to satisfy the verifier that your type is correct
 * If related to locals, and you have `double` or `long` in the mix, remember that these take up two slots!
 
+One thing the verifier is quite keen on is that the stack map frames (for recent class format versions) or 
+`MAXLOCALS` and `MAXSTACK` (for older versions) are correct - JASM computes these for you based on the
+code so you shouldn't need to worry about it too much.
+
 More info on the verifier can be found here: https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.10.2.2
 
 #### Calling methods
@@ -40,7 +44,7 @@ Generally, you want the stack to look like:
 ..., receiver, arg1, arg2
 ```
 
-For example, if you have a method `com/example/MyClass.someMethod(java/lang/String str1, I anInt)java/lang/String` 
+For example, if you have a method `com/example/MyClass.someMethod(java/lang/String, I)java/lang/String` 
 you will want the stack to look like:
 
 ```
