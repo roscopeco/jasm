@@ -70,16 +70,30 @@ class JasmAssemblingVisitor(
     }
 
     override fun visitField(ctx: JasmParser.FieldContext) {
+        if ((ctx.field_initializer() != null) && (modifiers.mapModifiers(ctx.field_modifier()) and Opcodes.ACC_STATIC) == 0) {
+            throw SyntaxErrorException("Unexpected value for non-static field ${ctx.membername().text}")
+        }
+
         val fv = visitor.visitField(
             modifiers.mapModifiers(ctx.field_modifier()),
             ctx.membername().text,
             TypeVisitor().visitType(ctx.type()),
             null,
-            null
+            generateFieldInitializer(ctx.field_initializer())
         )
 
         super.visitField(ctx)
         fv.visitEnd()
+    }
+
+    private fun unescapeConstantString(constant: String) =
+        constant.substring(1, constant.length - 1).replace("\"\"", "\"")
+
+    private fun generateFieldInitializer(ctx: JasmParser.Field_initializerContext?) = when {
+        ctx?.int_atom() != null     -> ctx.int_atom().text.toInt()
+        ctx?.float_atom() != null   -> ctx.float_atom().text.toFloat()
+        ctx?.string_atom() != null  -> unescapeConstantString(ctx.string_atom().text)
+        else                        -> null
     }
 
     override fun visitMethod(ctx: JasmParser.MethodContext) {
@@ -401,6 +415,27 @@ class JasmAssemblingVisitor(
             super.visitInsn_fstore(ctx)
         }
 
+        override fun visitInsn_getfield(ctx: JasmParser.Insn_getfieldContext) {
+            methodVisitor.visitFieldInsn(
+                Opcodes.GETFIELD, 
+                ctx.owner().text, 
+                ctx.membername().text, 
+                TypeVisitor().visitType(ctx.type())
+            )
+            
+            super.visitInsn_getfield(ctx)
+        }
+
+        override fun visitInsn_getstatic(ctx: JasmParser.Insn_getstaticContext) {
+            methodVisitor.visitFieldInsn(
+                Opcodes.GETSTATIC,
+                ctx.owner().text,
+                ctx.membername().text,
+                TypeVisitor().visitType(ctx.type())
+            )
+            super.visitInsn_getstatic(ctx)
+        }
+        
         override fun visitInsn_goto(ctx: JasmParser.Insn_gotoContext) {
             methodVisitor.visitJumpInsn(Opcodes.GOTO, getLabel(ctx.NAME().text).label)
             super.visitInsn_goto(ctx)
@@ -620,10 +655,32 @@ class JasmAssemblingVisitor(
             super.visitInsn_new(ctx)
         }
 
+        override fun visitInsn_putfield(ctx: JasmParser.Insn_putfieldContext) {
+            methodVisitor.visitFieldInsn(
+                Opcodes.PUTFIELD,
+                ctx.owner().text,
+                ctx.membername().text,
+                TypeVisitor().visitType(ctx.type())
+            )
+
+            super.visitInsn_putfield(ctx)
+        }
+
+        override fun visitInsn_putstatic(ctx: JasmParser.Insn_putstaticContext) {
+            methodVisitor.visitFieldInsn(
+                Opcodes.PUTSTATIC,
+                ctx.owner().text,
+                ctx.membername().text,
+                TypeVisitor().visitType(ctx.type())
+            )
+            super.visitInsn_putstatic(ctx)
+        }
+        
         override fun visitInsn_return(ctx: JasmParser.Insn_returnContext) {
             methodVisitor.visitInsn(Opcodes.RETURN)
             super.visitInsn_return(ctx)
         }
+
         private fun buildBootstrapHandle(ctx: JasmParser.Method_handleContext): Handle {
             return Handle(
                 generateTagForHandle(ctx),
@@ -684,9 +741,6 @@ class JasmAssemblingVisitor(
             } catch (e: NumberFormatException) {
                 throw SyntaxErrorException("Invalid non-numeric operand for ICONST (found '" + ctx.text + "')")
             }
-
-        private fun unescapeConstantString(constant: String) =
-            constant.substring(1, constant.length - 1).replace("\"\"", "\"")
 
         private fun normaliseLabelName(labelName: String) =
             if (labelName.endsWith(":")) {

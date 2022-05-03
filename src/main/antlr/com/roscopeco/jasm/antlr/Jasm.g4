@@ -27,7 +27,13 @@ member
  ;
 
 field
- : field_modifier* membername type
+ : field_modifier* membername type (EQUALS field_initializer)?
+ ;
+
+field_initializer
+ : int_atom
+ | float_atom
+ | string_atom
  ;
 
 method
@@ -289,6 +295,8 @@ instruction
  | insn_freturn
  | insn_fsub
  | insn_fstore
+ | insn_getfield
+ | insn_getstatic
  | insn_goto
  | insn_iaload
  | insn_iastore
@@ -324,6 +332,8 @@ instruction
  | insn_lreturn
  | insn_lstore
  | insn_new
+ | insn_putfield
+ | insn_putstatic
  | insn_return
  | label
  ;
@@ -548,6 +558,14 @@ insn_fstore
  : FSTORE int_atom
  ;
 
+insn_getfield
+ : GETFIELD owner DOT membername type
+ ;
+
+insn_getstatic
+ : GETSTATIC owner DOT membername type
+ ;
+
 insn_goto
  : GOTO NAME
  ;
@@ -732,6 +750,14 @@ insn_new
  : NEW QNAME
  ;
 
+insn_putfield
+ : PUTFIELD owner DOT membername type
+ ;
+
+insn_putstatic
+ : PUTSTATIC owner DOT membername type
+ ;
+
 insn_return
  : RETURN
  ;
@@ -758,8 +784,9 @@ LSQUARE : '[';
 RSQUARE : ']';
 DOT     : '.';
 MINUS   : '-';
-SEMI    : ';';
+SEMI    : ';';  /* not used but defining for saner errors in descriptors */
 COMMA   : ',';
+EQUALS  : '=';
 
 CLASS       : 'class';
 EXTENDS     : 'extends';

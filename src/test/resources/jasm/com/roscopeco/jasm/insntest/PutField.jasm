@@ -1,0 +1,5 @@
+class com/roscopeco/jasm/insntest/PutField {
+    insnTest()V {
+        putfield com/example/SomeClass.someField java/lang/String
+    }
+}

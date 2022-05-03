@@ -1,0 +1,29 @@
+public class com/roscopeco/jasm/ConstFieldTests implements com/roscopeco/jasm/model/ConstFieldTests {
+    private static final CONST_STR java/lang/String = "Constant String"
+    private static final CONST_INT I = 10
+    private static final CONST_FLOAT F = 42.0
+
+    public getConstString()java/lang/String {
+        aload 0
+        getstatic com/roscopeco/jasm/ConstFieldTests.CONST_STR java/lang/String
+        areturn
+    }
+
+    public getConstInt()I {
+        aload 0
+        getstatic com/roscopeco/jasm/ConstFieldTests.CONST_INT I
+        ireturn
+    }
+
+    public getConstFloat()F {
+        aload 0
+        getstatic com/roscopeco/jasm/ConstFieldTests.CONST_FLOAT F
+        freturn
+    }
+
+    public <init>()V {
+        aload 0
+        invokespecial java/lang/Object.<init>()V
+        return
+    }
+}

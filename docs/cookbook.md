@@ -200,9 +200,22 @@ public class MyClass {
 }
 ```
 
-As a side note: Specifically for static fields, there are a bunch of types that can be stored directly in the 
-constant pool, so _technically_ these wouldnt have to be initialized in a `<clinit>`. These include all the 
-types you are able to use with the `ldc` instruction (and do include dynamic consts).
+As a side note: Specifically for static fields, there are a few types that can be stored directly in the 
+constant pool, so _technically_ these don't have to be initialized in a `<clinit>`. These types are:
 
-However, JASM currently doesn't provide an easy way to pass a default value for a field, so you're stuck with
-`<clinit>`. I may well add this in the future though (or maybe I already did, and forgot to update this document :D ).
+* String
+* int
+* float
+* double
+* long
+
+Currently, JASM supports the first three, with syntax like:
+
+```java
+private static final CONST_STR java/lang/String = "Constant String"
+private static final CONST_INT I = 10
+private static final CONST_FLOAT F = 42.0
+```
+
+Note that this is **only** for static fields, a `SyntaxErrorException` will be thrown if you
+try to use this for non-statics.

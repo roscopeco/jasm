@@ -1,0 +1,5 @@
+class com/roscopeco/jasm/insntest/GetStatic {
+    insnTest()V {
+        getstatic com/example/SomeClass.someField java/lang/String
+    }
+}

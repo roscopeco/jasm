@@ -7,8 +7,10 @@ package com.roscopeco.jasm.e2e;
 
 import com.roscopeco.jasm.model.AthrowTest;
 import com.roscopeco.jasm.model.CheckcastTest;
+import com.roscopeco.jasm.model.ConstFieldTests;
 import com.roscopeco.jasm.model.DoubleMathTests;
 import com.roscopeco.jasm.model.FloatMathTests;
+import com.roscopeco.jasm.model.GetPutFieldTests;
 import com.roscopeco.jasm.model.IfIcmpTests;
 import com.roscopeco.jasm.model.IfTests;
 import com.roscopeco.jasm.model.Interface1;
@@ -624,5 +626,41 @@ class JasmE2ETests {
         assertThat(obj.testFneg(10f)).isEqualTo(-10f);
         assertThat(obj.testFrem(10f, 3f)).isEqualTo(1f);
         assertThat(obj.testFsub(10f, 5f)).isEqualTo(5f);
+    }
+
+    @Test
+    void shouldAssembleGetPutFieldTestsToValidJavaClass() {
+        final var clz = assembleAndDefine("com/roscopeco/jasm/GetPutFieldTests.jasm");
+
+        assertThat(clz.getName()).isEqualTo("com.roscopeco.jasm.GetPutFieldTests");
+
+        assertThat(clz.getDeclaredClasses()).isEmpty();
+        assertThat(clz.getDeclaredFields()).hasSize(3);
+        assertThat(clz.getDeclaredConstructors()).hasSize(1);
+        assertThat(clz.getDeclaredMethods()).hasSize(3);
+
+        final var obj = instantiate(clz, GetPutFieldTests.class);
+
+        assertThat(obj.getConstField()).isEqualTo("Const value from <clinit>");
+        assertThat(obj.getRefField()).isEqualTo("Ref Field");
+        assertThat(obj.getPrimField()).isEqualTo(42);
+    }
+
+    @Test
+    void shouldAssembleConstFieldTestsToValidJavaClass() {
+        final var clz = assembleAndDefine("com/roscopeco/jasm/ConstFieldTests.jasm");
+
+        assertThat(clz.getName()).isEqualTo("com.roscopeco.jasm.ConstFieldTests");
+
+        assertThat(clz.getDeclaredClasses()).isEmpty();
+        assertThat(clz.getDeclaredFields()).hasSize(3);
+        assertThat(clz.getDeclaredConstructors()).hasSize(1);
+        assertThat(clz.getDeclaredMethods()).hasSize(3);
+
+        final var obj = instantiate(clz, ConstFieldTests.class);
+
+        assertThat(obj.getConstString()).isEqualTo("Constant String");
+        assertThat(obj.getConstInt()).isEqualTo(10);
+        assertThat(obj.getConstFloat()).isEqualTo(42.0f);
     }
 }

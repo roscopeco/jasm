@@ -382,6 +382,20 @@ class ParserInstructionTests {
     }
 
     @Test
+    void shouldParseGetField() {
+        runInstructionTest("com/roscopeco/jasm/insntest/GetField.jasm", code -> code
+            .getField("com/example/SomeClass", "someField", "Ljava/lang/String;")
+        );
+    }
+
+    @Test
+    void shouldParseGetStatic() {
+        runInstructionTest("com/roscopeco/jasm/insntest/GetStatic.jasm", code -> code
+            .getStatic("com/example/SomeClass", "someField", "Ljava/lang/String;")
+        );
+    }
+
+    @Test
     void shouldParseGoto() {
         runInstructionTest("com/roscopeco/jasm/insntest/Goto.jasm", code -> code
                 .label("infinity:")
@@ -595,6 +609,21 @@ class ParserInstructionTests {
         runInstructionTest("com/roscopeco/jasm/insntest/New.jasm", code -> code
                 .anew("java/util/ArrayList")
                 .noMoreCode()
+        );
+    }
+
+
+    @Test
+    void shouldParsePutField() {
+        runInstructionTest("com/roscopeco/jasm/insntest/PutField.jasm", code -> code
+            .putField("com/example/SomeClass", "someField", "Ljava/lang/String;")
+        );
+    }
+
+    @Test
+    void shouldParsePutStatic() {
+        runInstructionTest("com/roscopeco/jasm/insntest/PutStatic.jasm", code -> code
+            .putStatic("com/example/SomeClass", "someField", "Ljava/lang/String;")
         );
     }
 

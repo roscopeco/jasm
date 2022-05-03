@@ -1,0 +1,5 @@
+class com/roscopeco/jasm/insntest/PutStatic {
+    insnTest()V {
+        putstatic com/example/SomeClass.someField java/lang/String
+    }
+}

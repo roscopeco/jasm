@@ -6,6 +6,7 @@
 package com.roscopeco.jasm.asserts
 
 import com.roscopeco.jasm.TypeVisitor
+import com.roscopeco.jasm.antlr.JasmParser
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.AbstractAssert
 import com.roscopeco.jasm.antlr.JasmParser.Stat_blockContext
@@ -166,6 +167,30 @@ class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private
     fun fstore(expected: Int) = genericIntOperandCheck("fstore", expected, InstructionContext::insn_fstore) {
             fstore -> fstore.int_atom().text
     }
+
+    fun getField(expectedOwner: String, expectedName: String, expectedDescriptor: String) =
+        genericFieldAccessCheck(
+            "getfield",
+            expectedOwner,
+            expectedName,
+            expectedDescriptor,
+            InstructionContext::insn_getfield,
+            JasmParser.Insn_getfieldContext::owner,
+            JasmParser.Insn_getfieldContext::membername,
+            JasmParser.Insn_getfieldContext::type
+        )
+
+    fun getStatic(expectedOwner: String, expectedName: String, expectedDescriptor: String) =
+        genericFieldAccessCheck(
+            "getstatic",
+            expectedOwner,
+            expectedName,
+            expectedDescriptor,
+            InstructionContext::insn_getstatic,
+            JasmParser.Insn_getstaticContext::owner,
+            JasmParser.Insn_getstaticContext::membername,
+            JasmParser.Insn_getstaticContext::type
+        )
 
     fun _goto(expected: String) = genericStringOperandCheck("goto", expected, InstructionContext::insn_goto) {
             _goto -> _goto.NAME().text
@@ -393,6 +418,30 @@ class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private
             lstore -> lstore.int_atom().text
     }
 
+    fun putField(expectedOwner: String, expectedName: String, expectedDescriptor: String) =
+        genericFieldAccessCheck(
+            "putfield",
+            expectedOwner,
+            expectedName,
+            expectedDescriptor,
+            InstructionContext::insn_putfield,
+            JasmParser.Insn_putfieldContext::owner,
+            JasmParser.Insn_putfieldContext::membername,
+            JasmParser.Insn_putfieldContext::type
+        )
+
+    fun putStatic(expectedOwner: String, expectedName: String, expectedDescriptor: String) =
+        genericFieldAccessCheck(
+            "putstatic",
+            expectedOwner,
+            expectedName,
+            expectedDescriptor,
+            InstructionContext::insn_putstatic,
+            JasmParser.Insn_putstaticContext::owner,
+            JasmParser.Insn_putstaticContext::membername,
+            JasmParser.Insn_putstaticContext::type
+        )
+
     fun vreturn(): CodeSequenceAssert {
         return genericNoOperandCheck("vreturn", InstructionContext::insn_return)
     }
@@ -518,6 +567,51 @@ class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private
         membernameExtractor: (T) -> MembernameContext,
         descriptorExtractor: (T) -> Method_descriptorContext
     ): CodeSequenceAssert {
+        return genericOwnerNameTypeCheckCheck(
+            invokeType,
+            owner,
+            name,
+            descriptor,
+            invokeExtractor,
+            { t: T -> ownerExtractor.invoke(t).text },
+            { t: T -> membernameExtractor.invoke(t).text },
+            { t: T -> TypeVisitor().visitMethod_descriptor(descriptorExtractor.invoke(t)) }
+        )
+    }
+
+
+    private fun <T> genericFieldAccessCheck(
+        accessType: String,
+        owner: String,
+        name: String,
+        descriptor: String,
+        accessExtractor: (InstructionContext) -> T,
+        ownerExtractor: (T) -> OwnerContext,
+        membernameExtractor: (T) -> MembernameContext,
+        typeExtractor: (T) -> JasmParser.TypeContext
+    ): CodeSequenceAssert {
+        return genericOwnerNameTypeCheckCheck(
+            accessType,
+            owner,
+            name,
+            descriptor,
+            accessExtractor,
+            { t: T -> ownerExtractor.invoke(t).text },
+            { t: T -> membernameExtractor.invoke(t).text },
+            { t: T -> TypeVisitor().visitType(typeExtractor.invoke(t)) }
+        )
+    }
+
+    private fun <T> genericOwnerNameTypeCheckCheck(
+        invokeType: String,
+        owner: String,
+        name: String,
+        descriptor: String,
+        invokeExtractor: (InstructionContext) -> T,
+        ownerExtractor: (T) -> String,
+        membernameExtractor: (T) -> String,
+        descriptorExtractor: (T) -> String
+    ): CodeSequenceAssert {
 
         val failMessageSupplier = { insn: InstructionContext ->
             ("Expected "
@@ -540,9 +634,9 @@ class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private
         }
 
         val insn = invokeExtractor.invoke(stat.instruction())
-        val extractedOwner = ownerExtractor.invoke(insn).text
-        val extractedName = membernameExtractor.invoke(insn).text
-        val extractedDesc = TypeVisitor().visitMethod_descriptor(descriptorExtractor.invoke(insn))
+        val extractedOwner = ownerExtractor.invoke(insn)
+        val extractedName = membernameExtractor.invoke(insn)
+        val extractedDesc = descriptorExtractor.invoke(insn)
 
         if (owner != extractedOwner) {
             failWithMessage(

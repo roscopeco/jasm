@@ -429,12 +429,54 @@ class LexerInstructionTests {
     void shouldLexFstore() {
         runInstructionTest("com/roscopeco/jasm/insntest/Fstore.jasm", lexer -> {
             assertNextToken(lexer)
-                    .hasType(JasmLexer.FSTORE);
+                .hasType(JasmLexer.FSTORE);
 
             assertNextToken(lexer)
-                    .hasType(JasmLexer.INT)
-                    .hasText("0");
+                .hasType(JasmLexer.INT)
+                .hasText("0");
         });
+    }
+
+    @Test
+    void shouldLexGetField() {
+        runInstructionTest("com/roscopeco/jasm/insntest/GetField.jasm", lexer -> assertTokens(lexer, tokens -> {
+            tokens.next().hasType(JasmLexer.GETFIELD);
+
+            tokens.next()
+                .hasType(JasmLexer.QNAME)
+                .hasText("com/example/SomeClass");
+
+            tokens.next().hasType(JasmLexer.DOT);
+
+            tokens.next()
+                .hasType(JasmLexer.NAME)
+                .hasText("someField");
+
+            tokens.next()
+                .hasType(JasmLexer.QNAME)
+                .hasText("java/lang/String");
+        }));
+    }
+
+    @Test
+    void shouldLexGetStatic() {
+        runInstructionTest("com/roscopeco/jasm/insntest/GetStatic.jasm", lexer -> assertTokens(lexer, tokens -> {
+            tokens.next().hasType(JasmLexer.GETSTATIC);
+
+            tokens.next()
+                .hasType(JasmLexer.QNAME)
+                .hasText("com/example/SomeClass");
+
+            tokens.next().hasType(JasmLexer.DOT);
+
+            tokens.next()
+                .hasType(JasmLexer.NAME)
+                .hasText("someField");
+
+            tokens.next()
+                .hasType(JasmLexer.QNAME)
+                .hasText("java/lang/String");
+        }));
     }
 
     @Test
@@ -1125,6 +1167,48 @@ class LexerInstructionTests {
         });
     }
 
+    @Test
+    void shouldLexPutField() {
+        runInstructionTest("com/roscopeco/jasm/insntest/PutField.jasm", lexer -> assertTokens(lexer, tokens -> {
+            tokens.next().hasType(JasmLexer.PUTFIELD);
+
+            tokens.next()
+                .hasType(JasmLexer.QNAME)
+                .hasText("com/example/SomeClass");
+
+            tokens.next().hasType(JasmLexer.DOT);
+
+            tokens.next()
+                .hasType(JasmLexer.NAME)
+                .hasText("someField");
+
+            tokens.next()
+                .hasType(JasmLexer.QNAME)
+                .hasText("java/lang/String");
+        }));
+    }
+
+    @Test
+    void shouldLexPutStatic() {
+        runInstructionTest("com/roscopeco/jasm/insntest/PutStatic.jasm", lexer -> assertTokens(lexer, tokens -> {
+            tokens.next().hasType(JasmLexer.PUTSTATIC);
+
+            tokens.next()
+                .hasType(JasmLexer.QNAME)
+                .hasText("com/example/SomeClass");
+
+            tokens.next().hasType(JasmLexer.DOT);
+
+            tokens.next()
+                .hasType(JasmLexer.NAME)
+                .hasText("someField");
+
+            tokens.next()
+                .hasType(JasmLexer.QNAME)
+                .hasText("java/lang/String");
+        }));
+    }
+    
     @Test
     void shouldLexReturn() {
         runInstructionTest("com/roscopeco/jasm/insntest/Return.jasm", lexer ->

@@ -1,0 +1,44 @@
+public class com/roscopeco/jasm/GetPutFieldTests implements com/roscopeco/jasm/model/GetPutFieldTests {
+
+    public static final CONST_FIELD java/lang/String
+    private publicRefField java/lang/String
+    publicPrimField I
+
+    public getConstField()java/lang/String {
+        getstatic com/roscopeco/jasm/GetPutFieldTests.CONST_FIELD java/lang/String
+        areturn
+    }
+
+    public getRefField()java/lang/String {
+        aload 0
+        getfield com/roscopeco/jasm/GetPutFieldTests.publicRefField java/lang/String
+        areturn
+    }
+
+    public getPrimField()I {
+        aload 0
+        getfield com/roscopeco/jasm/GetPutFieldTests.publicPrimField I
+        ireturn
+    }
+
+    private static <clinit>()V {
+        ldc "Const value from <clinit>"
+        putstatic com/roscopeco/jasm/GetPutFieldTests.CONST_FIELD java/lang/String
+        return
+    }
+
+    public <init>()V {
+        aload 0
+        dup
+        dup
+        invokespecial java/lang/Object.<init>()V
+
+        ldc "Ref Field"
+        putfield com/roscopeco/jasm/GetPutFieldTests.publicRefField java/lang/String
+
+        ldc 42
+        putfield com/roscopeco/jasm/GetPutFieldTests.publicPrimField I
+
+        return
+    }
+}
