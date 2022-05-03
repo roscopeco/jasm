@@ -1,0 +1,104 @@
+public class com/roscopeco/jasm/FloatMathTests implements com/roscopeco/jasm/model/FloatMathTests {
+    public testF2d(F)D {
+        fload 1
+        f2d
+        dreturn
+    }
+
+    public testF2i(F)I {
+        fload 1
+        f2i
+        ireturn
+    }
+
+    public testF2l(F)J {
+        fload 1
+        f2l
+        lreturn
+    }
+
+    public testFadd(F, F)F {
+        fload 1
+        fload 2
+        fadd
+        freturn
+    }
+
+    public testFconst0()F {
+        fconst 0
+        freturn
+    }
+
+    public testFconst1()F {
+        fconst 1
+        freturn
+    }
+
+    public testFcmpg(F, F)I {
+        fload 1
+        fload 2
+
+        fcmpg
+
+        ireturn
+    }
+
+    public testFcmpl(F, F)I {
+        fload 1
+        fload 2
+
+        fcmpl
+
+        ireturn
+    }
+
+    public testFdiv(F, F)F {
+        fload 1
+        fload 2
+
+        fdiv
+
+        freturn
+    }
+
+    public testFmul(F, F)F {
+        fload 1
+        fload 2
+
+        fmul
+
+        freturn
+    }
+
+    public testFneg(F)F {
+        fload 1
+
+        fneg
+
+        freturn
+    }
+
+    public testFrem(F, F)F {
+        fload 1
+        fload 2
+
+        frem
+
+        freturn
+    }
+
+    public testFsub(F, F)F {
+        fload 1
+        fload 2
+
+        fsub
+
+        freturn
+    }
+
+    public <init>()V {
+        aload 0
+        invokespecial java/lang/Object.<init>()V
+        return
+    }
+}

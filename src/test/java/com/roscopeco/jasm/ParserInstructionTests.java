@@ -10,6 +10,9 @@ import lombok.NonNull;
 import org.assertj.core.api.ThrowingConsumer;
 import org.junit.jupiter.api.Test;
 
+import java.util.function.BiFunction;
+import java.util.function.Function;
+
 import static com.roscopeco.jasm.TestUtil.doParse;
 import static com.roscopeco.jasm.asserts.LexerParserAssertions.assertMember;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -200,11 +203,31 @@ class ParserInstructionTests {
     }
 
     @Test
+    void shouldParseDdiv() {
+        singleInsnNoOperands("com/roscopeco/jasm/insntest/Ddiv.jasm", CodeSequenceAssert::ddiv);
+    }
+
+    @Test
     void shouldParseDload() {
         runInstructionTest("com/roscopeco/jasm/insntest/Dload.jasm", code -> code
                 .dload(0)
                 .noMoreCode()
         );
+    }
+
+    @Test
+    void shouldParseDmul() {
+        singleInsnNoOperands("com/roscopeco/jasm/insntest/Dmul.jasm", CodeSequenceAssert::dmul);
+    }
+
+    @Test
+    void shouldParseDneg() {
+        singleInsnNoOperands("com/roscopeco/jasm/insntest/Dneg.jasm", CodeSequenceAssert::dneg);
+    }
+
+    @Test
+    void shouldParseDrem() {
+        singleInsnNoOperands("com/roscopeco/jasm/insntest/Drem.jasm", CodeSequenceAssert::drem);
     }
 
     @Test
@@ -224,11 +247,36 @@ class ParserInstructionTests {
     }
 
     @Test
+    void shouldParseDsub() {
+        singleInsnNoOperands("com/roscopeco/jasm/insntest/Dsub.jasm", CodeSequenceAssert::dsub);
+    }
+
+    @Test
     void shouldParseDup() {
         runInstructionTest("com/roscopeco/jasm/insntest/Dup.jasm", code -> code
                 .dup()
                 .noMoreCode()
         );
+    }
+
+    @Test
+    void shouldParseF2d() {
+        singleInsnNoOperands("com/roscopeco/jasm/insntest/F2d.jasm", CodeSequenceAssert::f2d);
+    }
+
+    @Test
+    void shouldParseF2i() {
+        singleInsnNoOperands("com/roscopeco/jasm/insntest/F2i.jasm", CodeSequenceAssert::f2i);
+    }
+
+    @Test
+    void shouldParseF2l() {
+        singleInsnNoOperands("com/roscopeco/jasm/insntest/F2l.jasm", CodeSequenceAssert::f2l);
+    }
+
+    @Test
+    void shouldParseFadd() {
+        singleInsnNoOperands("com/roscopeco/jasm/insntest/Fadd.jasm", CodeSequenceAssert::fadd);
     }
 
     @Test
@@ -248,11 +296,46 @@ class ParserInstructionTests {
     }
 
     @Test
+    void shouldParseFcmpg() {
+        singleInsnNoOperands("com/roscopeco/jasm/insntest/Fcmpg.jasm", CodeSequenceAssert::fcmpg);
+    }
+
+    @Test
+    void shouldParseFcmpl() {
+        singleInsnNoOperands("com/roscopeco/jasm/insntest/Fcmpl.jasm", CodeSequenceAssert::fcmpl);
+    }
+
+    @Test
+    void shouldParseFconst() {
+        singleInsnOneOperand("com/roscopeco/jasm/insntest/Fconst.jasm", 0, CodeSequenceAssert::fconst);
+    }
+
+    @Test
+    void shouldParseFdiv() {
+        singleInsnNoOperands("com/roscopeco/jasm/insntest/Fdiv.jasm", CodeSequenceAssert::fdiv);
+    }
+
+    @Test
     void shouldParseFload() {
         runInstructionTest("com/roscopeco/jasm/insntest/Fload.jasm", code -> code
                 .fload(0)
                 .noMoreCode()
         );
+    }
+
+    @Test
+    void shouldParseFmul() {
+        singleInsnNoOperands("com/roscopeco/jasm/insntest/Fmul.jasm", CodeSequenceAssert::fmul);
+    }
+
+    @Test
+    void shouldParseFneg() {
+        singleInsnNoOperands("com/roscopeco/jasm/insntest/Fneg.jasm", CodeSequenceAssert::fneg);
+    }
+
+    @Test
+    void shouldParseFrem() {
+        singleInsnNoOperands("com/roscopeco/jasm/insntest/Frem.jasm", CodeSequenceAssert::frem);
     }
 
     @Test
@@ -269,6 +352,11 @@ class ParserInstructionTests {
                 .fstore(0)
                 .noMoreCode()
         );
+    }
+
+    @Test
+    void shouldParseFsub() {
+        singleInsnNoOperands("com/roscopeco/jasm/insntest/Fsub.jasm", CodeSequenceAssert::fsub);
     }
 
     @Test
@@ -494,6 +582,18 @@ class ParserInstructionTests {
                 .vreturn()
                 .noMoreCode()
         );
+    }
+
+    void singleInsnNoOperands(final String testCase, final Function<CodeSequenceAssert, CodeSequenceAssert> assertFunc) {
+        runInstructionTest(testCase, code -> assertFunc.apply(code).noMoreCode());
+    }
+
+    <T> void singleInsnOneOperand(
+        final String testCase,
+        T operand,
+        final BiFunction<CodeSequenceAssert, T, CodeSequenceAssert> assertFunc
+    ) {
+        runInstructionTest(testCase, code -> assertFunc.apply(code, operand).noMoreCode());
     }
 
     private void runInstructionTest(@NonNull final String testCase, ThrowingConsumer<CodeSequenceAssert> codeAssertions) {

@@ -75,8 +75,6 @@ class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private
             checkcast -> checkcast.QNAME().text
     }
 
-    fun daload() = genericNoOperandCheck("daload", InstructionContext::insn_daload)
-
     fun d2f() = genericNoOperandCheck("d2f", InstructionContext::insn_d2f)
 
     fun d2i() = genericNoOperandCheck("d2i", InstructionContext::insn_d2i)
@@ -84,6 +82,8 @@ class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private
     fun d2l() = genericNoOperandCheck("d2l", InstructionContext::insn_d2l)
 
     fun dadd() = genericNoOperandCheck("dadd", InstructionContext::insn_dadd)
+
+    fun daload() = genericNoOperandCheck("daload", InstructionContext::insn_daload)
 
     fun dastore() = genericNoOperandCheck("dastore", InstructionContext::insn_dastore)
 
@@ -95,27 +95,64 @@ class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private
             dconst -> dconst.int_atom().text
     }
 
+    fun ddiv() = genericNoOperandCheck("ddiv", InstructionContext::insn_ddiv)
+
     fun dload(expected: Int) = genericIntOperandCheck("dload", expected, InstructionContext::insn_dload) {
             dload -> dload.int_atom().text
     }
+
+    fun dmul() = genericNoOperandCheck("dmul", InstructionContext::insn_dmul)
+
+    fun dneg() = genericNoOperandCheck("dneg", InstructionContext::insn_dneg)
+
+    fun drem() = genericNoOperandCheck("drem", InstructionContext::insn_drem)
 
     fun dreturn() = genericNoOperandCheck("dreturn", InstructionContext::insn_dreturn)
 
     fun dstore(expected: Int) = genericIntOperandCheck("dstore", expected, InstructionContext::insn_dstore) {
             dstore -> dstore.int_atom().text
     }
-    
+
+    fun dsub() = genericNoOperandCheck("dsub", InstructionContext::insn_dsub)
+
     fun dup() = genericNoOperandCheck("dup", InstructionContext::insn_dup)
 
+    fun f2d() = genericNoOperandCheck("f2d", InstructionContext::insn_f2d)
+
+    fun f2i() = genericNoOperandCheck("f2i", InstructionContext::insn_f2i)
+
+    fun f2l() = genericNoOperandCheck("f2l", InstructionContext::insn_f2l)
+
+    fun fadd() = genericNoOperandCheck("fadd", InstructionContext::insn_fadd)
+    
     fun faload() = genericNoOperandCheck("faload", InstructionContext::insn_faload)
+    
     fun fastore() = genericNoOperandCheck("fastore", InstructionContext::insn_fastore)
+
+    fun fcmpg() = genericNoOperandCheck("fcmpg", InstructionContext::insn_fcmpg)
+
+    fun fcmpl() = genericNoOperandCheck("fcmpl", InstructionContext::insn_fcmpl)
+
+    fun fconst(expected: Int) = genericIntOperandCheck("fconst", expected, InstructionContext::insn_fconst) {
+            fconst -> fconst.int_atom().text
+    }
+
+    fun fdiv() = genericNoOperandCheck("fdiv", InstructionContext::insn_fdiv)
 
     fun fload(expected: Int) = genericIntOperandCheck("fload", expected, InstructionContext::insn_fload) {
             fload -> fload.int_atom().text
     }
 
+    fun fmul() = genericNoOperandCheck("fmul", InstructionContext::insn_fmul)
+
+    fun fneg() = genericNoOperandCheck("fneg", InstructionContext::insn_fneg)
+
+    fun frem() = genericNoOperandCheck("frem", InstructionContext::insn_frem)
+
     fun freturn() = genericNoOperandCheck("freturn", InstructionContext::insn_freturn)
-    
+
+    fun fsub() = genericNoOperandCheck("fsub", InstructionContext::insn_fsub)
+
     fun fstore(expected: Int) = genericIntOperandCheck("fstore", expected, InstructionContext::insn_fstore) {
             fstore -> fstore.int_atom().text
     }

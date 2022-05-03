@@ -77,14 +77,31 @@ membername
  | DCMPG
  | DCMPG
  | DCONST
+ | DDIV
  | DLOAD
+ | DMUL
+ | DNEG
+ | DREM
  | DRETURN
  | DSTORE
+ | DSUB
  | DUP
+ | F2D
+ | F2I
+ | F2L
+ | FADD
  | FALOAD
  | FASTORE
+ | FCMPG
+ | FCMPG
+ | FCONST
+ | FDIV
  | FLOAD
+ | FMUL
+ | FNEG
+ | FREM
  | FRETURN
+ | FSUB
  | FSTORE
  | GETFIELD
  | GETSTATIC
@@ -236,14 +253,31 @@ instruction
  | insn_dcmpg
  | insn_dcmpl
  | insn_dconst
+ | insn_ddiv
  | insn_dload
+ | insn_dmul
+ | insn_dneg
+ | insn_drem
  | insn_dreturn
  | insn_dstore
+ | insn_dsub
  | insn_dup
+ | insn_f2d
+ | insn_f2i
+ | insn_f2l
+ | insn_fadd
  | insn_faload
  | insn_fastore
+ | insn_fcmpg
+ | insn_fcmpl
+ | insn_fconst
+ | insn_fdiv
  | insn_fload
+ | insn_fmul
+ | insn_fneg
+ | insn_frem
  | insn_freturn
+ | insn_fsub
  | insn_fstore
  | insn_goto
  | insn_iaload
@@ -380,8 +414,24 @@ insn_dconst
  : DCONST int_atom
  ;
 
+insn_ddiv
+ : DDIV
+ ;
+
 insn_dload
  : DLOAD int_atom
+ ;
+
+insn_dmul
+ : DMUL
+ ;
+
+insn_dneg
+ : DNEG
+ ;
+
+insn_drem
+ : DREM
  ;
 
 insn_dreturn
@@ -392,8 +442,28 @@ insn_dstore
  : DSTORE int_atom
  ;
 
+insn_dsub
+ : DSUB
+ ;
+
 insn_dup
  : DUP
+ ;
+
+insn_f2d
+ : F2D
+ ;
+
+insn_f2i
+ : F2I
+ ;
+
+insn_f2l
+ : F2L
+ ;
+
+insn_fadd
+ : FADD
  ;
 
 insn_faload
@@ -404,12 +474,44 @@ insn_fastore
  : FASTORE
  ;
 
+insn_fcmpg
+ : FCMPG
+ ;
+
+insn_fcmpl
+ : FCMPL
+ ;
+
+insn_fconst
+ : FCONST int_atom
+ ;
+
+insn_fdiv
+ : FDIV
+ ;
+
 insn_fload
  : FLOAD int_atom
  ;
 
+insn_fmul
+ : FMUL
+ ;
+
+insn_fneg
+ : FNEG
+ ;
+
+insn_frem
+ : FREM
+ ;
+
 insn_freturn
  : FRETURN
+ ;
+
+insn_fsub
+ : FSUB
  ;
 
 insn_fstore
@@ -681,14 +783,31 @@ DASTORE         : 'dastore';
 DCMPG           : 'dcmpg';
 DCMPL           : 'dcmpl';
 DCONST          : 'dconst';
+DDIV            : 'ddiv';
 DLOAD           : 'dload';
+DMUL            : 'dmul';
+DNEG            : 'dneg';
+DREM            : 'drem';
 DRETURN         : 'dreturn';
 DSTORE          : 'dstore';
+DSUB            : 'dsub';
 DUP             : 'dup';
+F2D             : 'f2d';
+F2I             : 'f2i';
+F2L             : 'f2l';
+FADD            : 'fadd';
 FALOAD          : 'faload';
 FASTORE         : 'fastore';
+FCMPG           : 'fcmpg';
+FCMPL           : 'fcmpl';
+FCONST          : 'fconst';
+FDIV            : 'fdiv';
 FLOAD           : 'fload';
+FMUL            : 'fmul';
+FNEG            : 'fneg';
+FREM            : 'frem';
 FRETURN         : 'freturn';
+FSUB            : 'fsub';
 FSTORE          : 'fstore';
 GETFIELD        : 'getfield';
 GETSTATIC       : 'getstatic';

@@ -52,6 +52,50 @@ public class com/roscopeco/jasm/DoubleMathTests implements com/roscopeco/jasm/mo
         ireturn
     }
 
+    public testDdiv(D, D)D {
+        dload 1
+        dload 3
+
+        ddiv
+
+        dreturn
+    }
+
+    public testDmul(D, D)D {
+        dload 1
+        dload 3
+
+        dmul
+
+        dreturn
+    }
+
+    public testDneg(D)D {
+        dload 1
+
+        dneg
+
+        dreturn
+    }
+
+    public testDrem(D, D)D {
+        dload 1
+        dload 3
+
+        drem
+
+        dreturn
+    }
+
+    public testDsub(D, D)D {
+        dload 1
+        dload 3
+
+        dsub
+
+        dreturn
+    }
+
     public <init>()V {
         aload 0
         invokespecial java/lang/Object.<init>()V

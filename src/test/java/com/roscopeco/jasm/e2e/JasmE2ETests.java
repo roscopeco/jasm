@@ -8,6 +8,7 @@ package com.roscopeco.jasm.e2e;
 import com.roscopeco.jasm.model.AthrowTest;
 import com.roscopeco.jasm.model.CheckcastTest;
 import com.roscopeco.jasm.model.DoubleMathTests;
+import com.roscopeco.jasm.model.FloatMathTests;
 import com.roscopeco.jasm.model.IfIcmpTests;
 import com.roscopeco.jasm.model.IfTests;
 import com.roscopeco.jasm.model.Interface1;
@@ -61,17 +62,17 @@ class JasmE2ETests {
         assertThat(clz.getDeclaredFields()).hasSize(6);
 
         assertThat(clz.getDeclaredField("defaultIntField"))
-                .hasToString("int com.roscopeco.jasm.BasicFieldTests.defaultIntField");
+            .hasToString("int com.roscopeco.jasm.BasicFieldTests.defaultIntField");
         assertThat(clz.getDeclaredField("publicLongField"))
-                .hasToString("public long com.roscopeco.jasm.BasicFieldTests.publicLongField");
+            .hasToString("public long com.roscopeco.jasm.BasicFieldTests.publicLongField");
         assertThat(clz.getDeclaredField("finalFloatField"))
-                .hasToString("final float com.roscopeco.jasm.BasicFieldTests.finalFloatField");
+            .hasToString("final float com.roscopeco.jasm.BasicFieldTests.finalFloatField");
         assertThat(clz.getDeclaredField("defaultDoubleField"))
-                .hasToString("double com.roscopeco.jasm.BasicFieldTests.defaultDoubleField");
+            .hasToString("double com.roscopeco.jasm.BasicFieldTests.defaultDoubleField");
         assertThat(clz.getDeclaredField("defaultBoolField"))
-                .hasToString("boolean com.roscopeco.jasm.BasicFieldTests.defaultBoolField");
+            .hasToString("boolean com.roscopeco.jasm.BasicFieldTests.defaultBoolField");
         assertThat(clz.getDeclaredField("defaultRefField"))
-                .hasToString("java.lang.Object com.roscopeco.jasm.BasicFieldTests.defaultRefField");
+            .hasToString("java.lang.Object com.roscopeco.jasm.BasicFieldTests.defaultRefField");
     }
 
     @Test
@@ -195,8 +196,8 @@ class JasmE2ETests {
 
         assertThat(list).isEmpty();
 
-        assertThat(objectArgsInvoker(obj, "testMethod", new Class[] { List.class }).apply(new Object[] { list }))
-                .isSameAs(list);
+        assertThat(objectArgsInvoker(obj, "testMethod", new Class[]{List.class}).apply(new Object[]{list}))
+            .isSameAs(list);
 
         assertThat(list).containsExactly("Hello World");
     }
@@ -217,7 +218,7 @@ class JasmE2ETests {
 
         assertThat(obj).isInstanceOf(ArrayList.class);
 
-        final var list = (ArrayList<?>)obj;
+        final var list = (ArrayList<?>) obj;
 
         assertThat(list).isEmpty();
     }
@@ -236,7 +237,7 @@ class JasmE2ETests {
         final var list = new ArrayList<>();
 
         // Tests GOTO and labels - should skip adding "CANARY" to the list
-        objectArgsInvoker(clz, "testMethod", List.class).apply(new Object[] { list });
+        objectArgsInvoker(clz, "testMethod", List.class).apply(new Object[]{list});
 
         assertThat(list).isEmpty();
     }
@@ -372,7 +373,7 @@ class JasmE2ETests {
         final var exception = new Exception();
 
         assertThatThrownBy(() -> obj.sneakyThrow(exception))
-                .isSameAs(exception);
+            .isSameAs(exception);
     }
 
     @Test
@@ -393,7 +394,7 @@ class JasmE2ETests {
         assertThat(obj.castToList(list)).isSameAs(list);
 
         assertThatThrownBy(() -> obj.castToList(nonList))
-                .isInstanceOf(ClassCastException.class);
+            .isInstanceOf(ClassCastException.class);
     }
 
     @Test
@@ -428,10 +429,10 @@ class JasmE2ETests {
         final var primArrayField = clz.getDeclaredField("primArrayField");
         final var oneArg = clz.getDeclaredMethod("arrayTypesTest", int[].class, String[][].class);
         final var threeArg = clz.getDeclaredMethod(
-                "arrayTypesTestMultiple",
-                String.class,
-                String[].class,
-                String[][].class
+            "arrayTypesTestMultiple",
+            String.class,
+            String[].class,
+            String[][].class
         );
 
         assertThat(arrayField).isNotNull();
@@ -508,13 +509,13 @@ class JasmE2ETests {
 
         final var bary = new byte[1];
         obj.testBipushBastore(bary);
-        assertThat(bary[0]).isEqualTo((byte)42);
-        assertThat(obj.testBaload(bary)).isEqualTo((byte)42);
+        assertThat(bary[0]).isEqualTo((byte) 42);
+        assertThat(obj.testBaload(bary)).isEqualTo((byte) 42);
 
         final var cary = new char[1];
         obj.testCastore(cary);
-        assertThat(cary[0]).isEqualTo((char)42);
-        assertThat(obj.testCaload(cary)).isEqualTo((char)42);
+        assertThat(cary[0]).isEqualTo((char) 42);
+        assertThat(obj.testCaload(cary)).isEqualTo((char) 42);
 
         final var dary = new double[1];
         obj.testDastore(dary, 42.0d);
@@ -546,17 +547,16 @@ class JasmE2ETests {
         assertThat(clz.getDeclaredClasses()).isEmpty();
         assertThat(clz.getDeclaredFields()).isEmpty();
         assertThat(clz.getDeclaredConstructors()).hasSize(1);
-        assertThat(clz.getDeclaredMethods()).hasSize(8);
+        assertThat(clz.getDeclaredMethods()).hasSize(13);
 
         final var obj = instantiate(clz, DoubleMathTests.class);
 
         assertThat(obj.testD2f(10.0d)).isEqualTo(10.0f);
         assertThat(obj.testD2i(10.0d)).isEqualTo(10);
         assertThat(obj.testD2l(10.0d)).isEqualTo(10);
-        assertThat(obj.testDadd(10.0, 5.0)).isEqualTo(15.0);
 
-        assertThat(obj.testDconst0()).isEqualTo(0.0);
-        assertThat(obj.testDconst1()).isEqualTo(1.0);
+        assertThat(obj.testDconst0()).isEqualTo(0.0d);
+        assertThat(obj.testDconst1()).isEqualTo(1.0d);
 
         assertThat(obj.testDcmpg(10d, 1d)).isEqualTo(1);
         assertThat(obj.testDcmpg(1d, 10d)).isEqualTo(-1);
@@ -567,6 +567,13 @@ class JasmE2ETests {
         assertThat(obj.testDcmpl(1d, 10d)).isEqualTo(-1);
         assertThat(obj.testDcmpl(1d, 1d)).isEqualTo(0);
         assertThat(obj.testDcmpl(Double.NaN, 1d)).isEqualTo(-1);
+
+        assertThat(obj.testDadd(10d, 5d)).isEqualTo(15.0d);
+        assertThat(obj.testDdiv(10d, 2d)).isEqualTo(5d);
+        assertThat(obj.testDmul(10d, 2d)).isEqualTo(20d);
+        assertThat(obj.testDneg(10d)).isEqualTo(-10d);
+        assertThat(obj.testDrem(10d, 3d)).isEqualTo(1d);
+        assertThat(obj.testDsub(10d, 5d)).isEqualTo(5d);
     }
 
     @Test
@@ -579,5 +586,43 @@ class JasmE2ETests {
         assertThat(clz.getDeclaredFields()).hasSize(2);
         assertThat(clz.getDeclaredConstructors()).isEmpty();
         assertThat(clz.getDeclaredMethods()).hasSize(3);
+    }
+
+    @Test
+    void shouldAssembleFloatMathTestsToValidJavaClass() {
+        final var clz = assembleAndDefine("com/roscopeco/jasm/FloatMathTests.jasm");
+
+        assertThat(clz.getName()).isEqualTo("com.roscopeco.jasm.FloatMathTests");
+
+        assertThat(clz.getDeclaredClasses()).isEmpty();
+        assertThat(clz.getDeclaredFields()).isEmpty();
+        assertThat(clz.getDeclaredConstructors()).hasSize(1);
+        assertThat(clz.getDeclaredMethods()).hasSize(13);
+
+        final var obj = instantiate(clz, FloatMathTests.class);
+
+        assertThat(obj.testF2d(10.0f)).isEqualTo(10.0d);
+        assertThat(obj.testF2i(10.0f)).isEqualTo(10);
+        assertThat(obj.testF2l(10.0f)).isEqualTo(10);
+
+        assertThat(obj.testFconst0()).isEqualTo(0.0f);
+        assertThat(obj.testFconst1()).isEqualTo(1.0f);
+
+        assertThat(obj.testFcmpg(10f, 1f)).isEqualTo(1);
+        assertThat(obj.testFcmpg(1f, 10f)).isEqualTo(-1);
+        assertThat(obj.testFcmpg(1f, 1f)).isEqualTo(0);
+        assertThat(obj.testFcmpg(Float.NaN, 1f)).isEqualTo(1);
+
+        assertThat(obj.testFcmpl(10f, 1f)).isEqualTo(1);
+        assertThat(obj.testFcmpl(1f, 10f)).isEqualTo(-1);
+        assertThat(obj.testFcmpl(1f, 1f)).isEqualTo(0);
+        assertThat(obj.testFcmpl(Float.NaN, 1f)).isEqualTo(-1);
+
+        assertThat(obj.testFadd(10f, 5f)).isEqualTo(15.0f);
+        assertThat(obj.testFdiv(10f, 2f)).isEqualTo(5f);
+        assertThat(obj.testFmul(10f, 2f)).isEqualTo(20f);
+        assertThat(obj.testFneg(10f)).isEqualTo(-10f);
+        assertThat(obj.testFrem(10f, 3f)).isEqualTo(1f);
+        assertThat(obj.testFsub(10f, 5f)).isEqualTo(5f);
     }
 }

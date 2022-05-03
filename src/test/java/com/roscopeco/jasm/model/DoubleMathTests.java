@@ -10,4 +10,10 @@ public interface DoubleMathTests {
     double testDconst1();
     int testDcmpg(final double a, final double b);
     int testDcmpl(final double a, final double b);
+
+    double testDdiv(final double a, final double b);
+    double testDmul(final double a, final double b);
+    double testDneg(final double a);
+    double testDrem(final double a, final double b);
+    double testDsub(final double a, final double b);
 }

@@ -212,6 +212,13 @@ class LexerInstructionTests {
     }
 
     @Test
+    void shouldLexDdiv() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Ddiv.jasm", lexer ->
+            assertNextToken(lexer)
+                .hasType(JasmLexer.DDIV));
+    }
+
+    @Test
     void shouldLexDload() {
         runInstructionTest("com/roscopeco/jasm/insntest/Dload.jasm", lexer -> {
             assertNextToken(lexer)
@@ -221,6 +228,34 @@ class LexerInstructionTests {
                     .hasType(JasmLexer.INT)
                     .hasText("0");
         });
+    }
+
+    @Test
+    void shouldLexDmul() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Dmul.jasm", lexer ->
+            assertNextToken(lexer)
+                .hasType(JasmLexer.DMUL));
+    }
+
+    @Test
+    void shouldLexDneg() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Dneg.jasm", lexer ->
+            assertNextToken(lexer)
+                .hasType(JasmLexer.DNEG));
+    }
+
+    @Test
+    void shouldLexDrem() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Drem.jasm", lexer ->
+            assertNextToken(lexer)
+                .hasType(JasmLexer.DREM));
+    }
+
+    @Test
+    void shouldLexDsub() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Dsub.jasm", lexer ->
+            assertNextToken(lexer)
+                .hasType(JasmLexer.DSUB));
     }
 
     @Test
@@ -234,7 +269,6 @@ class LexerInstructionTests {
                     .hasText("0");
         });
     }
-
 
     @Test
     void shouldLexDup() {
@@ -250,11 +284,70 @@ class LexerInstructionTests {
     }
 
     @Test
+    void shouldLexF2d() {
+        runInstructionTest("com/roscopeco/jasm/insntest/F2d.jasm", lexer -> assertNextToken(lexer)
+            .hasType(JasmLexer.F2D));
+    }
+
+    @Test
+    void shouldLexF2i() {
+        runInstructionTest("com/roscopeco/jasm/insntest/F2i.jasm", lexer -> assertNextToken(lexer)
+            .hasType(JasmLexer.F2I));
+    }
+
+    @Test
+    void shouldLexF2l() {
+        runInstructionTest("com/roscopeco/jasm/insntest/F2l.jasm", lexer -> assertNextToken(lexer)
+            .hasType(JasmLexer.F2L));
+    }
+
+    @Test
+    void shoulfLexFadd() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Fadd.jasm", lexer ->
+            assertNextToken(lexer)
+                .hasType(JasmLexer.FADD));
+    }
+
+    @Test
     void shouldLexFastore() {
         runInstructionTest("com/roscopeco/jasm/insntest/Fastore.jasm", lexer ->
                 assertNextToken(lexer)
                         .hasType(JasmLexer.FASTORE));
     }
+
+    @Test
+    void shoulfLexFcmpg() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Fcmpg.jasm", lexer ->
+            assertNextToken(lexer)
+                .hasType(JasmLexer.FCMPG));
+    }
+
+    @Test
+    void shoulfLexFcmpl() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Fcmpl.jasm", lexer ->
+            assertNextToken(lexer)
+                .hasType(JasmLexer.FCMPL));
+    }
+
+    @Test
+    void shoulfLexFconst() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Fconst.jasm", lexer -> {
+            assertNextToken(lexer)
+                .hasType(JasmLexer.FCONST);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.INT)
+                .hasText("0");
+        });
+    }
+    
+    @Test
+    void shoulfLexFdiv() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Fdiv.jasm", lexer ->
+            assertNextToken(lexer)
+                .hasType(JasmLexer.FDIV));
+    }
+
     @Test
     void shouldLexFload() {
         runInstructionTest("com/roscopeco/jasm/insntest/Fload.jasm", lexer -> {
@@ -268,10 +361,38 @@ class LexerInstructionTests {
     }
 
     @Test
+    void shoulfLexFmul() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Fmul.jasm", lexer ->
+            assertNextToken(lexer)
+                .hasType(JasmLexer.FMUL));
+    }
+
+    @Test
+    void shoulfLexFneg() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Fneg.jasm", lexer ->
+            assertNextToken(lexer)
+                .hasType(JasmLexer.FNEG));
+    }
+
+    @Test
+    void shoulfLexFrem() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Frem.jasm", lexer ->
+            assertNextToken(lexer)
+                .hasType(JasmLexer.FREM));
+    }
+
+    @Test
     void shouldLexFreturn() {
         runInstructionTest("com/roscopeco/jasm/insntest/Freturn.jasm", FLOAT_RETURN_TYPE_TOKEN, lexer ->
                 assertNextToken(lexer)
                         .hasType(JasmLexer.FRETURN));
+    }
+
+    @Test
+    void shoulfLexFsub() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Fsub.jasm", lexer ->
+            assertNextToken(lexer)
+                .hasType(JasmLexer.FSUB));
     }
 
     @Test

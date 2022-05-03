@@ -1,0 +1,5 @@
+class com/roscopeco/jasm/insntest/F2i {
+    insnTest()V {
+        f2i
+    }
+}
