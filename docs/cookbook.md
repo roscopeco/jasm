@@ -48,7 +48,7 @@ you will want the stack to look like:
 ```
 
 Assuming this is a virtual method, you would then do 
-`invokevirtual com/example/MyClass.someMethod(java/lang/String str1, I anInt)java/lang/String`
+`invokevirtual com/example/MyClass.someMethod(java/lang/String, I)java/lang/String`
 which will call the method with the args and receiver popped from the stack. The instruction will push the
 return value from the method (a String in this case according to the descriptor) back onto the stack, leaving it
 looking like this:
