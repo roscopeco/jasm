@@ -135,7 +135,7 @@ pursuit of this project, how about these (some lifted from Jasmin's README):
 
 * Security Researchers - Create hostile classes and see if you can sneak them
   past the class verifier.
-* 
+
 * Teachers - Perhaps you're teaching a compiler course, maybe you could use this
   to introduce students to JVM bytecode, or even as an IL for the compilers.
 
