@@ -253,10 +253,32 @@ class ParserInstructionTests {
 
     @Test
     void shouldParseDup() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Dup.jasm", code -> code
-                .dup()
-                .noMoreCode()
-        );
+        singleInsnNoOperands("com/roscopeco/jasm/insntest/Dup.jasm", CodeSequenceAssert::dup);
+    }
+
+    @Test
+    void shouldParseDup_x1() {
+        singleInsnNoOperands("com/roscopeco/jasm/insntest/Dup_x1.jasm", CodeSequenceAssert::dupX1);
+    }
+
+    @Test
+    void shouldParseDup_x2() {
+        singleInsnNoOperands("com/roscopeco/jasm/insntest/Dup_x2.jasm", CodeSequenceAssert::dupX2);
+    }
+
+    @Test
+    void shouldParseDup2() {
+        singleInsnNoOperands("com/roscopeco/jasm/insntest/Dup2.jasm", CodeSequenceAssert::dup2);
+    }
+
+    @Test
+    void shouldParseDup2_x1() {
+        singleInsnNoOperands("com/roscopeco/jasm/insntest/Dup2_x1.jasm", CodeSequenceAssert::dup2X1);
+    }
+
+    @Test
+    void shouldParseDup2_x2() {
+        singleInsnNoOperands("com/roscopeco/jasm/insntest/Dup2_x2.jasm", CodeSequenceAssert::dup2X2);
     }
 
     @Test

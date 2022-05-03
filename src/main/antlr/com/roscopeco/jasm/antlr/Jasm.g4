@@ -86,6 +86,11 @@ membername
  | DSTORE
  | DSUB
  | DUP
+ | DUP_X1
+ | DUP_X2
+ | DUP2
+ | DUP2_X1
+ | DUP2_X2
  | F2D
  | F2I
  | F2L
@@ -262,6 +267,11 @@ instruction
  | insn_dstore
  | insn_dsub
  | insn_dup
+ | insn_dup_x1
+ | insn_dup_x2
+ | insn_dup2
+ | insn_dup2_x1
+ | insn_dup2_x2
  | insn_f2d
  | insn_f2i
  | insn_f2l
@@ -448,6 +458,26 @@ insn_dsub
 
 insn_dup
  : DUP
+ ;
+
+insn_dup_x1
+ : DUP_X1
+ ;
+
+insn_dup_x2
+ : DUP_X2
+ ;
+
+insn_dup2
+ : DUP2
+ ;
+
+insn_dup2_x1
+ : DUP2_X1
+ ;
+
+insn_dup2_x2
+ : DUP2_X2
  ;
 
 insn_f2d
@@ -792,6 +822,11 @@ DRETURN         : 'dreturn';
 DSTORE          : 'dstore';
 DSUB            : 'dsub';
 DUP             : 'dup';
+DUP_X1          : 'dup_x1';
+DUP_X2          : 'dup_x2';
+DUP2            : 'dup2';
+DUP2_X1         : 'dup2_x1';
+DUP2_X2         : 'dup2_x2';
 F2D             : 'f2d';
 F2I             : 'f2i';
 F2L             : 'f2l';

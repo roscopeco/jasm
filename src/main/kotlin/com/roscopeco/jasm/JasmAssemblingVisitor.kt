@@ -7,50 +7,6 @@ package com.roscopeco.jasm
 
 import com.roscopeco.jasm.antlr.JasmBaseVisitor
 import com.roscopeco.jasm.antlr.JasmParser
-import com.roscopeco.jasm.antlr.JasmParser.ClassContext
-import com.roscopeco.jasm.antlr.JasmParser.FieldContext
-import com.roscopeco.jasm.antlr.JasmParser.MethodContext
-import com.roscopeco.jasm.antlr.JasmParser.LabelContext
-import com.roscopeco.jasm.antlr.JasmParser.Insn_aconst_nullContext
-import com.roscopeco.jasm.antlr.JasmParser.Insn_aloadContext
-import com.roscopeco.jasm.antlr.JasmParser.Insn_anewarrayContext
-import com.roscopeco.jasm.antlr.JasmParser.Insn_areturnContext
-import com.roscopeco.jasm.antlr.JasmParser.Insn_arraylengthContext
-import com.roscopeco.jasm.antlr.JasmParser.Insn_astoreContext
-import com.roscopeco.jasm.antlr.JasmParser.Insn_athrowContext
-import com.roscopeco.jasm.antlr.JasmParser.Insn_checkcastContext
-import com.roscopeco.jasm.antlr.JasmParser.Insn_dupContext
-import com.roscopeco.jasm.antlr.JasmParser.Insn_freturnContext
-import com.roscopeco.jasm.antlr.JasmParser.Insn_gotoContext
-import com.roscopeco.jasm.antlr.JasmParser.Insn_iconstContext
-import com.roscopeco.jasm.antlr.JasmParser.Insn_ifeqContext
-import com.roscopeco.jasm.antlr.JasmParser.Insn_ifgeContext
-import com.roscopeco.jasm.antlr.JasmParser.Insn_ifgtContext
-import com.roscopeco.jasm.antlr.JasmParser.Insn_ifleContext
-import com.roscopeco.jasm.antlr.JasmParser.Insn_ifltContext
-import com.roscopeco.jasm.antlr.JasmParser.Insn_ifneContext
-import com.roscopeco.jasm.antlr.JasmParser.Insn_if_acmpeqContext
-import com.roscopeco.jasm.antlr.JasmParser.Insn_if_acmpneContext
-import com.roscopeco.jasm.antlr.JasmParser.Insn_if_icmpeqContext
-import com.roscopeco.jasm.antlr.JasmParser.Insn_if_icmpgeContext
-import com.roscopeco.jasm.antlr.JasmParser.Insn_if_icmpgtContext
-import com.roscopeco.jasm.antlr.JasmParser.Insn_if_icmpleContext
-import com.roscopeco.jasm.antlr.JasmParser.Insn_if_icmpltContext
-import com.roscopeco.jasm.antlr.JasmParser.Insn_if_icmpneContext
-import com.roscopeco.jasm.antlr.JasmParser.Insn_ifnullContext
-import com.roscopeco.jasm.antlr.JasmParser.Insn_ifnonnullContext
-import com.roscopeco.jasm.antlr.JasmParser.Insn_invokedynamicContext
-import com.roscopeco.jasm.antlr.JasmParser.Insn_invokeinterfaceContext
-import com.roscopeco.jasm.antlr.JasmParser.Insn_invokespecialContext
-import com.roscopeco.jasm.antlr.JasmParser.Insn_invokestaticContext
-import com.roscopeco.jasm.antlr.JasmParser.Insn_invokevirtualContext
-import com.roscopeco.jasm.antlr.JasmParser.Insn_ireturnContext
-import com.roscopeco.jasm.antlr.JasmParser.Insn_ldcContext
-import com.roscopeco.jasm.antlr.JasmParser.Insn_newContext
-import com.roscopeco.jasm.antlr.JasmParser.Insn_returnContext
-import com.roscopeco.jasm.antlr.JasmParser.AtomContext
-import com.roscopeco.jasm.antlr.JasmParser.Method_handleContext
-import com.roscopeco.jasm.antlr.JasmParser.Const_argContext
 import org.objectweb.asm.ClassVisitor
 import org.objectweb.asm.ConstantDynamic
 import org.objectweb.asm.Handle
@@ -94,7 +50,7 @@ class JasmAssemblingVisitor(
     constructor(visitor: ClassVisitor, unitName: String, classFormat: Int)
             : this(visitor, Modifiers(), unitName, classFormat)
 
-    override fun visitClass(ctx: ClassContext) {
+    override fun visitClass(ctx: JasmParser.ClassContext) {
         visitor.visit(
             Opcodes.V17,
             modifiers.mapModifiers(ctx.type_modifier()),
@@ -113,7 +69,7 @@ class JasmAssemblingVisitor(
         visitor.visitEnd()
     }
 
-    override fun visitField(ctx: FieldContext) {
+    override fun visitField(ctx: JasmParser.FieldContext) {
         val fv = visitor.visitField(
             modifiers.mapModifiers(ctx.field_modifier()),
             ctx.membername().text,
@@ -126,11 +82,11 @@ class JasmAssemblingVisitor(
         fv.visitEnd()
     }
 
-    override fun visitMethod(ctx: MethodContext) {
+    override fun visitMethod(ctx: JasmParser.MethodContext) {
         return JasmMethodVisitor(ctx).visitMethod(ctx)
     }
 
-    private inner class JasmMethodVisitor(ctx: MethodContext) : JasmBaseVisitor<Unit>() {
+    private inner class JasmMethodVisitor(ctx: JasmParser.MethodContext) : JasmBaseVisitor<Unit>() {
         private val labels = HashMap<String, LabelHolder>()
 
         // Cheating slightly, but prevents us having to have an apparently-mutable visitor...
@@ -142,7 +98,7 @@ class JasmAssemblingVisitor(
             null
         )
 
-        override fun visitMethod(ctx: MethodContext) {
+        override fun visitMethod(ctx: JasmParser.MethodContext) {
              super.visitMethod(ctx)
 
             // Do this **before** computing frames, as if a label hasn't been visited
@@ -154,7 +110,7 @@ class JasmAssemblingVisitor(
             methodVisitor.visitEnd()
         }
 
-        override fun visitLabel(ctx: LabelContext) {
+        override fun visitLabel(ctx: JasmParser.LabelContext) {
             val label = declareLabel(ctx.LABEL().text)
             methodVisitor.visitLabel(label.label)
             super.visitLabel(ctx)
@@ -170,37 +126,37 @@ class JasmAssemblingVisitor(
             super.visitInsn_aastore(ctx)
         }
 
-        override fun visitInsn_aconst_null(ctx: Insn_aconst_nullContext) {
+        override fun visitInsn_aconst_null(ctx: JasmParser.Insn_aconst_nullContext) {
             methodVisitor.visitInsn(Opcodes.ACONST_NULL)
             super.visitInsn_aconst_null(ctx)
         }
 
-        override fun visitInsn_aload(ctx: Insn_aloadContext) {
+        override fun visitInsn_aload(ctx: JasmParser.Insn_aloadContext) {
             methodVisitor.visitVarInsn(Opcodes.ALOAD, ctx.int_atom().text.toInt())
             super.visitInsn_aload(ctx)
         }
 
-        override fun visitInsn_anewarray(ctx: Insn_anewarrayContext) {
+        override fun visitInsn_anewarray(ctx: JasmParser.Insn_anewarrayContext) {
             methodVisitor.visitTypeInsn(Opcodes.ANEWARRAY, ctx.QNAME().text)
             super.visitInsn_anewarray(ctx)
         }
 
-        override fun visitInsn_areturn(ctx: Insn_areturnContext) {
+        override fun visitInsn_areturn(ctx: JasmParser.Insn_areturnContext) {
             methodVisitor.visitInsn(Opcodes.ARETURN)
             super.visitInsn_areturn(ctx)
         }
 
-        override fun visitInsn_arraylength(ctx: Insn_arraylengthContext) {
+        override fun visitInsn_arraylength(ctx: JasmParser.Insn_arraylengthContext) {
             methodVisitor.visitInsn(Opcodes.ARRAYLENGTH)
             super.visitInsn_arraylength(ctx)
         }
 
-        override fun visitInsn_astore(ctx: Insn_astoreContext) {
+        override fun visitInsn_astore(ctx: JasmParser.Insn_astoreContext) {
             methodVisitor.visitVarInsn(Opcodes.ASTORE, ctx.int_atom().text.toInt())
             super.visitInsn_astore(ctx)
         }
 
-        override fun visitInsn_athrow(ctx: Insn_athrowContext) {
+        override fun visitInsn_athrow(ctx: JasmParser.Insn_athrowContext) {
             methodVisitor.visitInsn(Opcodes.ATHROW)
             super.visitInsn_athrow(ctx)
         }
@@ -230,7 +186,7 @@ class JasmAssemblingVisitor(
             super.visitInsn_castore(ctx)
         }
 
-        override fun visitInsn_checkcast(ctx: Insn_checkcastContext) {
+        override fun visitInsn_checkcast(ctx: JasmParser.Insn_checkcastContext) {
             methodVisitor.visitTypeInsn(Opcodes.CHECKCAST, ctx.QNAME().text)
             super.visitInsn_checkcast(ctx)
         }
@@ -325,9 +281,34 @@ class JasmAssemblingVisitor(
             super.visitInsn_dsub(ctx)
         }
 
-        override fun visitInsn_dup(ctx: Insn_dupContext) {
+        override fun visitInsn_dup(ctx: JasmParser.Insn_dupContext) {
             methodVisitor.visitInsn(Opcodes.DUP)
             super.visitInsn_dup(ctx)
+        }
+
+        override fun visitInsn_dup_x1(ctx: JasmParser.Insn_dup_x1Context) {
+            methodVisitor.visitInsn(Opcodes.DUP_X1)
+            super.visitInsn_dup_x1(ctx)
+        }
+
+        override fun visitInsn_dup_x2(ctx: JasmParser.Insn_dup_x2Context) {
+            methodVisitor.visitInsn(Opcodes.DUP_X2)
+            super.visitInsn_dup_x2(ctx)
+        }
+
+        override fun visitInsn_dup2(ctx: JasmParser.Insn_dup2Context) {
+            methodVisitor.visitInsn(Opcodes.DUP2)
+            super.visitInsn_dup2(ctx)
+        }
+
+        override fun visitInsn_dup2_x2(ctx: JasmParser.Insn_dup2_x2Context) {
+            methodVisitor.visitInsn(Opcodes.DUP2_X2)
+            super.visitInsn_dup2_x2(ctx)
+        }
+
+        override fun visitInsn_dup2_x1(ctx: JasmParser.Insn_dup2_x1Context) {
+            methodVisitor.visitInsn(Opcodes.DUP2_X1)
+            super.visitInsn_dup2_x1(ctx)
         }
 
         override fun visitInsn_f2d(ctx: JasmParser.Insn_f2dContext) {
@@ -405,7 +386,7 @@ class JasmAssemblingVisitor(
             super.visitInsn_frem(ctx)
         }
         
-        override fun visitInsn_freturn(ctx: Insn_freturnContext) {
+        override fun visitInsn_freturn(ctx: JasmParser.Insn_freturnContext) {
             methodVisitor.visitInsn(Opcodes.FRETURN)
             super.visitInsn_freturn(ctx)
         }
@@ -420,7 +401,7 @@ class JasmAssemblingVisitor(
             super.visitInsn_fstore(ctx)
         }
 
-        override fun visitInsn_goto(ctx: Insn_gotoContext) {
+        override fun visitInsn_goto(ctx: JasmParser.Insn_gotoContext) {
             methodVisitor.visitJumpInsn(Opcodes.GOTO, getLabel(ctx.NAME().text).label)
             super.visitInsn_goto(ctx)
         }
@@ -435,89 +416,89 @@ class JasmAssemblingVisitor(
             super.visitInsn_iastore(ctx)
         }
 
-        override fun visitInsn_iconst(ctx: Insn_iconstContext) {
+        override fun visitInsn_iconst(ctx: JasmParser.Insn_iconstContext) {
             methodVisitor.visitInsn(generateIconstOpcode(ctx.atom()))
             super.visitInsn_iconst(ctx)
         }
 
-        override fun visitInsn_ifeq(ctx: Insn_ifeqContext) {
+        override fun visitInsn_ifeq(ctx: JasmParser.Insn_ifeqContext) {
             methodVisitor.visitJumpInsn(Opcodes.IFEQ, getLabel(ctx.NAME().text).label)
             super.visitInsn_ifeq(ctx)
         }
 
-        override fun visitInsn_ifge(ctx: Insn_ifgeContext) {
+        override fun visitInsn_ifge(ctx: JasmParser.Insn_ifgeContext) {
             methodVisitor.visitJumpInsn(Opcodes.IFGE, getLabel(ctx.NAME().text).label)
             super.visitInsn_ifge(ctx)
         }
 
-        override fun visitInsn_ifgt(ctx: Insn_ifgtContext) {
+        override fun visitInsn_ifgt(ctx: JasmParser.Insn_ifgtContext) {
             methodVisitor.visitJumpInsn(Opcodes.IFGT, getLabel(ctx.NAME().text).label)
             super.visitInsn_ifgt(ctx)
         }
 
-        override fun visitInsn_ifle(ctx: Insn_ifleContext) {
+        override fun visitInsn_ifle(ctx: JasmParser.Insn_ifleContext) {
             val label = getLabel(ctx.NAME().text)
             methodVisitor.visitJumpInsn(Opcodes.IFLE, label.label)
             super.visitInsn_ifle(ctx)
         }
 
-        override fun visitInsn_iflt(ctx: Insn_ifltContext) {
+        override fun visitInsn_iflt(ctx: JasmParser.Insn_ifltContext) {
             methodVisitor.visitJumpInsn(Opcodes.IFLT, getLabel(ctx.NAME().text).label)
             super.visitInsn_iflt(ctx)
         }
 
-        override fun visitInsn_ifne(ctx: Insn_ifneContext) {
+        override fun visitInsn_ifne(ctx: JasmParser.Insn_ifneContext) {
             methodVisitor.visitJumpInsn(Opcodes.IFNE, getLabel(ctx.NAME().text).label)
             super.visitInsn_ifne(ctx)
         }
 
-        override fun visitInsn_if_acmpeq(ctx: Insn_if_acmpeqContext) {
+        override fun visitInsn_if_acmpeq(ctx: JasmParser.Insn_if_acmpeqContext) {
             methodVisitor.visitJumpInsn(Opcodes.IF_ACMPEQ, getLabel(ctx.NAME().text).label)
             super.visitInsn_if_acmpeq(ctx)
         }
 
-        override fun visitInsn_if_acmpne(ctx: Insn_if_acmpneContext) {
+        override fun visitInsn_if_acmpne(ctx: JasmParser.Insn_if_acmpneContext) {
             methodVisitor.visitJumpInsn(Opcodes.IF_ACMPNE, getLabel(ctx.NAME().text).label)
             super.visitInsn_if_acmpne(ctx)
         }
 
-        override fun visitInsn_if_icmpeq(ctx: Insn_if_icmpeqContext) {
+        override fun visitInsn_if_icmpeq(ctx: JasmParser.Insn_if_icmpeqContext) {
             methodVisitor.visitJumpInsn(Opcodes.IF_ICMPEQ, getLabel(ctx.NAME().text).label)
             super.visitInsn_if_icmpeq(ctx)
         }
 
-        override fun visitInsn_if_icmpge(ctx: Insn_if_icmpgeContext) {
+        override fun visitInsn_if_icmpge(ctx: JasmParser.Insn_if_icmpgeContext) {
             methodVisitor.visitJumpInsn(Opcodes.IF_ICMPGE, getLabel(ctx.NAME().text).label)
             super.visitInsn_if_icmpge(ctx)
         }
 
-        override fun visitInsn_if_icmpgt(ctx: Insn_if_icmpgtContext) {
+        override fun visitInsn_if_icmpgt(ctx: JasmParser.Insn_if_icmpgtContext) {
             methodVisitor.visitJumpInsn(Opcodes.IF_ICMPGT, getLabel(ctx.NAME().text).label)
             super.visitInsn_if_icmpgt(ctx)
         }
 
-        override fun visitInsn_if_icmple(ctx: Insn_if_icmpleContext) {
+        override fun visitInsn_if_icmple(ctx: JasmParser.Insn_if_icmpleContext) {
             val label = getLabel(ctx.NAME().text)
             methodVisitor.visitJumpInsn(Opcodes.IF_ICMPLE, label.label)
             super.visitInsn_if_icmple(ctx)
         }
 
-        override fun visitInsn_if_icmplt(ctx: Insn_if_icmpltContext) {
+        override fun visitInsn_if_icmplt(ctx: JasmParser.Insn_if_icmpltContext) {
             methodVisitor.visitJumpInsn(Opcodes.IF_ICMPLT, getLabel(ctx.NAME().text).label)
             super.visitInsn_if_icmplt(ctx)
         }
 
-        override fun visitInsn_if_icmpne(ctx: Insn_if_icmpneContext) {
+        override fun visitInsn_if_icmpne(ctx: JasmParser.Insn_if_icmpneContext) {
             methodVisitor.visitJumpInsn(Opcodes.IF_ICMPNE, getLabel(ctx.NAME().text).label)
             super.visitInsn_if_icmpne(ctx)
         }
 
-        override fun visitInsn_ifnull(ctx: Insn_ifnullContext) {
+        override fun visitInsn_ifnull(ctx: JasmParser.Insn_ifnullContext) {
             methodVisitor.visitJumpInsn(Opcodes.IFNULL, getLabel(ctx.NAME().text).label)
             super.visitInsn_ifnull(ctx)
         }
 
-        override fun visitInsn_ifnonnull(ctx: Insn_ifnonnullContext) {
+        override fun visitInsn_ifnonnull(ctx: JasmParser.Insn_ifnonnullContext) {
             methodVisitor.visitJumpInsn(Opcodes.IFNONNULL, getLabel(ctx.NAME().text).label)
             super.visitInsn_ifnonnull(ctx)
         }
@@ -527,7 +508,7 @@ class JasmAssemblingVisitor(
             super.visitInsn_iload(ctx)
         }
 
-        override fun visitInsn_invokedynamic(ctx: Insn_invokedynamicContext) {
+        override fun visitInsn_invokedynamic(ctx: JasmParser.Insn_invokedynamicContext) {
             methodVisitor.visitInvokeDynamicInsn(
                 ctx.membername().text,
                 TypeVisitor().visitMethod_descriptor(ctx.method_descriptor()),
@@ -536,7 +517,7 @@ class JasmAssemblingVisitor(
             )
         }
 
-        override fun visitInsn_invokeinterface(ctx: Insn_invokeinterfaceContext) {
+        override fun visitInsn_invokeinterface(ctx: JasmParser.Insn_invokeinterfaceContext) {
             visitNonDynamicInvoke(
                 Opcodes.INVOKEINTERFACE,
                 ctx.owner().text,
@@ -548,7 +529,7 @@ class JasmAssemblingVisitor(
             super.visitInsn_invokeinterface(ctx)
         }
 
-        override fun visitInsn_invokespecial(ctx: Insn_invokespecialContext) {
+        override fun visitInsn_invokespecial(ctx: JasmParser.Insn_invokespecialContext) {
             visitNonDynamicInvoke(
                 Opcodes.INVOKESPECIAL,
                 ctx.owner().text,
@@ -560,7 +541,7 @@ class JasmAssemblingVisitor(
             super.visitInsn_invokespecial(ctx)
         }
 
-        override fun visitInsn_invokestatic(ctx: Insn_invokestaticContext) {
+        override fun visitInsn_invokestatic(ctx: JasmParser.Insn_invokestaticContext) {
             visitNonDynamicInvoke(
                 Opcodes.INVOKESTATIC,
                 ctx.owner().text,
@@ -572,7 +553,7 @@ class JasmAssemblingVisitor(
             super.visitInsn_invokestatic(ctx)
         }
 
-        override fun visitInsn_invokevirtual(ctx: Insn_invokevirtualContext) {
+        override fun visitInsn_invokevirtual(ctx: JasmParser.Insn_invokevirtualContext) {
             visitNonDynamicInvoke(
                 Opcodes.INVOKEVIRTUAL,
                 ctx.owner().text,
@@ -594,7 +575,7 @@ class JasmAssemblingVisitor(
             methodVisitor.visitMethodInsn(opcode, owner, name, descriptor, isInterface)
         }
 
-        override fun visitInsn_ireturn(ctx: Insn_ireturnContext) {
+        override fun visitInsn_ireturn(ctx: JasmParser.Insn_ireturnContext) {
             methodVisitor.visitInsn(Opcodes.IRETURN)
             super.visitInsn_ireturn(ctx)
         }
@@ -614,7 +595,7 @@ class JasmAssemblingVisitor(
             super.visitInsn_lastore(ctx)
         }
 
-        override fun visitInsn_ldc(ctx: Insn_ldcContext) {
+        override fun visitInsn_ldc(ctx: JasmParser.Insn_ldcContext) {
             methodVisitor.visitLdcInsn(generateSingleConstArg(0, ctx.const_arg()))
             super.visitInsn_ldc(ctx)
         }
@@ -634,16 +615,16 @@ class JasmAssemblingVisitor(
             super.visitInsn_lstore(ctx)
         }
 
-        override fun visitInsn_new(ctx: Insn_newContext) {
+        override fun visitInsn_new(ctx: JasmParser.Insn_newContext) {
             methodVisitor.visitTypeInsn(Opcodes.NEW, ctx.QNAME().text)
             super.visitInsn_new(ctx)
         }
 
-        override fun visitInsn_return(ctx: Insn_returnContext) {
+        override fun visitInsn_return(ctx: JasmParser.Insn_returnContext) {
             methodVisitor.visitInsn(Opcodes.RETURN)
             super.visitInsn_return(ctx)
         }
-        private fun buildBootstrapHandle(ctx: Method_handleContext): Handle {
+        private fun buildBootstrapHandle(ctx: JasmParser.Method_handleContext): Handle {
             return Handle(
                 generateTagForHandle(ctx),
                 ctx.bootstrap_spec().owner().text,
@@ -653,7 +634,7 @@ class JasmAssemblingVisitor(
             )
         }
 
-        private fun generateTagForHandle(ctx: Method_handleContext) = when {
+        private fun generateTagForHandle(ctx: JasmParser.Method_handleContext) = when {
             ctx.handle_tag().INVOKEINTERFACE() != null  -> Opcodes.H_INVOKEINTERFACE
             ctx.handle_tag().INVOKESPECIAL() != null    -> Opcodes.H_INVOKESPECIAL
             ctx.handle_tag().INVOKESTATIC() != null     -> Opcodes.H_INVOKESTATIC
@@ -666,11 +647,11 @@ class JasmAssemblingVisitor(
             else -> throw SyntaxErrorException("Unknown handle tag " + ctx.handle_tag().text)
         }
 
-        private fun generateConstArgs(ctx: MutableList<Const_argContext>): Array<Any> {
+        private fun generateConstArgs(ctx: MutableList<JasmParser.Const_argContext>): Array<Any> {
             return ctx.mapIndexed { i, arg -> generateSingleConstArg(i, arg) }.toTypedArray()
         }
 
-        private fun generateSingleConstArg(idx: Int, ctx: Const_argContext): Any {
+        private fun generateSingleConstArg(idx: Int, ctx: JasmParser.Const_argContext): Any {
             return when {
                 ctx.int_atom() != null          -> Integer.parseInt(ctx.int_atom().text)
                 ctx.float_atom() != null        -> java.lang.Float.parseFloat(ctx.float_atom().text)
@@ -689,7 +670,7 @@ class JasmAssemblingVisitor(
             }
         }
 
-        private fun generateIconstOpcode(ctx: AtomContext): Int = try {
+        private fun generateIconstOpcode(ctx: JasmParser.AtomContext): Int = try {
                 when (ctx.text.toInt()) {
                     -1 -> Opcodes.ICONST_M1
                     0  -> Opcodes.ICONST_0

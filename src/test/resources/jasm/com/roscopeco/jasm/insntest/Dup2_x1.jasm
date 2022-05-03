@@ -1,0 +1,5 @@
+class com/roscopeco/jasm/insntest/Dup2_x1 {
+    insnTest()V {
+        dup2_x1
+    }
+}

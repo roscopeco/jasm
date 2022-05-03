@@ -273,7 +273,37 @@ class LexerInstructionTests {
     @Test
     void shouldLexDup() {
         runInstructionTest("com/roscopeco/jasm/insntest/Dup.jasm", lexer -> assertNextToken(lexer)
-                .hasType(JasmLexer.DUP));
+            .hasType(JasmLexer.DUP));
+    }
+
+    @Test
+    void shouldLexDup_x1() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Dup_x1.jasm", lexer -> assertNextToken(lexer)
+            .hasType(JasmLexer.DUP_X1));
+    }
+
+    @Test
+    void shouldLexDup_x2() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Dup_x2.jasm", lexer -> assertNextToken(lexer)
+            .hasType(JasmLexer.DUP_X2));
+    }
+
+    @Test
+    void shouldLexDup2() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Dup2.jasm", lexer -> assertNextToken(lexer)
+            .hasType(JasmLexer.DUP2));
+    }
+
+    @Test
+    void shouldLexDup2_x1() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Dup2_x1.jasm", lexer -> assertNextToken(lexer)
+            .hasType(JasmLexer.DUP2_X1));
+    }
+
+    @Test
+    void shouldLexDup2_x2() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Dup2_x2.jasm", lexer -> assertNextToken(lexer)
+            .hasType(JasmLexer.DUP2_X2));
     }
 
     @Test

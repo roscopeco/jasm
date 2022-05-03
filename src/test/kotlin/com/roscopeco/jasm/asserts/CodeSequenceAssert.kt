@@ -117,6 +117,16 @@ class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private
 
     fun dup() = genericNoOperandCheck("dup", InstructionContext::insn_dup)
 
+    fun dupX1() = genericNoOperandCheck("dup_x1", InstructionContext::insn_dup_x1)
+
+    fun dupX2() = genericNoOperandCheck("dup_x2", InstructionContext::insn_dup_x2)
+
+    fun dup2() = genericNoOperandCheck("dup2", InstructionContext::insn_dup2)
+
+    fun dup2X1() = genericNoOperandCheck("dup2_x1", InstructionContext::insn_dup2_x1)
+
+    fun dup2X2() = genericNoOperandCheck("dup2_x2", InstructionContext::insn_dup2_x2)
+
     fun f2d() = genericNoOperandCheck("f2d", InstructionContext::insn_f2d)
 
     fun f2i() = genericNoOperandCheck("f2i", InstructionContext::insn_f2i)
