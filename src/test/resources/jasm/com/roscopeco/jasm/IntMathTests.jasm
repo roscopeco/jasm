@@ -1,0 +1,157 @@
+public class com/roscopeco/jasm/IntMathTests implements com/roscopeco/jasm/model/IntMathTests {
+    public testI2b(int) byte {
+        iload 1
+        i2b
+        ireturn
+    }
+
+    public testI2c(int) char {
+        iload 1
+        i2c
+        ireturn
+    }
+
+    public testI2d(int) double {
+        iload 1
+        i2d
+        dreturn
+    }
+
+    public testI2f(int) float {
+        iload 1
+        i2f
+        freturn
+    }
+
+    public testI2l(int) long {
+        iload 1
+        i2l
+        lreturn
+    }
+
+    public testI2s(int) short {
+        iload 1
+        i2s
+        ireturn
+    }
+
+    public testIadd(int, int) int {
+        iload 1
+        iload 2
+
+        iadd
+
+        ireturn
+    }
+
+    public testIand(int, int) int {
+        iload 1
+        iload 2
+
+        iand
+
+        ireturn
+    }
+
+    public testIdiv(int, int) int {
+        iload 1
+        iload 2
+
+        idiv
+
+        ireturn
+    }
+
+    public testIinc(int) int {
+        iinc 1[42]
+        iload 1
+
+        ireturn
+    }
+
+    public testImul(int, int) int {
+        iload 1
+        iload 2
+
+        imul
+
+        ireturn
+    }
+
+    public testIneg(int) int {
+        iload 1
+
+        ineg
+
+        ireturn
+    }
+
+    public testIor(int, int) int {
+        iload 1
+        iload 2
+
+        ior
+
+        ireturn
+    }
+
+    public testIrem(int, int) int {
+        iload 1
+        iload 2
+
+        irem
+
+        ireturn
+    }
+
+    public testIshl(int, int) int {
+        iload 1
+        iload 2
+
+        ishl
+
+        ireturn
+    }
+
+    public testIshr(int, int) int {
+        iload 1
+        iload 2
+
+        ishr
+
+        ireturn
+    }
+
+    public testIsub(int, int) int {
+        iload 1
+        iload 2
+
+        isub
+
+        ireturn
+    }
+
+    public testIushr(int, int) int {
+        iload 1
+        iload 2
+
+        iushr
+
+        ireturn
+    }
+
+    public testIxor(int, int) int {
+        iload 1
+        iload 2
+
+        ixor
+
+        ireturn
+    }
+
+    public <init>()V {
+        aload 0
+        invokespecial java/lang/Object.<init>()V
+        return
+    }
+}

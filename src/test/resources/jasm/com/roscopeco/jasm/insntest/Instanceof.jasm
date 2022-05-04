@@ -1,0 +1,5 @@
+class com/roscopeco/jasm/insntest/Instanceof {
+    insnTest()V {
+        instanceof java/lang/Object
+    }
+}

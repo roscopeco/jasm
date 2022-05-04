@@ -117,14 +117,18 @@ membername
  | GETFIELD
  | GETSTATIC
  | GOTO
+ | I2B
+ | I2C
+ | I2D
+ | I2F
+ | I2L
+ | I2S
+ | IADD
  | IALOAD
+ | IAND
+ | IASTORE
  | ICONST
- | IFEQ
- | IFGE
- | IFGT
- | IFLE
- | IFLT
- | IFNE
+ | IDIV
  | IFACMPEQ
  | IFACMPNE
  | IFICMPEQ
@@ -133,17 +137,34 @@ membername
  | IFICMPLE
  | IFICMPLT
  | IFICMPNE
- | IFNONNULL
+ | IFEQ
+ | IFGE
+ | IFGT
+ | IFLE
+ | IFLT
+ | IFNE
  | IFNULL
+ | IFNONNULL
+ | IINC
  | ILOAD
+ | IMUL
+ | INEG
+ | INSTANCEOF
  | INVOKEDYNAMIC
  | INVOKEINTERFACE
  | INVOKESPECIAL
  | INVOKESTATIC
  | INVOKEVIRTUAL
  | NEWINVOKESPECIAL
+ | IOR
+ | IREM
  | IRETURN
+ | ISHL
+ | ISHR
  | ISTORE
+ | ISUB
+ | IUSHR
+ | IXOR
  | LALOAD
  | LASTORE
  | LDC
@@ -298,15 +319,18 @@ instruction
  | insn_getfield
  | insn_getstatic
  | insn_goto
+ | insn_i2b
+ | insn_i2c
+ | insn_i2d
+ | insn_i2f
+ | insn_i2l
+ | insn_i2s
+ | insn_iadd
  | insn_iaload
+ | insn_iand
  | insn_iastore
  | insn_iconst
- | insn_ifeq
- | insn_ifge
- | insn_ifgt
- | insn_ifle
- | insn_iflt
- | insn_ifne
+ | insn_idiv
  | insn_if_acmpeq
  | insn_if_acmpne
  | insn_if_icmpeq
@@ -315,16 +339,33 @@ instruction
  | insn_if_icmple
  | insn_if_icmplt
  | insn_if_icmpne
+ | insn_ifeq
+ | insn_ifge
+ | insn_ifgt
+ | insn_ifle
+ | insn_iflt
+ | insn_ifne
  | insn_ifnull
  | insn_ifnonnull
+ | insn_iinc
  | insn_iload
+ | insn_imul
+ | insn_ineg
+ | insn_instanceof
  | insn_invokedynamic
  | insn_invokeinterface
  | insn_invokespecial
  | insn_invokestatic
  | insn_invokevirtual
+ | insn_ior
+ | insn_irem
  | insn_ireturn
+ | insn_ishl
+ | insn_ishr
  | insn_istore
+ | insn_isub
+ | insn_iushr
+ | insn_ixor
  | insn_laload
  | insn_lastore
  | insn_ldc
@@ -570,8 +611,40 @@ insn_goto
  : GOTO NAME
  ;
 
+insn_i2b
+ : I2B
+ ;
+
+insn_i2c
+ : I2C
+ ;
+
+insn_i2d
+ : I2D
+ ;
+
+insn_i2f
+ : I2F
+ ;
+
+insn_i2l
+ : I2L
+ ;
+
+insn_i2s
+ : I2S
+ ;
+
+insn_iadd
+ : IADD
+ ;
+
 insn_iaload
  : IALOAD
+ ;
+
+insn_iand
+ : IAND
  ;
 
 insn_iastore
@@ -582,28 +655,8 @@ insn_iconst
  : ICONST atom
  ;
 
-insn_ifeq
- : IFEQ NAME
- ;
-
-insn_ifge
- : IFGE NAME
- ;
-
-insn_ifgt
- : IFGT NAME
- ;
-
-insn_ifle
- : IFLE NAME
- ;
-
-insn_iflt
- : IFLT NAME
- ;
-
-insn_ifne
- : IFNE NAME
+insn_idiv
+ : IDIV
  ;
 
 insn_if_acmpeq
@@ -638,6 +691,30 @@ insn_if_icmpne
  : IFICMPNE NAME
  ;
 
+insn_ifeq
+ : IFEQ NAME
+ ;
+
+insn_ifge
+ : IFGE NAME
+ ;
+
+insn_ifgt
+ : IFGT NAME
+ ;
+
+insn_ifle
+ : IFLE NAME
+ ;
+
+insn_iflt
+ : IFLT NAME
+ ;
+
+insn_ifne
+ : IFNE NAME
+ ;
+
 insn_ifnull
  : IFNULL NAME
  ;
@@ -646,8 +723,24 @@ insn_ifnonnull
  : IFNONNULL NAME
  ;
 
+insn_iinc
+ : IINC int_atom COMMA? LSQUARE int_atom RSQUARE
+ ;
+
 insn_iload
  : ILOAD int_atom
+ ;
+
+insn_imul
+ : IMUL
+ ;
+
+insn_ineg
+ : INEG
+ ;
+
+insn_instanceof
+ : INSTANCEOF QNAME
  ;
 
 insn_invokedynamic
@@ -705,21 +798,40 @@ insn_invokevirtual
  : INVOKEVIRTUAL owner DOT membername method_descriptor
  ;
 
-label
- : LABEL
+insn_ior
+ : IOR
  ;
 
-owner
- : QNAME
- | NAME
+insn_irem
+ : IREM
  ;
 
 insn_ireturn
  : IRETURN
  ;
 
+insn_ishl
+ : ISHL
+ ;
+
+insn_ishr
+ : ISHR
+ ;
+
 insn_istore
  : ISTORE int_atom
+ ;
+
+insn_isub
+ : ISUB
+ ;
+
+insn_iushr
+ : IUSHR
+ ;
+
+insn_ixor
+ : IXOR
  ;
 
 insn_laload
@@ -760,6 +872,15 @@ insn_putstatic
 
 insn_return
  : RETURN
+ ;
+
+label
+ : LABEL
+ ;
+
+owner
+ : QNAME
+ | NAME
  ;
 
 atom
@@ -874,15 +995,18 @@ FSTORE          : 'fstore';
 GETFIELD        : 'getfield';
 GETSTATIC       : 'getstatic';
 GOTO            : 'goto';
+I2B             : 'i2b';
+I2C             : 'i2c';
+I2D             : 'i2d';
+I2F             : 'i2f';
+I2L             : 'i2l';
+I2S             : 'i2s';
+IADD            : 'iadd';
 IALOAD          : 'iaload';
+IAND            : 'iand';
 IASTORE         : 'iastore';
 ICONST          : 'iconst';
-IFEQ            : 'ifeq';
-IFGT            : 'ifgt';
-IFLE            : 'ifle';
-IFLT            : 'iflt';
-IFGE            : 'ifge';
-IFNE            : 'ifne';
+IDIV            : 'idiv';
 IFACMPEQ        : 'if_acmpeq';
 IFACMPNE        : 'if_acmpne';
 IFICMPEQ        : 'if_icmpeq';
@@ -891,16 +1015,33 @@ IFICMPLE        : 'if_icmple';
 IFICMPLT        : 'if_icmplt';
 IFICMPGE        : 'if_icmpge';
 IFICMPNE        : 'if_icmpne';
-IFNULL          : 'ifnull';
+IFEQ            : 'ifeq';
+IFGT            : 'ifgt';
+IFLE            : 'ifle';
+IFLT            : 'iflt';
+IFGE            : 'ifge';
+IFNE            : 'ifne';
 IFNONNULL       : 'ifnonnull';
+IFNULL          : 'ifnull';
+IINC            : 'iinc';
 ILOAD           : 'iload';
+IMUL            : 'imul';
+INEG            : 'ineg';
+INSTANCEOF      : 'instanceof';
 INVOKEDYNAMIC   : 'invokedynamic';
 INVOKEINTERFACE : 'invokeinterface';
 INVOKESPECIAL   : 'invokespecial';
 INVOKESTATIC    : 'invokestatic';
 INVOKEVIRTUAL   : 'invokevirtual';
+IOR             : 'ior';
+IREM            : 'irem';
 IRETURN         : 'ireturn';
+ISHL            : 'ishl';
+ISHR            : 'ishr';
 ISTORE          : 'istore';
+ISUB            : 'isub';
+IUSHR           : 'iushr';
+IXOR            : 'ixor';
 LALOAD          : 'laload';
 LASTORE         : 'lastore';
 LDC             : 'ldc';

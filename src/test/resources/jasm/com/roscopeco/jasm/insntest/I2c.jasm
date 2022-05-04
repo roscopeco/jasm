@@ -1,0 +1,5 @@
+class com/roscopeco/jasm/insntest/I2c {
+    insnTest()V {
+        i2c
+    }
+}

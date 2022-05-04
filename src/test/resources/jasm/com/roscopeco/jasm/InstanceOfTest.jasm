@@ -1,0 +1,13 @@
+public class com/roscopeco/jasm/InstanceOfTest implements com/roscopeco/jasm/model/InstanceOfTest {
+    public isList(java/lang/Object)Z {
+        aload 1
+        instanceof java/util/List
+        ireturn
+    }
+
+    public <init>()V {
+        aload 0
+        invokespecial java/lang/Object.<init>()V
+        return
+    }
+}

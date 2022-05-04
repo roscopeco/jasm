@@ -13,6 +13,8 @@ import com.roscopeco.jasm.model.FloatMathTests;
 import com.roscopeco.jasm.model.GetPutFieldTests;
 import com.roscopeco.jasm.model.IfIcmpTests;
 import com.roscopeco.jasm.model.IfTests;
+import com.roscopeco.jasm.model.InstanceOfTest;
+import com.roscopeco.jasm.model.IntMathTests;
 import com.roscopeco.jasm.model.Interface1;
 import com.roscopeco.jasm.model.Interface2;
 import com.roscopeco.jasm.model.IfNullNonNullTest;
@@ -662,5 +664,59 @@ class JasmE2ETests {
         assertThat(obj.getConstString()).isEqualTo("Constant String");
         assertThat(obj.getConstInt()).isEqualTo(10);
         assertThat(obj.getConstFloat()).isEqualTo(42.0f);
+    }
+
+    @Test
+    void shouldAssembleIntMathTestsToValidJavaClass() {
+        final var clz = assembleAndDefine("com/roscopeco/jasm/IntMathTests.jasm");
+
+        assertThat(clz.getName()).isEqualTo("com.roscopeco.jasm.IntMathTests");
+
+        assertThat(clz.getDeclaredClasses()).isEmpty();
+        assertThat(clz.getDeclaredFields()).isEmpty();
+        assertThat(clz.getDeclaredConstructors()).hasSize(1);
+        assertThat(clz.getDeclaredMethods()).hasSize(19);
+
+        final var obj = instantiate(clz, IntMathTests.class);
+
+        assertThat(obj.testI2b(10)).isEqualTo((byte)10);
+        assertThat(obj.testI2b(256)).isEqualTo((byte)0);
+        assertThat(obj.testI2c(32)).isEqualTo((char)32);
+        assertThat(obj.testI2d(1001)).isEqualTo(1001d);
+        assertThat(obj.testI2f(1001)).isEqualTo(1001f);
+        assertThat(obj.testI2l(Integer.MAX_VALUE)).isEqualTo(Integer.MAX_VALUE);
+
+        assertThat(obj.testIadd(10, 20)).isEqualTo(30);
+        assertThat(obj.testIand(0x6, 0x4)).isEqualTo(0x4);
+        assertThat(obj.testIdiv(20, 10)).isEqualTo(2);
+        assertThat(obj.testIinc(10)).isEqualTo(52);
+        assertThat(obj.testImul(10, 20)).isEqualTo(200);
+        assertThat(obj.testIneg(10)).isEqualTo(-10);
+        assertThat(obj.testIor(0x2, 0x4)).isEqualTo(0x6);
+        assertThat(obj.testIrem(20, 15)).isEqualTo(5);
+        assertThat(obj.testIshl(0x1, 0x2)).isEqualTo(0x4);
+        assertThat(obj.testIshr(0x10, 0x2)).isEqualTo(0x4);
+        assertThat(obj.testIsub(20, 10)).isEqualTo(10);
+        assertThat(obj.testIxor(0x7, 0x5)).isEqualTo(0x2);
+
+        assertThat(obj.testIshr(-16, 2)).isEqualTo(-4);
+        assertThat(obj.testIushr(-16, 2)).isEqualTo(1073741820);
+    }
+
+    @Test
+    void shouldAssembleInstanceOfTestsToValidJavaClass() {
+        final var clz = assembleAndDefine("com/roscopeco/jasm/InstanceOfTest.jasm");
+
+        assertThat(clz.getName()).isEqualTo("com.roscopeco.jasm.InstanceOfTest");
+
+        assertThat(clz.getDeclaredClasses()).isEmpty();
+        assertThat(clz.getDeclaredFields()).isEmpty();
+        assertThat(clz.getDeclaredConstructors()).hasSize(1);
+        assertThat(clz.getDeclaredMethods()).hasSize(1);
+
+        final var obj = instantiate(clz, InstanceOfTest.class);
+
+        assertThat(obj.isList("Test")).isFalse();
+        assertThat(obj.isList(new ArrayList<>())).isTrue();
     }
 }

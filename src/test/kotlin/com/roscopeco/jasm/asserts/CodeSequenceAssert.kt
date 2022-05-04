@@ -196,12 +196,31 @@ class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private
             _goto -> _goto.NAME().text
     }
 
+    fun i2b() = genericNoOperandCheck("i2b", InstructionContext::insn_i2b)
+
+    fun i2c() = genericNoOperandCheck("i2c", InstructionContext::insn_i2c)
+
+    fun i2d() = genericNoOperandCheck("i2d", InstructionContext::insn_i2d)
+
+    fun i2f() = genericNoOperandCheck("i2f", InstructionContext::insn_i2f)
+
+    fun i2l() = genericNoOperandCheck("i2l", InstructionContext::insn_i2l)
+
+    fun i2s() = genericNoOperandCheck("i2s", InstructionContext::insn_i2s)
+
+    fun iadd() = genericNoOperandCheck("iadd", InstructionContext::insn_iadd)
+    
     fun iaload() = genericNoOperandCheck("iaload", InstructionContext::insn_iaload)
+
+    fun iand() = genericNoOperandCheck("iand", InstructionContext::insn_iand)
+
     fun iastore() = genericNoOperandCheck("iastore", InstructionContext::insn_iastore)
 
     fun iconst(expected: Int) = genericIntOperandCheck("iconst", expected, InstructionContext::insn_iconst) {
             iconst -> iconst.atom().text
     }
+
+    fun idiv() = genericNoOperandCheck("idiv", InstructionContext::insn_idiv)
 
     fun ifeq(expected: String) = genericStringOperandCheck("ifeq", expected, InstructionContext::insn_ifeq) {
             ifeq -> ifeq.NAME().text
@@ -268,9 +287,35 @@ class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private
         InstructionContext::insn_ifnonnull) {
             ifnonnull -> ifnonnull.NAME().text
     }
-    
+
+    fun iinc(expectedVarNum: Int, expectedAmount: Int): CodeSequenceAssert {
+        isNotNull
+
+        val insn = actual.stat()[pc]?.instruction()?.insn_iinc()
+        val actualVarNum = insn?.int_atom(0)?.text?.toInt()
+        val actualAmount = insn?.int_atom(1)?.text?.toInt()
+
+        if (actualVarNum != expectedVarNum || actualAmount != expectedAmount) {
+            failWithMessage(
+                "Expected iinc instruction at pc($pc) with slot number $expectedVarNum"
+                        + " and amount $expectedAmount, but was ${insn?.text ?: "<NONE>"}"
+            )
+        }
+
+        pc++
+        return this
+    }
+
     fun iload(expected: Int) = genericIntOperandCheck("iload", expected, InstructionContext::insn_iload) {
             iload -> iload.int_atom().text
+    }
+
+    fun imul() = genericNoOperandCheck("imul", InstructionContext::insn_imul)
+
+    fun ineg() = genericNoOperandCheck("ineg", InstructionContext::insn_ineg)
+
+    fun instance_of(expected: String) = genericStringOperandCheck("iload", expected, InstructionContext::insn_instanceof) {
+            instof -> instof.QNAME().text
     }
 
     fun invokeDynamic(
@@ -376,11 +421,25 @@ class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private
             Insn_invokevirtualContext::method_descriptor
         )
 
+    fun ior() = genericNoOperandCheck("ior", InstructionContext::insn_ior)
+
+    fun irem() = genericNoOperandCheck("irem", InstructionContext::insn_irem)
+
     fun ireturn() = genericNoOperandCheck("ireturn", InstructionContext::insn_ireturn)
+
+    fun ishl() = genericNoOperandCheck("ishl", InstructionContext::insn_ishl)
+
+    fun ishr() = genericNoOperandCheck("ishr", InstructionContext::insn_ishr)
 
     fun istore(expected: Int) = genericIntOperandCheck("istore", expected, InstructionContext::insn_istore) {
             istore -> istore.int_atom().text
     }
+
+    fun isub() = genericNoOperandCheck("isub", InstructionContext::insn_isub)
+
+    fun iushr() = genericNoOperandCheck("iushr", InstructionContext::insn_iushr)
+
+    fun ixor() = genericNoOperandCheck("ixor", InstructionContext::insn_ixor)
 
     fun laload() = genericNoOperandCheck("laload", InstructionContext::insn_laload)
     fun lastore() = genericNoOperandCheck("lastore", InstructionContext::insn_lastore)

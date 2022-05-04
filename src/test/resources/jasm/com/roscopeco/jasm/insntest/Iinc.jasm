@@ -1,0 +1,7 @@
+class com/roscopeco/jasm/insntest/Iinc {
+    insnTest()V {
+                            // Both forms are equivalent, you can use whichever is more readable :)
+        iinc 3[42]          // First form
+        iinc 3, [42]        // Second form
+    }
+}

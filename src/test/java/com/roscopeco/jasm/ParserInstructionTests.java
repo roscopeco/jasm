@@ -408,11 +408,51 @@ class ParserInstructionTests {
     }
 
     @Test
+    void shouldParseI2b() {
+        singleInsnNoOperands("com/roscopeco/jasm/insntest/I2b.jasm", CodeSequenceAssert::i2b);
+    }
+
+    @Test
+    void shouldParseI2c() {
+        singleInsnNoOperands("com/roscopeco/jasm/insntest/I2c.jasm", CodeSequenceAssert::i2c);
+    }
+
+    @Test
+    void shouldParseI2d() {
+        singleInsnNoOperands("com/roscopeco/jasm/insntest/I2d.jasm", CodeSequenceAssert::i2d);
+    }
+
+    @Test
+    void shouldParseI2f() {
+        singleInsnNoOperands("com/roscopeco/jasm/insntest/I2f.jasm", CodeSequenceAssert::i2f);
+    }
+
+    @Test
+    void shouldParseI2l() {
+        singleInsnNoOperands("com/roscopeco/jasm/insntest/I2l.jasm", CodeSequenceAssert::i2l);
+    }
+
+    @Test
+    void shouldParseI2s() {
+        singleInsnNoOperands("com/roscopeco/jasm/insntest/I2s.jasm", CodeSequenceAssert::i2s);
+    }
+
+    @Test
+    void shouldParseIadd() {
+        singleInsnNoOperands("com/roscopeco/jasm/insntest/Iadd.jasm", CodeSequenceAssert::iadd);
+    }
+
+    @Test
     void shouldParseIaload() {
         runInstructionTest("com/roscopeco/jasm/insntest/Iaload.jasm", code -> code
                 .iaload()
                 .noMoreCode()
         );
+    }
+
+    @Test
+    void shouldParseIand() {
+        singleInsnNoOperands("com/roscopeco/jasm/insntest/Iand.jasm", CodeSequenceAssert::iand);
     }
 
     @Test
@@ -429,6 +469,11 @@ class ParserInstructionTests {
                 .iconst(0)
                 .noMoreCode()
         );
+    }
+
+    @Test
+    void shouldParseIdiv() {
+        singleInsnNoOperands("com/roscopeco/jasm/insntest/Idiv.jasm", CodeSequenceAssert::idiv);
     }
 
     @Test
@@ -484,10 +529,38 @@ class ParserInstructionTests {
     }
 
     @Test
+    void shouldParseIinc() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Iinc.jasm", code -> code
+            .iinc(3, 42)    // This appears twice to test both forms parse properly
+            .iinc(3, 42)
+            .noMoreCode()
+        );
+    }
+
+    @Test
     void shouldParseIload() {
         runInstructionTest("com/roscopeco/jasm/insntest/Iload.jasm", code -> code
                 .iload(0)
                 .noMoreCode()
+        );
+    }
+
+    @Test
+    void shouldParseImul() {
+        singleInsnNoOperands("com/roscopeco/jasm/insntest/Imul.jasm", CodeSequenceAssert::imul);
+    }
+
+    @Test
+    void shouldParseIneg() {
+        singleInsnNoOperands("com/roscopeco/jasm/insntest/Ineg.jasm", CodeSequenceAssert::ineg);
+    }
+
+    @Test
+    void shouldParseInstanceof() {
+        singleInsnOneOperand(
+            "com/roscopeco/jasm/insntest/Instanceof.jasm",
+            "java/lang/Object",
+            CodeSequenceAssert::instance_of
         );
     }
 
@@ -533,6 +606,16 @@ class ParserInstructionTests {
     }
 
     @Test
+    void shouldParseIor() {
+        singleInsnNoOperands("com/roscopeco/jasm/insntest/Ior.jasm", CodeSequenceAssert::ior);
+    }
+
+    @Test
+    void shouldParseIrem() {
+        singleInsnNoOperands("com/roscopeco/jasm/insntest/Irem.jasm", CodeSequenceAssert::irem);
+    }
+
+    @Test
     void shouldParseIreturn() {
         runInstructionTest("com/roscopeco/jasm/insntest/Ireturn.jasm", code -> code
                 .ireturn()
@@ -541,11 +624,36 @@ class ParserInstructionTests {
     }
 
     @Test
+    void shouldParseIshl() {
+        singleInsnNoOperands("com/roscopeco/jasm/insntest/Ishl.jasm", CodeSequenceAssert::ishl);
+    }
+
+    @Test
+    void shouldParseIshr() {
+        singleInsnNoOperands("com/roscopeco/jasm/insntest/Ishr.jasm", CodeSequenceAssert::ishr);
+    }
+
+    @Test
     void shouldParseIstore() {
         runInstructionTest("com/roscopeco/jasm/insntest/Istore.jasm", code -> code
                 .istore(0)
                 .noMoreCode()
         );
+    }
+
+    @Test
+    void shouldParseIsub() {
+        singleInsnNoOperands("com/roscopeco/jasm/insntest/Isub.jasm", CodeSequenceAssert::isub);
+    }
+
+    @Test
+    void shouldParseIushr() {
+        singleInsnNoOperands("com/roscopeco/jasm/insntest/Iushr.jasm", CodeSequenceAssert::iushr);
+    }
+
+    @Test
+    void shouldParseIxor() {
+        singleInsnNoOperands("com/roscopeco/jasm/insntest/Ixor.jasm", CodeSequenceAssert::ixor);
     }
 
     @Test

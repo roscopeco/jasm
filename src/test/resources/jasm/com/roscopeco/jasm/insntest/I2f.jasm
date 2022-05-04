@@ -1,0 +1,5 @@
+class com/roscopeco/jasm/insntest/I2f {
+    insnTest()V {
+        i2f
+    }
+}
