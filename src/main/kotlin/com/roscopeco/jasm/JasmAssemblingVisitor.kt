@@ -740,6 +740,19 @@ class JasmAssemblingVisitor(
             super.visitInsn_lload(ctx)
         }
 
+        override fun visitInsn_lookupswitch(ctx: JasmParser.Insn_lookupswitchContext) {
+            val keys = ctx.switch_case().map { c -> c.int_atom().text.toInt() }.toIntArray()
+            val labels = ctx.switch_case().map { c -> getLabel(c.NAME().text).label }.toTypedArray()
+
+            methodVisitor.visitLookupSwitchInsn(
+                getLabel(ctx.NAME().text).label,
+                keys,
+                labels
+            )
+
+            super.visitInsn_lookupswitch(ctx)
+        }
+
         override fun visitInsn_lreturn(ctx: JasmParser.Insn_lreturnContext) {
             methodVisitor.visitInsn(Opcodes.LRETURN)
             super.visitInsn_lreturn(ctx)

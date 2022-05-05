@@ -169,6 +169,7 @@ membername
  | LASTORE
  | LDC
  | LLOAD
+ | LOOKUPSWITCH
  | LRETURN
  | LSTORE
  | NEW
@@ -370,6 +371,7 @@ instruction
  | insn_lastore
  | insn_ldc
  | insn_lload
+ | insn_lookupswitch
  | insn_lreturn
  | insn_lstore
  | insn_new
@@ -850,6 +852,14 @@ insn_lload
  : LLOAD int_atom
  ;
 
+insn_lookupswitch
+ : LOOKUPSWITCH NAME LBRACE switch_case+ RBRACE
+ ;
+
+switch_case
+ : (int_atom COLON NAME COMMA?)
+ ;
+
 insn_lreturn
  : LRETURN
  ;
@@ -906,6 +916,7 @@ RSQUARE : ']';
 DOT     : '.';
 MINUS   : '-';
 SEMI    : ';';  /* not used but defining for saner errors in descriptors */
+COLON   : ':';
 COMMA   : ',';
 EQUALS  : '=';
 
@@ -1046,6 +1057,7 @@ LALOAD          : 'laload';
 LASTORE         : 'lastore';
 LDC             : 'ldc';
 LLOAD           : 'lload';
+LOOKUPSWITCH    : 'lookupswitch';
 LRETURN         : 'lreturn';
 LSTORE          : 'lstore';
 NEW             : 'new';

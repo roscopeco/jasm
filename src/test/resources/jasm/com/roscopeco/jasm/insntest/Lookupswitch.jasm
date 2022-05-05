@@ -1,0 +1,9 @@
+class com/roscopeco/jasm/insntest/Lookupswitch {
+    insnTest()V {
+        lookupswitch defaultLabel {
+            1: oneLabel
+            100: hundredLabel,      // comma is optional
+            1000: thousandLabel
+        }
+    }
+}

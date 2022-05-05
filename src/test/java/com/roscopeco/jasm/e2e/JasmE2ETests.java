@@ -24,6 +24,7 @@ import com.roscopeco.jasm.model.LoadsAndStoresTest;
 import com.roscopeco.jasm.model.PrimArrayTests;
 import com.roscopeco.jasm.model.RefArrayTests;
 import com.roscopeco.jasm.model.Superclass;
+import com.roscopeco.jasm.model.SwitchTests;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -718,5 +719,29 @@ class JasmE2ETests {
 
         assertThat(obj.isList("Test")).isFalse();
         assertThat(obj.isList(new ArrayList<>())).isTrue();
+    }
+
+    @Test
+    void shouldAssembleSwitchTestsToValidJavaClass() {
+        final var clz = assembleAndDefine("com/roscopeco/jasm/SwitchTests.jasm");
+
+        assertThat(clz.getName()).isEqualTo("com.roscopeco.jasm.SwitchTests");
+
+        assertThat(clz.getDeclaredClasses()).isEmpty();
+        assertThat(clz.getDeclaredFields()).isEmpty();
+        assertThat(clz.getDeclaredConstructors()).hasSize(1);
+        assertThat(clz.getDeclaredMethods()).hasSize(1);
+
+        final var obj = instantiate(clz, SwitchTests.class);
+
+        assertThat(obj.testLookupswitch(0)).isEqualTo("No match");
+        assertThat(obj.testLookupswitch(1)).isEqualTo("One");
+        assertThat(obj.testLookupswitch(2)).isEqualTo("No match");
+        assertThat(obj.testLookupswitch(99)).isEqualTo("No match");
+        assertThat(obj.testLookupswitch(100)).isEqualTo("Hundred");
+        assertThat(obj.testLookupswitch(101)).isEqualTo("No match");
+        assertThat(obj.testLookupswitch(999)).isEqualTo("No match");
+        assertThat(obj.testLookupswitch(1000)).isEqualTo("Thousand");
+        assertThat(obj.testLookupswitch(1001)).isEqualTo("No match");
     }
 }

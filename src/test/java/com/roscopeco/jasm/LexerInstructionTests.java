@@ -1327,6 +1327,60 @@ class LexerInstructionTests {
     }
 
     @Test
+    void shouldLexLookupswitch() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Lookupswitch.jasm", lexer -> {
+            assertNextToken(lexer)
+                .hasType(JasmLexer.LOOKUPSWITCH);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.NAME)
+                .hasText("defaultLabel");
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.LBRACE);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.INT)
+                .hasText("1");
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.COLON);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.NAME)
+                .hasText("oneLabel");
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.INT)
+                .hasText("100");
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.COLON);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.NAME)
+                .hasText("hundredLabel");
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.COMMA);      // Optional
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.INT)
+                .hasText("1000");
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.COLON);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.NAME)
+                .hasText("thousandLabel");
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.RBRACE);
+        });
+    }
+
+    @Test
     void shouldLexLstore() {
         runInstructionTest("com/roscopeco/jasm/insntest/Lstore.jasm", lexer -> {
             assertNextToken(lexer)

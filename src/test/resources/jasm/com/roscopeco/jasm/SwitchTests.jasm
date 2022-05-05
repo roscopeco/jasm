@@ -1,0 +1,33 @@
+public class com/roscopeco/jasm/SwitchTests implements com/roscopeco/jasm/model/SwitchTests {
+    public testLookupswitch(I)java/lang/String {
+        iload 1
+
+        lookupswitch default {
+            1: one
+            100: hundred
+            1000: thousand
+        }
+
+      one:
+        ldc "One"
+        areturn
+
+      hundred:
+        ldc "Hundred"
+        areturn
+
+      thousand:
+        ldc "Thousand"
+        areturn
+
+      default:
+        ldc "No match"
+        areturn
+    }
+
+    public <init>()V {
+        aload 0
+        invokespecial java/lang/Object.<init>()V
+        return
+    }
+}

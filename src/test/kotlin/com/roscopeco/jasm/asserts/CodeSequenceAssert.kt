@@ -471,6 +471,56 @@ class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private
             lload -> lload.int_atom().text
     }
 
+    fun lookupswitch(): SwitchAssert {
+        isNotNull
+
+        Assertions.assertThat(actual.stat()).isNotNull
+        hasNotUnderflowed("lookupswitch")
+        val stat = actual.stat()[pc]
+        val lookup = stat?.instruction()?.insn_lookupswitch()
+
+        if (lookup == null) {
+            failWithMessage(
+                "Expected lookupswitch instruction at pc($pc) but was ${stat.instruction().text}"
+            )
+        }
+
+        pc++
+        return SwitchAssert(lookup!!)
+    }
+
+    inner class SwitchAssert(private val actual: JasmParser.Insn_lookupswitchContext) {
+        fun withDefault(expected: String): SwitchAssert {
+            Assertions.assertThat(actual.NAME())
+                .isNotNull
+                .extracting{ l -> l.text }
+                .isEqualTo(expected)
+
+            return this
+        }
+
+        fun withCase(expectedNum: Int, expectedLabel: String): SwitchAssert {
+            Assertions.assertThat(actual.switch_case())
+                .isNotNull
+                .isNotEmpty
+
+            val match = actual.switch_case().find {
+                    c -> expectedNum == c.int_atom().text.toInt() && expectedLabel == c.NAME().text
+            }
+
+            if (match == null) {
+                failWithMessage(
+                    "Expected lookupswitch instruction at pc(${pc - 1}) to contain "
+                            + "a case matching {$expectedNum: $expectedLabel} but it did not"
+                )
+            }
+
+            return this
+        }
+
+        fun end() = this@CodeSequenceAssert
+    }
+
     fun lreturn() = genericNoOperandCheck("lreturn", InstructionContext::insn_lreturn)
 
     fun lstore(expected: Int) = genericIntOperandCheck("lstore", expected, InstructionContext::insn_lstore) {

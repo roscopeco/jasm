@@ -266,6 +266,17 @@ class ParserInstructionTests {
     }
 
     @Test
+    void shouldParseLookupswitch() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Lookupswitch.jasm", code -> code
+            .lookupswitch()
+            .withDefault("defaultLabel")
+            .withCase(1, "oneLabel")
+            .withCase(100, "hundredLabel")
+            .withCase(1000, "thousandLabel")
+        );
+    }
+
+    @Test
     void shouldParsePutField() {
         runInstructionTest("com/roscopeco/jasm/insntest/PutField.jasm", code -> code
             .putField("com/example/SomeClass", "someField", "Ljava/lang/String;")
