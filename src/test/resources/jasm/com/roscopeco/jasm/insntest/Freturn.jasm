@@ -1,5 +1,5 @@
 class com/roscopeco/jasm/insntest/Freturn {
-    insnTest()F {
+    insnTest()V {
         freturn
     }
 }

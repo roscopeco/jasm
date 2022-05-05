@@ -41,7 +41,7 @@ public class TestUtil {
     public static JasmLexer testCaseLexer(@NonNull final String testCase) {
         try (final var input = inputStreamForTestCase(testCase)) {
 
-            assertThat(input).as("InputStream for test-case source").isNotNull();
+            assertThat(input).as("InputStream for test-case source: "+ testCase).isNotNull();
 
             return buildLexer(testCase, CharStreams.fromStream(input));
 

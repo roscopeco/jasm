@@ -9,33 +9,89 @@ import com.roscopeco.jasm.antlr.JasmLexer;
 import lombok.NonNull;
 import org.assertj.core.api.ThrowingConsumer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-import java.util.List;
+import java.util.stream.Stream;
 
 import static com.roscopeco.jasm.TestUtil.testCaseLexer;
 import static com.roscopeco.jasm.asserts.LexerParserAssertions.assertNextToken;
 import static com.roscopeco.jasm.asserts.LexerParserAssertions.assertTokens;
 
 class LexerInstructionTests {
-    @Test
-    void shouldLexAaload() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Aaload.jasm", lexer ->
-                assertNextToken(lexer)
-                        .hasType(JasmLexer.AALOAD));
-    }
-
-    @Test
-    void shouldLexAastore() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Aastore.jasm", lexer ->
-                assertNextToken(lexer)
-                        .hasType(JasmLexer.AASTORE));
-    }
-
-    @Test
-    void shouldLexAconstNull() {
-        runInstructionTest("com/roscopeco/jasm/insntest/AconstNull.jasm", lexer ->
-                assertNextToken(lexer)
-                        .hasType(JasmLexer.ACONST_NULL));
+    static Stream<Arguments> singleInstructionNoOperandTests() {
+        return Stream.of(
+            Arguments.of("Aaload", JasmLexer.AALOAD),
+            Arguments.of("Aastore", JasmLexer.AASTORE),
+            Arguments.of("AconstNull", JasmLexer.ACONST_NULL),
+            Arguments.of("Areturn", JasmLexer.ARETURN),
+            Arguments.of("Arraylength", JasmLexer.ARRAYLENGTH),
+            Arguments.of("Athrow", JasmLexer.ATHROW),
+            Arguments.of("Baload", JasmLexer.BALOAD),
+            Arguments.of("Bastore", JasmLexer.BASTORE),
+            Arguments.of("Caload", JasmLexer.CALOAD),
+            Arguments.of("Castore", JasmLexer.CASTORE),
+            Arguments.of("D2i", JasmLexer.D2I),
+            Arguments.of("D2f", JasmLexer.D2F),
+            Arguments.of("D2l", JasmLexer.D2L),
+            Arguments.of("Dadd", JasmLexer.DADD),
+            Arguments.of("Daload", JasmLexer.DALOAD),
+            Arguments.of("Dastore", JasmLexer.DASTORE),
+            Arguments.of("Dcmpg", JasmLexer.DCMPG),
+            Arguments.of("Dcmpl", JasmLexer.DCMPL),
+            Arguments.of("Ddiv", JasmLexer.DDIV),
+            Arguments.of("Dmul", JasmLexer.DMUL),
+            Arguments.of("Dneg", JasmLexer.DNEG),
+            Arguments.of("Drem", JasmLexer.DREM),
+            Arguments.of("Dreturn", JasmLexer.DRETURN),
+            Arguments.of("Dsub", JasmLexer.DSUB),
+            Arguments.of("Dup", JasmLexer.DUP),
+            Arguments.of("Dup_x1", JasmLexer.DUP_X1),
+            Arguments.of("Dup_x2", JasmLexer.DUP_X2),
+            Arguments.of("Dup2", JasmLexer.DUP2),
+            Arguments.of("Dup2_x1", JasmLexer.DUP2_X1),
+            Arguments.of("Dup2_x2", JasmLexer.DUP2_X2),
+            Arguments.of("F2i", JasmLexer.F2I),
+            Arguments.of("F2d", JasmLexer.F2D),
+            Arguments.of("F2l", JasmLexer.F2L),
+            Arguments.of("Fadd", JasmLexer.FADD),
+            Arguments.of("Faload", JasmLexer.FALOAD),
+            Arguments.of("Fastore", JasmLexer.FASTORE),
+            Arguments.of("Fcmpg", JasmLexer.FCMPG),
+            Arguments.of("Fcmpl", JasmLexer.FCMPL),
+            Arguments.of("Fdiv", JasmLexer.FDIV),
+            Arguments.of("Fmul", JasmLexer.FMUL),
+            Arguments.of("Fneg", JasmLexer.FNEG),
+            Arguments.of("Frem", JasmLexer.FREM),
+            Arguments.of("Freturn", JasmLexer.FRETURN),
+            Arguments.of("Fsub", JasmLexer.FSUB),
+            Arguments.of("I2b", JasmLexer.I2B),
+            Arguments.of("I2c", JasmLexer.I2C),
+            Arguments.of("I2d", JasmLexer.I2D),
+            Arguments.of("I2f", JasmLexer.I2F),
+            Arguments.of("I2l", JasmLexer.I2L),
+            Arguments.of("I2s", JasmLexer.I2S),
+            Arguments.of("Iadd", JasmLexer.IADD),
+            Arguments.of("Iaload", JasmLexer.IALOAD),
+            Arguments.of("Iand", JasmLexer.IAND),
+            Arguments.of("Iastore", JasmLexer.IASTORE),
+            Arguments.of("Idiv", JasmLexer.IDIV),
+            Arguments.of("Imul", JasmLexer.IMUL),
+            Arguments.of("Ineg", JasmLexer.INEG),
+            Arguments.of("Ior", JasmLexer.IOR),
+            Arguments.of("Irem", JasmLexer.IREM),
+            Arguments.of("Ireturn", JasmLexer.IRETURN),
+            Arguments.of("Ishl", JasmLexer.ISHL),
+            Arguments.of("Ishr", JasmLexer.ISHR),
+            Arguments.of("Isub", JasmLexer.ISUB),
+            Arguments.of("Iushr", JasmLexer.IUSHR),
+            Arguments.of("Ixor", JasmLexer.IXOR),
+            Arguments.of("Laload", JasmLexer.LALOAD),
+            Arguments.of("Lastore", JasmLexer.LASTORE),
+            Arguments.of("Lreturn", JasmLexer.LRETURN),
+            Arguments.of("Return", JasmLexer.RETURN)
+        );
     }
 
     @Test
@@ -63,20 +119,6 @@ class LexerInstructionTests {
     }
 
     @Test
-    void shouldLexAreturn() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Areturn.jasm", REF_RETURN_TYPE_TOKEN, lexer ->
-                assertNextToken(lexer)
-                        .hasType(JasmLexer.ARETURN));
-    }
-
-    @Test
-    void shouldLexArraylength() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Arraylength.jasm", lexer ->
-                assertNextToken(lexer)
-                        .hasType(JasmLexer.ARRAYLENGTH));
-    }
-
-    @Test
     void shouldLexAstore() {
         runInstructionTest("com/roscopeco/jasm/insntest/Astore.jasm", lexer -> {
             assertNextToken(lexer)
@@ -86,27 +128,6 @@ class LexerInstructionTests {
                     .hasType(JasmLexer.INT)
                     .hasText("1");
         });
-    }
-
-    @Test
-    void shouldLexAthrow() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Athrow.jasm", lexer ->
-                assertNextToken(lexer)
-                        .hasType(JasmLexer.ATHROW));
-    }
-
-    @Test
-    void shouldLexBaload() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Baload.jasm", lexer ->
-                assertNextToken(lexer)
-                        .hasType(JasmLexer.BALOAD));
-    }
-
-    @Test
-    void shouldLexBastore() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Bastore.jasm", lexer ->
-                assertNextToken(lexer)
-                        .hasType(JasmLexer.BASTORE));
     }
 
     @Test
@@ -122,20 +143,6 @@ class LexerInstructionTests {
     }
 
     @Test
-    void shouldLexCaload() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Caload.jasm", lexer ->
-                assertNextToken(lexer)
-                        .hasType(JasmLexer.CALOAD));
-    }
-
-    @Test
-    void shouldLexCastore() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Castore.jasm", lexer ->
-                assertNextToken(lexer)
-                        .hasType(JasmLexer.CASTORE));
-    }
-
-    @Test
     void shouldLexCheckCast() {
         runInstructionTest("com/roscopeco/jasm/insntest/Checkcast.jasm", lexer -> {
             assertNextToken(lexer)
@@ -145,58 +152,6 @@ class LexerInstructionTests {
                     .hasType(JasmLexer.QNAME)
                     .hasText("java/util/ArrayList");
         });
-    }
-
-    @Test
-    void shouldLexD2f() {
-        runInstructionTest("com/roscopeco/jasm/insntest/D2f.jasm", lexer -> assertNextToken(lexer)
-            .hasType(JasmLexer.D2F));
-    }
-
-    @Test
-    void shouldLexD2i() {
-        runInstructionTest("com/roscopeco/jasm/insntest/D2i.jasm", lexer -> assertNextToken(lexer)
-            .hasType(JasmLexer.D2I));
-    }
-
-    @Test
-    void shouldLexD2l() {
-        runInstructionTest("com/roscopeco/jasm/insntest/D2l.jasm", lexer -> assertNextToken(lexer)
-            .hasType(JasmLexer.D2L));
-    }
-
-    @Test
-    void shouldLexDadd() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Dadd.jasm", lexer -> assertNextToken(lexer)
-            .hasType(JasmLexer.DADD));
-    }
-
-    @Test
-    void shouldLexDaload() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Daload.jasm", lexer ->
-                assertNextToken(lexer)
-                        .hasType(JasmLexer.DALOAD));
-    }
-
-    @Test
-    void shouldLexDastore() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Dastore.jasm", lexer ->
-            assertNextToken(lexer)
-                .hasType(JasmLexer.DASTORE));
-    }
-
-    @Test
-    void shouldLexDcmpg() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Dcmpg.jasm", lexer ->
-            assertNextToken(lexer)
-                .hasType(JasmLexer.DCMPG));
-    }
-
-    @Test
-    void shouldLexDcmpl() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Dcmpl.jasm", lexer ->
-            assertNextToken(lexer)
-                .hasType(JasmLexer.DCMPL));
     }
 
     @Test
@@ -212,13 +167,6 @@ class LexerInstructionTests {
     }
 
     @Test
-    void shouldLexDdiv() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Ddiv.jasm", lexer ->
-            assertNextToken(lexer)
-                .hasType(JasmLexer.DDIV));
-    }
-
-    @Test
     void shouldLexDload() {
         runInstructionTest("com/roscopeco/jasm/insntest/Dload.jasm", lexer -> {
             assertNextToken(lexer)
@@ -228,34 +176,6 @@ class LexerInstructionTests {
                     .hasType(JasmLexer.INT)
                     .hasText("0");
         });
-    }
-
-    @Test
-    void shouldLexDmul() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Dmul.jasm", lexer ->
-            assertNextToken(lexer)
-                .hasType(JasmLexer.DMUL));
-    }
-
-    @Test
-    void shouldLexDneg() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Dneg.jasm", lexer ->
-            assertNextToken(lexer)
-                .hasType(JasmLexer.DNEG));
-    }
-
-    @Test
-    void shouldLexDrem() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Drem.jasm", lexer ->
-            assertNextToken(lexer)
-                .hasType(JasmLexer.DREM));
-    }
-
-    @Test
-    void shouldLexDsub() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Dsub.jasm", lexer ->
-            assertNextToken(lexer)
-                .hasType(JasmLexer.DSUB));
     }
 
     @Test
@@ -271,95 +191,6 @@ class LexerInstructionTests {
     }
 
     @Test
-    void shouldLexDup() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Dup.jasm", lexer -> assertNextToken(lexer)
-            .hasType(JasmLexer.DUP));
-    }
-
-    @Test
-    void shouldLexDup_x1() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Dup_x1.jasm", lexer -> assertNextToken(lexer)
-            .hasType(JasmLexer.DUP_X1));
-    }
-
-    @Test
-    void shouldLexDup_x2() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Dup_x2.jasm", lexer -> assertNextToken(lexer)
-            .hasType(JasmLexer.DUP_X2));
-    }
-
-    @Test
-    void shouldLexDup2() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Dup2.jasm", lexer -> assertNextToken(lexer)
-            .hasType(JasmLexer.DUP2));
-    }
-
-    @Test
-    void shouldLexDup2_x1() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Dup2_x1.jasm", lexer -> assertNextToken(lexer)
-            .hasType(JasmLexer.DUP2_X1));
-    }
-
-    @Test
-    void shouldLexDup2_x2() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Dup2_x2.jasm", lexer -> assertNextToken(lexer)
-            .hasType(JasmLexer.DUP2_X2));
-    }
-
-    @Test
-    void shouldLexFaload() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Faload.jasm", lexer ->
-                assertNextToken(lexer)
-                        .hasType(JasmLexer.FALOAD));
-    }
-
-    @Test
-    void shouldLexF2d() {
-        runInstructionTest("com/roscopeco/jasm/insntest/F2d.jasm", lexer -> assertNextToken(lexer)
-            .hasType(JasmLexer.F2D));
-    }
-
-    @Test
-    void shouldLexF2i() {
-        runInstructionTest("com/roscopeco/jasm/insntest/F2i.jasm", lexer -> assertNextToken(lexer)
-            .hasType(JasmLexer.F2I));
-    }
-
-    @Test
-    void shouldLexF2l() {
-        runInstructionTest("com/roscopeco/jasm/insntest/F2l.jasm", lexer -> assertNextToken(lexer)
-            .hasType(JasmLexer.F2L));
-    }
-
-    @Test
-    void shoulfLexFadd() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Fadd.jasm", lexer ->
-            assertNextToken(lexer)
-                .hasType(JasmLexer.FADD));
-    }
-
-    @Test
-    void shouldLexFastore() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Fastore.jasm", lexer ->
-                assertNextToken(lexer)
-                        .hasType(JasmLexer.FASTORE));
-    }
-
-    @Test
-    void shoulfLexFcmpg() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Fcmpg.jasm", lexer ->
-            assertNextToken(lexer)
-                .hasType(JasmLexer.FCMPG));
-    }
-
-    @Test
-    void shoulfLexFcmpl() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Fcmpl.jasm", lexer ->
-            assertNextToken(lexer)
-                .hasType(JasmLexer.FCMPL));
-    }
-
-    @Test
     void shoulfLexFconst() {
         runInstructionTest("com/roscopeco/jasm/insntest/Fconst.jasm", lexer -> {
             assertNextToken(lexer)
@@ -369,13 +200,6 @@ class LexerInstructionTests {
                 .hasType(JasmLexer.INT)
                 .hasText("0");
         });
-    }
-    
-    @Test
-    void shoulfLexFdiv() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Fdiv.jasm", lexer ->
-            assertNextToken(lexer)
-                .hasType(JasmLexer.FDIV));
     }
 
     @Test
@@ -388,41 +212,6 @@ class LexerInstructionTests {
                     .hasType(JasmLexer.INT)
                     .hasText("0");
         });
-    }
-
-    @Test
-    void shoulfLexFmul() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Fmul.jasm", lexer ->
-            assertNextToken(lexer)
-                .hasType(JasmLexer.FMUL));
-    }
-
-    @Test
-    void shoulfLexFneg() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Fneg.jasm", lexer ->
-            assertNextToken(lexer)
-                .hasType(JasmLexer.FNEG));
-    }
-
-    @Test
-    void shoulfLexFrem() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Frem.jasm", lexer ->
-            assertNextToken(lexer)
-                .hasType(JasmLexer.FREM));
-    }
-
-    @Test
-    void shouldLexFreturn() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Freturn.jasm", FLOAT_RETURN_TYPE_TOKEN, lexer ->
-                assertNextToken(lexer)
-                        .hasType(JasmLexer.FRETURN));
-    }
-
-    @Test
-    void shoulfLexFsub() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Fsub.jasm", lexer ->
-            assertNextToken(lexer)
-                .hasType(JasmLexer.FSUB));
     }
 
     @Test
@@ -510,76 +299,6 @@ class LexerInstructionTests {
     }
 
     @Test
-    void shoulfLexI2b() {
-        runInstructionTest("com/roscopeco/jasm/insntest/I2b.jasm", lexer ->
-            assertNextToken(lexer)
-                .hasType(JasmLexer.I2B));
-    }
-
-    @Test
-    void shoulfLexI2c() {
-        runInstructionTest("com/roscopeco/jasm/insntest/I2c.jasm", lexer ->
-            assertNextToken(lexer)
-                .hasType(JasmLexer.I2C));
-    }
-
-    @Test
-    void shoulfLexI2d() {
-        runInstructionTest("com/roscopeco/jasm/insntest/I2d.jasm", lexer ->
-            assertNextToken(lexer)
-                .hasType(JasmLexer.I2D));
-    }
-
-    @Test
-    void shoulfLexI2f() {
-        runInstructionTest("com/roscopeco/jasm/insntest/I2f.jasm", lexer ->
-            assertNextToken(lexer)
-                .hasType(JasmLexer.I2F));
-    }
-
-    @Test
-    void shoulfLexI2l() {
-        runInstructionTest("com/roscopeco/jasm/insntest/I2l.jasm", lexer ->
-            assertNextToken(lexer)
-                .hasType(JasmLexer.I2L));
-    }
-
-    @Test
-    void shoulfLexI2s() {
-        runInstructionTest("com/roscopeco/jasm/insntest/I2s.jasm", lexer ->
-            assertNextToken(lexer)
-                .hasType(JasmLexer.I2S));
-    }
-
-    @Test
-    void shoulfLexIadd() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Iadd.jasm", lexer ->
-            assertNextToken(lexer)
-                .hasType(JasmLexer.IADD));
-    }
-
-    @Test
-    void shouldLexIaload() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Iaload.jasm", lexer ->
-                assertNextToken(lexer)
-                        .hasType(JasmLexer.IALOAD));
-    }
-
-    @Test
-    void shoulfLexIand() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Iand.jasm", lexer ->
-            assertNextToken(lexer)
-                .hasType(JasmLexer.IAND));
-    }
-    
-    @Test
-    void shouldLexIastore() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Iastore.jasm", lexer ->
-                assertNextToken(lexer)
-                        .hasType(JasmLexer.IASTORE));
-    }
-    
-    @Test
     void shouldLexIconst() {
         runInstructionTest("com/roscopeco/jasm/insntest/Iconst.jasm", lexer -> {
             assertNextToken(lexer)
@@ -591,13 +310,6 @@ class LexerInstructionTests {
         });
     }
 
-    @Test
-    void shoulfLexIdiv() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Idiv.jasm", lexer ->
-            assertNextToken(lexer)
-                .hasType(JasmLexer.IDIV));
-    }
-    
     @Test
     void shouldLexIfs() {
         runInstructionTest("com/roscopeco/jasm/insntest/If.jasm", lexer -> {
@@ -813,20 +525,6 @@ class LexerInstructionTests {
                     .hasType(JasmLexer.INT)
                     .hasText("0");
         });
-    }
-
-    @Test
-    void shoulfLexImul() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Imul.jasm", lexer ->
-            assertNextToken(lexer)
-                .hasType(JasmLexer.IMUL));
-    }
-
-    @Test
-    void shoulfLexIneg() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Ineg.jasm", lexer ->
-            assertNextToken(lexer)
-                .hasType(JasmLexer.INEG));
     }
 
     @Test
@@ -1149,40 +847,6 @@ class LexerInstructionTests {
     }
 
     @Test
-    void shoulfLexIor() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Ior.jasm", lexer ->
-            assertNextToken(lexer)
-                .hasType(JasmLexer.IOR));
-    }
-
-    @Test
-    void shoulfLexIrem() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Irem.jasm", lexer ->
-            assertNextToken(lexer)
-                .hasType(JasmLexer.IREM));
-    }
-
-    @Test
-    void shouldLexIreturn() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Ireturn.jasm", lexer -> assertNextToken(lexer)
-                .hasType(JasmLexer.IRETURN));
-    }
-
-    @Test
-    void shoulfLexIshl() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Ishl.jasm", lexer ->
-            assertNextToken(lexer)
-                .hasType(JasmLexer.ISHL));
-    }
-
-    @Test
-    void shoulfLexIshr() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Ishr.jasm", lexer ->
-            assertNextToken(lexer)
-                .hasType(JasmLexer.ISHR));
-    }
-
-    @Test
     void shouldLexIstore() {
         runInstructionTest("com/roscopeco/jasm/insntest/Istore.jasm", lexer -> {
             assertNextToken(lexer)
@@ -1192,41 +856,6 @@ class LexerInstructionTests {
                     .hasType(JasmLexer.INT)
                     .hasText("0");
         });
-    }
-
-    @Test
-    void shoulfLexIsub() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Isub.jasm", lexer ->
-            assertNextToken(lexer)
-                .hasType(JasmLexer.ISUB));
-    }
-
-    @Test
-    void shoulfLexIushr() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Iushr.jasm", lexer ->
-            assertNextToken(lexer)
-                .hasType(JasmLexer.IUSHR));
-    }
-
-    @Test
-    void shoulfLexIxor() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Ixor.jasm", lexer ->
-            assertNextToken(lexer)
-                .hasType(JasmLexer.IXOR));
-    }
-
-    @Test
-    void shouldLexLaload() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Laload.jasm", lexer ->
-                assertNextToken(lexer)
-                        .hasType(JasmLexer.LALOAD));
-    }
-
-    @Test
-    void shouldLexLastore() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Lastore.jasm", lexer ->
-                assertNextToken(lexer)
-                        .hasType(JasmLexer.LASTORE));
     }
 
     @Test
@@ -1316,14 +945,6 @@ class LexerInstructionTests {
                     .hasType(JasmLexer.INT)
                     .hasText("0");
         });
-    }
-
-    @Test
-    void shouldLexLReturn() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Lreturn.jasm", lexer ->
-                assertNextToken(lexer)
-                        .hasType(JasmLexer.LRETURN)
-        );
     }
 
     @Test
@@ -1445,29 +1066,18 @@ class LexerInstructionTests {
                 .hasText("java/lang/String");
         }));
     }
-    
-    @Test
-    void shouldLexReturn() {
-        runInstructionTest("com/roscopeco/jasm/insntest/Return.jasm", lexer ->
-                assertNextToken(lexer)
-                        .hasType(JasmLexer.RETURN)
+
+    @ParameterizedTest
+    @MethodSource("singleInstructionNoOperandTests")
+    void singleInstructionNoOperandTests(final String testCase, final int expectedToken) {
+        runInstructionTest("com/roscopeco/jasm/insntest/" + testCase + ".jasm", lexer ->
+            assertNextToken(lexer)
+                .hasType(expectedToken)
         );
     }
 
-    private static final List<Integer> VOID_RETURN_TYPE_TOKEN = List.of(JasmLexer.TYPE_VOID);
-    private static final List<Integer> FLOAT_RETURN_TYPE_TOKEN = List.of(JasmLexer.TYPE_FLOAT);
-    private static final List<Integer> REF_RETURN_TYPE_TOKEN = List.of(JasmLexer.QNAME);
-
     private void runInstructionTest(
             @NonNull final String testCase,
-            @NonNull final ThrowingConsumer<JasmLexer> assertions
-    ) {
-        runInstructionTest(testCase, VOID_RETURN_TYPE_TOKEN, assertions);
-    }
-
-    private void runInstructionTest(
-            @NonNull final String testCase,
-            @NonNull final List<Integer> expectedReturnTokenTypes,
             @NonNull final ThrowingConsumer<JasmLexer> assertions
     ) {
         final var lexer = testCaseLexer(testCase);
@@ -1491,9 +1101,8 @@ class LexerInstructionTests {
         assertNextToken(lexer)
                 .hasType(JasmLexer.RPAREN);
 
-        expectedReturnTokenTypes.forEach(token -> assertNextToken(lexer)
-                .hasType(token)
-        );
+        assertNextToken(lexer)
+            .hasType(JasmLexer.TYPE_VOID);
 
         assertNextToken(lexer)
                 .hasType(JasmLexer.LBRACE);
