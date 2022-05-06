@@ -116,7 +116,8 @@ class ParserInstructionTests {
             Arguments.of("Pop2.jasm", (Function<CodeSequenceAssert, CodeSequenceAssert>) CodeSequenceAssert::pop2),
             Arguments.of("Return.jasm", (Function<CodeSequenceAssert, CodeSequenceAssert>) CodeSequenceAssert::vreturn),
             Arguments.of("Saload.jasm", (Function<CodeSequenceAssert, CodeSequenceAssert>) CodeSequenceAssert::saload),
-            Arguments.of("Sastore.jasm", (Function<CodeSequenceAssert, CodeSequenceAssert>) CodeSequenceAssert::sastore)
+            Arguments.of("Sastore.jasm", (Function<CodeSequenceAssert, CodeSequenceAssert>) CodeSequenceAssert::sastore),
+            Arguments.of("Swap.jasm", (Function<CodeSequenceAssert, CodeSequenceAssert>) CodeSequenceAssert::swap)
         );
     }
 

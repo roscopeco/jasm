@@ -1,6 +1,7 @@
 package com.roscopeco.jasm.model
 
-interface PopsTest {
+interface StackOpsTest {
     fun testPop(): Int
     fun testPop2(): Int
+    fun testSwap(): Int
 }

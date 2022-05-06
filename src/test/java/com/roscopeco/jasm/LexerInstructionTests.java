@@ -112,7 +112,8 @@ class LexerInstructionTests {
             Arguments.of("Pop2", JasmLexer.POP2),
             Arguments.of("Return", JasmLexer.RETURN),
             Arguments.of("Saload", JasmLexer.SALOAD),
-            Arguments.of("Sastore", JasmLexer.SASTORE)
+            Arguments.of("Sastore", JasmLexer.SASTORE),
+            Arguments.of("Swap", JasmLexer.SWAP)
         );
     }
 

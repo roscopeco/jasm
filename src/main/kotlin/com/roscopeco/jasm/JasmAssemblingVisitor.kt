@@ -45,7 +45,7 @@ class JasmAssemblingVisitor(
      *
      * @param visitor An ASM class visitor to do generation with
      * @param unitName The name of the compilation unit (shows up in errors and as an attribute in the class)
-     * @param classFormat One of the ASM {@code Vxx} constants from the {@code org.objectweb.asm. class
+     * @param classFormat One of the ASM {@code Vxx} constants from the {@code org.objectweb.asm.Opcodes} class
      */
     constructor(visitor: ClassVisitor, unitName: String, classFormat: Int)
             : this(visitor, Modifiers(), unitName, classFormat)
@@ -927,6 +927,9 @@ class JasmAssemblingVisitor(
 
         override fun visitInsn_sipush(ctx: JasmParser.Insn_sipushContext)
                 = methodVisitor.visitIntInsn(Opcodes.SIPUSH, ctx.int_atom().text.toInt() and 0xffff)
+
+        override fun visitInsn_swap(ctx: JasmParser.Insn_swapContext)
+                = methodVisitor.visitInsn(Opcodes.SWAP)
 
         private fun visitNonDynamicInvoke(
             opcode: Int,

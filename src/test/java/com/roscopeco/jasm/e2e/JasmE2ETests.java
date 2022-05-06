@@ -23,7 +23,7 @@ import com.roscopeco.jasm.model.JsrRetTest;
 import com.roscopeco.jasm.model.LdcAconstAreturn;
 import com.roscopeco.jasm.model.LoadsAndStoresTest;
 import com.roscopeco.jasm.model.LongMathTests;
-import com.roscopeco.jasm.model.PopsTest;
+import com.roscopeco.jasm.model.StackOpsTest;
 import com.roscopeco.jasm.model.PrimArrayTests;
 import com.roscopeco.jasm.model.RefArrayTests;
 import com.roscopeco.jasm.model.Superclass;
@@ -795,20 +795,21 @@ class JasmE2ETests {
     }
 
     @Test
-    void shouldAssemblePopsTestToValidJavaClass() {
-        final var clz = assembleAndDefine("com/roscopeco/jasm/PopsTest.jasm");
+    void shouldAssembleStackOpsTestToValidJavaClass() {
+        final var clz = assembleAndDefine("com/roscopeco/jasm/StackOpsTest.jasm");
 
-        assertThat(clz.getName()).isEqualTo("com.roscopeco.jasm.PopsTest");
+        assertThat(clz.getName()).isEqualTo("com.roscopeco.jasm.StackOpsTest");
 
         assertThat(clz.getDeclaredClasses()).isEmpty();
         assertThat(clz.getDeclaredFields()).isEmpty();
         assertThat(clz.getDeclaredConstructors()).hasSize(1);
-        assertThat(clz.getDeclaredMethods()).hasSize(2);
+        assertThat(clz.getDeclaredMethods()).hasSize(3);
 
-        final var obj = instantiate(clz, PopsTest.class);
+        final var obj = instantiate(clz, StackOpsTest.class);
 
         assertThat(obj.testPop()).isEqualTo(1);
         assertThat(obj.testPop2()).isEqualTo(1);
+        assertThat(obj.testSwap()).isEqualTo(1);
     }
 
     @Test

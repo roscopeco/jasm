@@ -1,4 +1,4 @@
-public class com/roscopeco/jasm/PopsTest implements com/roscopeco/jasm/model/PopsTest {
+public class com/roscopeco/jasm/StackOpsTest implements com/roscopeco/jasm/model/StackOpsTest {
     public testPop()I {
         iconst 1
         iconst 2
@@ -11,6 +11,13 @@ public class com/roscopeco/jasm/PopsTest implements com/roscopeco/jasm/model/Pop
         iconst 2
         iconst 3
         pop2
+        ireturn
+    }
+
+    public testSwap()I {
+        iconst 1
+        iconst 2
+        swap
         ireturn
     }
 

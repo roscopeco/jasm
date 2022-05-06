@@ -658,6 +658,8 @@ class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private
             sipush -> sipush.int_atom().text
     }
 
+    fun swap() = genericNoOperandCheck("swap", InstructionContext::insn_swap)
+
     fun vreturn(): CodeSequenceAssert {
         return genericNoOperandCheck("vreturn", InstructionContext::insn_return)
     }

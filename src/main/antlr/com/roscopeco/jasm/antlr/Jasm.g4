@@ -205,6 +205,7 @@ membername
  | SALOAD
  | SASTORE
  | SIPUSH
+ | SWAP
  ;
 
 type
@@ -436,6 +437,7 @@ instruction
  | insn_saload
  | insn_sastore
  | insn_sipush
+ | insn_swap
  | label
  ;
 
@@ -1063,6 +1065,10 @@ insn_sipush
  : SIPUSH int_atom
  ;
 
+insn_swap
+ : SWAP
+ ;
+
 label
  : LABEL
  ;
@@ -1263,6 +1269,7 @@ RET             : 'ret';
 SALOAD          : 'saload';
 SASTORE         : 'sastore';
 SIPUSH          : 'sipush';
+SWAP            : 'swap';
 
 NEWINVOKESPECIAL: 'newinvokespecial';
 CONSTDYNAMIC    : 'constdynamic';
