@@ -665,16 +665,6 @@ class JasmAssemblingVisitor(
             super.visitInsn_invokevirtual(ctx)
         }
 
-        private fun visitNonDynamicInvoke(
-            opcode: Int,
-            owner: String,
-            name: String,
-            descriptor: String,
-            isInterface: Boolean
-        ) {
-            methodVisitor.visitMethodInsn(opcode, owner, name, descriptor, isInterface)
-        }
-
         override fun visitInsn_ior(ctx: JasmParser.Insn_iorContext) {
             methodVisitor.visitInsn(Opcodes.IOR)
             super.visitInsn_ior(ctx)
@@ -872,9 +862,6 @@ class JasmAssemblingVisitor(
             super.visitInsn_multianewarray(ctx)
         }
 
-        private fun getOrComputeArrayDims(ctx: JasmParser.Insn_multianewarrayContext)
-                = ctx.int_atom()?.text?.toInt() ?: ctx.array_type().text.count { c -> '[' == c }
-
         override fun visitInsn_new(ctx: JasmParser.Insn_newContext) {
             methodVisitor.visitTypeInsn(Opcodes.NEW, ctx.QNAME().text)
             super.visitInsn_new(ctx)
@@ -885,16 +872,19 @@ class JasmAssemblingVisitor(
             super.visitInsn_newarray(ctx)
         }
 
-        private fun typeForNewarray(ctx: JasmParser.Prim_typeContext) = when {
-            ctx.TYPE_BOOL() != null     -> Opcodes.T_BOOLEAN
-            ctx.TYPE_BYTE() != null     -> Opcodes.T_BYTE
-            ctx.TYPE_CHAR() != null     -> Opcodes.T_CHAR
-            ctx.TYPE_DOUBLE() != null   -> Opcodes.T_DOUBLE
-            ctx.TYPE_FLOAT() != null    -> Opcodes.T_FLOAT
-            ctx.TYPE_INT() != null      -> Opcodes.T_INT
-            ctx.TYPE_LONG() != null     -> Opcodes.T_LONG
-            ctx.TYPE_SHORT() != null    -> Opcodes.T_SHORT
-            else -> throw SyntaxErrorException("Unknown primitive type for newarray " + ctx.text)
+        override fun visitInsn_nop(ctx: JasmParser.Insn_nopContext) {
+            methodVisitor.visitInsn(Opcodes.NOP)
+            super.visitInsn_nop(ctx)
+        }
+
+        override fun visitInsn_pop(ctx: JasmParser.Insn_popContext) {
+            methodVisitor.visitInsn(Opcodes.POP)
+            super.visitInsn_pop(ctx)
+        }
+
+        override fun visitInsn_pop2(ctx: JasmParser.Insn_pop2Context) {
+            methodVisitor.visitInsn(Opcodes.POP2)
+            super.visitInsn_pop2(ctx)
         }
 
         override fun visitInsn_putfield(ctx: JasmParser.Insn_putfieldContext) {
@@ -921,6 +911,31 @@ class JasmAssemblingVisitor(
         override fun visitInsn_return(ctx: JasmParser.Insn_returnContext) {
             methodVisitor.visitInsn(Opcodes.RETURN)
             super.visitInsn_return(ctx)
+        }
+
+        private fun visitNonDynamicInvoke(
+            opcode: Int,
+            owner: String,
+            name: String,
+            descriptor: String,
+            isInterface: Boolean
+        ) {
+            methodVisitor.visitMethodInsn(opcode, owner, name, descriptor, isInterface)
+        }
+
+        private fun getOrComputeArrayDims(ctx: JasmParser.Insn_multianewarrayContext)
+                = ctx.int_atom()?.text?.toInt() ?: ctx.array_type().text.count { c -> '[' == c }
+
+        private fun typeForNewarray(ctx: JasmParser.Prim_typeContext) = when {
+            ctx.TYPE_BOOL() != null     -> Opcodes.T_BOOLEAN
+            ctx.TYPE_BYTE() != null     -> Opcodes.T_BYTE
+            ctx.TYPE_CHAR() != null     -> Opcodes.T_CHAR
+            ctx.TYPE_DOUBLE() != null   -> Opcodes.T_DOUBLE
+            ctx.TYPE_FLOAT() != null    -> Opcodes.T_FLOAT
+            ctx.TYPE_INT() != null      -> Opcodes.T_INT
+            ctx.TYPE_LONG() != null     -> Opcodes.T_LONG
+            ctx.TYPE_SHORT() != null    -> Opcodes.T_SHORT
+            else -> throw SyntaxErrorException("Unknown primitive type for newarray " + ctx.text)
         }
 
         private fun buildBootstrapHandle(ctx: JasmParser.Method_handleContext): Handle {

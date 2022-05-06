@@ -1,0 +1,5 @@
+class com/roscopeco/jasm/insntest/Nop {
+    insnTest()V {
+        nop
+    }
+}

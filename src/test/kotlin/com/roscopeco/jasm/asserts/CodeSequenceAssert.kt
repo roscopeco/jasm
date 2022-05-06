@@ -573,6 +573,12 @@ class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private
 
     fun monitorexit() = genericNoOperandCheck("monitorexit", InstructionContext::insn_monitorexit)
 
+    fun nop() = genericNoOperandCheck("nop", InstructionContext::insn_nop)
+
+    fun pop() = genericNoOperandCheck("pop", InstructionContext::insn_pop)
+
+    fun pop2() = genericNoOperandCheck("pop2", InstructionContext::insn_pop2)
+
     fun multianewarray(expectedType: String) = multianewarray(expectedType, null)
     fun multianewarray(expectedType: String, expectedDims: Int?): CodeSequenceAssert {
         isNotNull

@@ -107,6 +107,9 @@ class LexerInstructionTests {
             Arguments.of("Lushr", JasmLexer.LUSHR),
             Arguments.of("Monitorenter", JasmLexer.MONITORENTER),
             Arguments.of("Monitorexit", JasmLexer.MONITOREXIT),
+            Arguments.of("Nop", JasmLexer.NOP),
+            Arguments.of("Pop", JasmLexer.POP),
+            Arguments.of("Pop2", JasmLexer.POP2),
             Arguments.of("Return", JasmLexer.RETURN)
         );
     }

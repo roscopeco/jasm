@@ -22,6 +22,7 @@ import com.roscopeco.jasm.model.InvokedynamicTest;
 import com.roscopeco.jasm.model.LdcAconstAreturn;
 import com.roscopeco.jasm.model.LoadsAndStoresTest;
 import com.roscopeco.jasm.model.LongMathTests;
+import com.roscopeco.jasm.model.PopsTest;
 import com.roscopeco.jasm.model.PrimArrayTests;
 import com.roscopeco.jasm.model.RefArrayTests;
 import com.roscopeco.jasm.model.Superclass;
@@ -783,5 +784,22 @@ class JasmE2ETests {
         assertThat(obj.testLxor(0x7, 0x5)).isEqualTo(0x2);
         assertThat(obj.testLshr(-16, 2)).isEqualTo(-4);
         assertThat(obj.testLushr(-16, 2)).isEqualTo(4611686018427387900L);
+    }
+
+    @Test
+    void shouldAssemblePopsNamesToValidJavaClass() {
+        final var clz = assembleAndDefine("com/roscopeco/jasm/PopsTest.jasm");
+
+        assertThat(clz.getName()).isEqualTo("com.roscopeco.jasm.PopsTest");
+
+        assertThat(clz.getDeclaredClasses()).isEmpty();
+        assertThat(clz.getDeclaredFields()).isEmpty();
+        assertThat(clz.getDeclaredConstructors()).hasSize(1);
+        assertThat(clz.getDeclaredMethods()).hasSize(2);
+
+        final var obj = instantiate(clz, PopsTest.class);
+
+        assertThat(obj.testPop()).isEqualTo(1);
+        assertThat(obj.testPop2()).isEqualTo(1);
     }
 }

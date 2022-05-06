@@ -194,6 +194,9 @@ membername
  | MULTIANEWARRAY
  | NEW
  | NEWARRAY
+ | NOP
+ | POP
+ | POP2
  | PUTFIELD
  | PUTSTATIC
  | RETURN
@@ -417,6 +420,9 @@ instruction
  | insn_multianewarray
  | insn_new
  | insn_newarray
+ | insn_nop
+ | insn_pop
+ | insn_pop2
  | insn_putfield
  | insn_putstatic
  | insn_return
@@ -1003,6 +1009,18 @@ insn_newarray
  : NEWARRAY prim_type
  ;
 
+insn_nop
+ : NOP
+ ;
+
+insn_pop
+ : POP
+ ;
+
+insn_pop2
+ : POP2
+ ;
+
 insn_putfield
  : PUTFIELD owner DOT membername type
  ;
@@ -1213,6 +1231,9 @@ MONITOREXIT     : 'monitorexit';
 MULTIANEWARRAY  : 'multianewarray';
 NEW             : 'new';
 NEWARRAY        : 'newarray';
+NOP             : 'nop';
+POP             : 'pop';
+POP2            : 'pop2';
 PUTFIELD        : 'putfield';
 PUTSTATIC       : 'putstatic';
 RETURN          : 'return';

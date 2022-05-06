@@ -1,0 +1,22 @@
+public class com/roscopeco/jasm/PopsTest implements com/roscopeco/jasm/model/PopsTest {
+    public testPop()I {
+        iconst 1
+        iconst 2
+        pop
+        ireturn
+    }
+
+    public testPop2()I {
+        iconst 1
+        iconst 2
+        iconst 3
+        pop2
+        ireturn
+    }
+
+    public <init>()V {
+        aload 0
+        invokespecial java/lang/Object.<init>()V
+        return
+    }
+}
