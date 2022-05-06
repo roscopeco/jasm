@@ -202,6 +202,9 @@ membername
  | PUTSTATIC
  | RETURN
  | RET
+ | SALOAD
+ | SASTORE
+ | SIPUSH
  ;
 
 type
@@ -430,6 +433,9 @@ instruction
  | insn_putstatic
  | insn_return
  | insn_ret
+ | insn_saload
+ | insn_sastore
+ | insn_sipush
  | label
  ;
 
@@ -1045,6 +1051,18 @@ insn_ret
  : RET int_atom
  ;
 
+insn_saload
+ : SALOAD
+ ;
+
+insn_sastore
+ : SASTORE
+ ;
+
+insn_sipush
+ : SIPUSH int_atom
+ ;
+
 label
  : LABEL
  ;
@@ -1242,6 +1260,9 @@ PUTFIELD        : 'putfield';
 PUTSTATIC       : 'putstatic';
 RETURN          : 'return';
 RET             : 'ret';
+SALOAD          : 'saload';
+SASTORE         : 'sastore';
+SIPUSH          : 'sipush';
 
 NEWINVOKESPECIAL: 'newinvokespecial';
 CONSTDYNAMIC    : 'constdynamic';

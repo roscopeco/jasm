@@ -919,6 +919,15 @@ class JasmAssemblingVisitor(
             super.visitInsn_return(ctx)
         }
 
+        override fun visitInsn_saload(ctx: JasmParser.Insn_saloadContext)
+                = methodVisitor.visitInsn(Opcodes.SALOAD)
+
+        override fun visitInsn_sastore(ctx: JasmParser.Insn_sastoreContext)
+                = methodVisitor.visitInsn(Opcodes.SASTORE)
+
+        override fun visitInsn_sipush(ctx: JasmParser.Insn_sipushContext)
+                = methodVisitor.visitIntInsn(Opcodes.SIPUSH, ctx.int_atom().text.toInt() and 0xffff)
+
         private fun visitNonDynamicInvoke(
             opcode: Int,
             owner: String,

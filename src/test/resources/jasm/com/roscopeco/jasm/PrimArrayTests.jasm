@@ -89,6 +89,21 @@ public class com/roscopeco/jasm/PrimArrayTests implements com/roscopeco/jasm/mod
         lreturn
     }
 
+    public testSastore([S, S)V {
+        aload 1
+        iconst 0
+        iload 2
+        sastore
+        return
+    }
+
+    public testSaload([S)S {
+        aload 1
+        iconst 0
+        saload
+        ireturn
+    }
+
     public testNewarray(int)[I {
         iload 1
         newarray I

@@ -13,5 +13,7 @@ interface PrimArrayTests {
     fun testIaload(input: IntArray): Int
     fun testLastore(input: LongArray, testval: Long)
     fun testLaload(input: LongArray): Long
+    fun testSastore(input: ShortArray, testval: Short)
+    fun testSaload(input: ShortArray): Short
     fun testNewarray(size: Int): IntArray
 }

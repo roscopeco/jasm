@@ -114,7 +114,9 @@ class ParserInstructionTests {
             Arguments.of("Nop.jasm", (Function<CodeSequenceAssert, CodeSequenceAssert>) CodeSequenceAssert::nop),
             Arguments.of("Pop.jasm", (Function<CodeSequenceAssert, CodeSequenceAssert>) CodeSequenceAssert::pop),
             Arguments.of("Pop2.jasm", (Function<CodeSequenceAssert, CodeSequenceAssert>) CodeSequenceAssert::pop2),
-            Arguments.of("Return.jasm", (Function<CodeSequenceAssert, CodeSequenceAssert>) CodeSequenceAssert::vreturn)
+            Arguments.of("Return.jasm", (Function<CodeSequenceAssert, CodeSequenceAssert>) CodeSequenceAssert::vreturn),
+            Arguments.of("Saload.jasm", (Function<CodeSequenceAssert, CodeSequenceAssert>) CodeSequenceAssert::saload),
+            Arguments.of("Sastore.jasm", (Function<CodeSequenceAssert, CodeSequenceAssert>) CodeSequenceAssert::sastore)
         );
     }
 
@@ -141,7 +143,8 @@ class ParserInstructionTests {
             Arguments.of("Lstore.jasm", 0, (BiFunction<CodeSequenceAssert, Integer, CodeSequenceAssert>) CodeSequenceAssert::lstore),
             Arguments.of("New.jasm", "java/util/ArrayList", (BiFunction<CodeSequenceAssert, String, CodeSequenceAssert>) CodeSequenceAssert::anew),
             Arguments.of("Ret.jasm", 1, (BiFunction<CodeSequenceAssert, Integer, CodeSequenceAssert>) CodeSequenceAssert::ret),
-            Arguments.of("Newarray.jasm", "I", (BiFunction<CodeSequenceAssert, String, CodeSequenceAssert>) CodeSequenceAssert::newarray)
+            Arguments.of("Newarray.jasm", "I", (BiFunction<CodeSequenceAssert, String, CodeSequenceAssert>) CodeSequenceAssert::newarray),
+            Arguments.of("Sipush.jasm", 100, (BiFunction<CodeSequenceAssert, Integer, CodeSequenceAssert>) CodeSequenceAssert::sipush)
         );
     }
 

@@ -1,4 +1,4 @@
-class com/roscopeco/jasm/insntest/Aaload {
+class com/roscopeco/jasm/insntest/Bipush {
     insnTest()V {
         bipush 100
     }

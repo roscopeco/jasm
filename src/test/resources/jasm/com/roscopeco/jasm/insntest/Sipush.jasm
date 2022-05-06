@@ -1,0 +1,5 @@
+class com/roscopeco/jasm/insntest/Sipush {
+    insnTest()V {
+        sipush 100
+    }
+}

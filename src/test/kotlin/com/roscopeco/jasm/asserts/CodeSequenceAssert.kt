@@ -67,6 +67,7 @@ class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private
     fun athrow() = genericNoOperandCheck("athrow", InstructionContext::insn_athrow)
 
     fun baload() = genericNoOperandCheck("baload", InstructionContext::insn_baload)
+
     fun bastore() = genericNoOperandCheck("bastore", InstructionContext::insn_bastore)
 
     fun bipush(expected: Int) = genericIntOperandCheck("bipush", expected, InstructionContext::insn_bipush) {
@@ -648,6 +649,14 @@ class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private
             JasmParser.Insn_putstaticContext::membername,
             JasmParser.Insn_putstaticContext::type
         )
+
+    fun saload() = genericNoOperandCheck("saload", InstructionContext::insn_saload)
+
+    fun sastore() = genericNoOperandCheck("sastore", InstructionContext::insn_sastore)
+
+    fun sipush(expected: Int) = genericIntOperandCheck("sipush", expected, InstructionContext::insn_sipush) {
+            sipush -> sipush.int_atom().text
+    }
 
     fun vreturn(): CodeSequenceAssert {
         return genericNoOperandCheck("vreturn", InstructionContext::insn_return)

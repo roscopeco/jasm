@@ -110,7 +110,9 @@ class LexerInstructionTests {
             Arguments.of("Nop", JasmLexer.NOP),
             Arguments.of("Pop", JasmLexer.POP),
             Arguments.of("Pop2", JasmLexer.POP2),
-            Arguments.of("Return", JasmLexer.RETURN)
+            Arguments.of("Return", JasmLexer.RETURN),
+            Arguments.of("Saload", JasmLexer.SALOAD),
+            Arguments.of("Sastore", JasmLexer.SASTORE)
         );
     }
 
@@ -1194,6 +1196,19 @@ class LexerInstructionTests {
                 .hasText("1");
         });
     }
+
+    @Test
+    void shouldLexSipush() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Sipush.jasm", lexer -> {
+            assertNextToken(lexer)
+                .hasType(JasmLexer.SIPUSH);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.INT)
+                .hasText("100");
+        });
+    }
+
 
     @ParameterizedTest
     @MethodSource("singleInstructionNoOperandTests")
