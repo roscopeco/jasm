@@ -695,6 +695,7 @@ class JasmE2ETests {
         assertThat(obj.testI2d(1001)).isEqualTo(1001d);
         assertThat(obj.testI2f(1001)).isEqualTo(1001f);
         assertThat(obj.testI2l(Integer.MAX_VALUE)).isEqualTo(Integer.MAX_VALUE);
+        assertThat(obj.testI2s(Integer.MAX_VALUE)).isEqualTo((short)-1);
 
         assertThat(obj.testIadd(10, 20)).isEqualTo(30);
         assertThat(obj.testIand(0x6, 0x4)).isEqualTo(0x4);
