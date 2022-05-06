@@ -1,0 +1,12 @@
+class com/roscopeco/jasm/insntest/Tableswitch {
+    insnTest()V {
+        tableswitch defaultLabel {
+            1: oneLabel
+            2: twoLabel,      // comma is optional
+
+            // 3 and 4 will be automatically filled with default label
+
+            5: fiveLabel
+        }
+    }
+}

@@ -19,6 +19,8 @@ import com.roscopeco.jasm.antlr.JasmParser.Insn_invokespecialContext
 import com.roscopeco.jasm.antlr.JasmParser.Insn_invokestaticContext
 import com.roscopeco.jasm.antlr.JasmParser.Insn_invokevirtualContext
 import com.roscopeco.jasm.antlr.JasmParser.Const_argContext
+import org.antlr.v4.runtime.Token
+import org.antlr.v4.runtime.tree.TerminalNode
 
 class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private val caller: MethodAssert) :
     AbstractAssert<CodeSequenceAssert, Stat_blockContext>(actual, CodeSequenceAssert::class.java) {
@@ -503,56 +505,12 @@ class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private
 
     fun lneg() = genericNoOperandCheck("lneg", InstructionContext::insn_lneg)
 
-    fun lookupswitch(): SwitchAssert {
-        isNotNull
-
-        Assertions.assertThat(actual.stat()).isNotNull
-        hasNotUnderflowed("lookupswitch")
-
-        val stat = actual.stat()[pc]
-        val lookup = stat?.instruction()?.insn_lookupswitch()
-
-        if (lookup == null) {
-            failWithMessage(
-                "Expected lookupswitch instruction at pc($pc) but was ${stat.instruction().text}"
-            )
-        }
-
-        pc++
-        return SwitchAssert(lookup!!)
-    }
-
-    inner class SwitchAssert(private val actual: JasmParser.Insn_lookupswitchContext) {
-        fun withDefault(expected: String): SwitchAssert {
-            Assertions.assertThat(actual.NAME())
-                .isNotNull
-                .extracting{ l -> l.text }
-                .isEqualTo(expected)
-
-            return this
-        }
-
-        fun withCase(expectedNum: Int, expectedLabel: String): SwitchAssert {
-            Assertions.assertThat(actual.switch_case())
-                .isNotNull
-                .isNotEmpty
-
-            val match = actual.switch_case().find {
-                    c -> expectedNum == c.int_atom().text.toInt() && expectedLabel == c.NAME().text
-            }
-
-            if (match == null) {
-                failWithMessage(
-                    "Expected lookupswitch instruction at pc(${pc - 1}) to contain "
-                            + "a case matching {$expectedNum: $expectedLabel} but it did not"
-                )
-            }
-
-            return this
-        }
-
-        fun end() = this@CodeSequenceAssert
-    }
+    fun lookupswitch() = switchAssert(
+        "lookupswitch",
+        InstructionContext::insn_lookupswitch,
+        JasmParser.Insn_lookupswitchContext::NAME,
+        JasmParser.Insn_lookupswitchContext::switch_case
+    )
 
     fun lor() = genericNoOperandCheck("lor", InstructionContext::insn_lor)
 
@@ -662,6 +620,73 @@ class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private
 
     fun vreturn(): CodeSequenceAssert {
         return genericNoOperandCheck("vreturn", InstructionContext::insn_return)
+    }
+
+    fun tableswitch() = switchAssert(
+        "tableswitch",
+        InstructionContext::insn_tableswitch,
+        JasmParser.Insn_tableswitchContext::NAME,
+        JasmParser.Insn_tableswitchContext::switch_case
+    )
+
+    private fun <T> switchAssert(
+        kind: String,
+        ctxGetter: (InstructionContext) -> T,
+        nameGetter: (T) -> TerminalNode,
+        caseGetter: (T) -> List<JasmParser.Switch_caseContext>
+    ): SwitchAssert<T> {
+        isNotNull
+
+        Assertions.assertThat(actual.stat()).isNotNull
+        hasNotUnderflowed(kind)
+
+        val stat = actual.stat()[pc]
+        val lookup = ctxGetter(stat?.instruction()!!)
+
+        if (lookup == null) {
+            failWithMessage(
+                "Expected $kind instruction at pc($pc) but was ${stat.instruction().text}"
+            )
+        }
+
+        pc++
+        return SwitchAssert(lookup, nameGetter, caseGetter)
+    }
+
+    inner class SwitchAssert<T>(
+        private val actual: T,
+        private val nameGetter: (T) -> TerminalNode,
+        private val caseGetter: (T) -> List<JasmParser.Switch_caseContext>
+    ) {
+        fun withDefault(expected: String): SwitchAssert<T> {
+            Assertions.assertThat(nameGetter(actual))
+                .isNotNull
+                .extracting{ l -> l.text }
+                .isEqualTo(expected)
+
+            return this
+        }
+
+        fun withCase(expectedNum: Int, expectedLabel: String): SwitchAssert<T> {
+            Assertions.assertThat(caseGetter(actual))
+                .isNotNull
+                .isNotEmpty
+
+            val match = caseGetter(actual).find {
+                    c -> expectedNum == c.int_atom().text.toInt() && expectedLabel == c.NAME().text
+            }
+
+            if (match == null) {
+                failWithMessage(
+                    "Expected lookupswitch instruction at pc(${pc - 1}) to contain "
+                            + "a case matching {$expectedNum: $expectedLabel} but it did not"
+                )
+            }
+
+            return this
+        }
+
+        fun end() = this@CodeSequenceAssert
     }
 
     private fun cleanConstantString(constant: String): String {

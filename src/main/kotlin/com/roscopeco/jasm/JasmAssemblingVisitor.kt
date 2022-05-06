@@ -14,6 +14,7 @@ import org.objectweb.asm.Label
 import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Type
+import java.util.stream.IntStream
 
 /**
  * The main visitor which does the code generation to an ASM {@code ClassVisitor}.
@@ -930,6 +931,26 @@ class JasmAssemblingVisitor(
 
         override fun visitInsn_swap(ctx: JasmParser.Insn_swapContext)
                 = methodVisitor.visitInsn(Opcodes.SWAP)
+
+        override fun visitInsn_tableswitch(ctx: JasmParser.Insn_tableswitchContext) {
+            val keys = ctx.switch_case().map { c -> c.int_atom().text.toInt() }
+            val labels = ctx.switch_case().map { c -> getLabel(c.NAME().text).label }
+            val default = getLabel(ctx.NAME().text).label
+            val pairs = (keys zip labels)
+            val min = pairs.minOf { p -> p.first }
+            val max = pairs.maxOf { p -> p.first }
+
+            methodVisitor.visitTableSwitchInsn(
+                min,
+                max,
+                default,
+                *IntStream.rangeClosed(min, max).mapToObj {
+                        i -> pairs.find { p -> p.first == i }?.second ?: default
+                }.toList().toTypedArray()
+            )
+
+            super.visitInsn_tableswitch(ctx)
+        }
 
         private fun visitNonDynamicInvoke(
             opcode: Int,

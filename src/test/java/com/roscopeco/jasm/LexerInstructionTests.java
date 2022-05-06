@@ -1210,6 +1210,59 @@ class LexerInstructionTests {
         });
     }
 
+    @Test
+    void shouldLexTableswitch() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Tableswitch.jasm", lexer -> {
+            assertNextToken(lexer)
+                .hasType(JasmLexer.TABLESWITCH);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.NAME)
+                .hasText("defaultLabel");
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.LBRACE);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.INT)
+                .hasText("1");
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.COLON);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.NAME)
+                .hasText("oneLabel");
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.INT)
+                .hasText("2");
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.COLON);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.NAME)
+                .hasText("twoLabel");
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.COMMA);      // Optional
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.INT)
+                .hasText("5");
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.COLON);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.NAME)
+                .hasText("fiveLabel");
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.RBRACE);
+        });
+    }
 
     @ParameterizedTest
     @MethodSource("singleInstructionNoOperandTests")

@@ -206,6 +206,7 @@ membername
  | SASTORE
  | SIPUSH
  | SWAP
+ | TABLESWITCH
  ;
 
 type
@@ -438,6 +439,7 @@ instruction
  | insn_sastore
  | insn_sipush
  | insn_swap
+ | insn_tableswitch
  | label
  ;
 
@@ -1069,6 +1071,10 @@ insn_swap
  : SWAP
  ;
 
+insn_tableswitch
+ : TABLESWITCH NAME LBRACE switch_case+ RBRACE
+ ;
+
 label
  : LABEL
  ;
@@ -1270,6 +1276,7 @@ SALOAD          : 'saload';
 SASTORE         : 'sastore';
 SIPUSH          : 'sipush';
 SWAP            : 'swap';
+TABLESWITCH     : 'tableswitch';
 
 NEWINVOKESPECIAL: 'newinvokespecial';
 CONSTDYNAMIC    : 'constdynamic';

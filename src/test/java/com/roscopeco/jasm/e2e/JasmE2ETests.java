@@ -745,7 +745,7 @@ class JasmE2ETests {
         assertThat(clz.getDeclaredClasses()).isEmpty();
         assertThat(clz.getDeclaredFields()).isEmpty();
         assertThat(clz.getDeclaredConstructors()).hasSize(1);
-        assertThat(clz.getDeclaredMethods()).hasSize(1);
+        assertThat(clz.getDeclaredMethods()).hasSize(2);
 
         final var obj = instantiate(clz, SwitchTests.class);
 
@@ -758,6 +758,13 @@ class JasmE2ETests {
         assertThat(obj.testLookupswitch(999)).isEqualTo("No match");
         assertThat(obj.testLookupswitch(1000)).isEqualTo("Thousand");
         assertThat(obj.testLookupswitch(1001)).isEqualTo("No match");
+
+        assertThat(obj.testTableswitch(0)).isEqualTo("No match");
+        assertThat(obj.testTableswitch(1)).isEqualTo("One");
+        assertThat(obj.testTableswitch(2)).isEqualTo("Two");
+        assertThat(obj.testTableswitch(3)).isEqualTo("No match");
+        assertThat(obj.testTableswitch(4)).isEqualTo("No match");
+        assertThat(obj.testTableswitch(5)).isEqualTo("Five");
     }
 
     @Test

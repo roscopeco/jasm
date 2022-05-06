@@ -25,6 +25,37 @@ public class com/roscopeco/jasm/SwitchTests implements com/roscopeco/jasm/model/
         areturn
     }
 
+    public testTableswitch(I)java/lang/String {
+        iload 1
+
+        tableswitch default {
+            // Order will be corrected automatically, and gaps in a sparse table will be
+            // filled with the default label.
+            //
+            // If your switch is very sparse, you should probably consider a lookupswitch instead of course
+            //
+            2: two
+            5: five
+            1: one
+        }
+
+    one:
+        ldc "One"
+        areturn
+
+    two:
+        ldc "Two"
+        areturn
+
+    five:
+        ldc "Five"
+        areturn
+
+    default:
+        ldc "No match"
+        areturn
+    }
+
     public <init>()V {
         aload 0
         invokespecial java/lang/Object.<init>()V

@@ -332,6 +332,19 @@ class ParserInstructionTests {
         );
     }
 
+    @Test
+    void shouldParseTableswitch() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Tableswitch.jasm", code -> code
+            .tableswitch()
+                .withDefault("defaultLabel")
+                .withCase(1, "oneLabel")
+                .withCase(2, "twoLabel")
+                .withCase(5, "fiveLabel")
+                .end()
+            .noMoreCode()
+        );
+    }
+
     @ParameterizedTest
     @MethodSource("singleInstructionNoOperandsTests")
     void singleInstructionNoOperandsTests(final String testCase, final Function<CodeSequenceAssert, CodeSequenceAssert> assertFunc) {
