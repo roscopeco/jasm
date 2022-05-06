@@ -854,6 +854,16 @@ class JasmAssemblingVisitor(
             super.visitInsn_lxor(ctx)
         }
 
+        override fun visitInsn_monitorenter(ctx: JasmParser.Insn_monitorenterContext) {
+            methodVisitor.visitInsn(Opcodes.MONITORENTER)
+            super.visitInsn_monitorenter(ctx)
+        }
+
+        override fun visitInsn_monitorexit(ctx: JasmParser.Insn_monitorexitContext) {
+            methodVisitor.visitInsn(Opcodes.MONITOREXIT)
+            super.visitInsn_monitorexit(ctx)
+        }
+
         override fun visitInsn_new(ctx: JasmParser.Insn_newContext) {
             methodVisitor.visitTypeInsn(Opcodes.NEW, ctx.QNAME().text)
             super.visitInsn_new(ctx)

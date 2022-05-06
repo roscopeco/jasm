@@ -109,6 +109,8 @@ class ParserInstructionTests {
             Arguments.of("Lsub.jasm", (Function<CodeSequenceAssert, CodeSequenceAssert>) CodeSequenceAssert::lsub),
             Arguments.of("Lushr.jasm", (Function<CodeSequenceAssert, CodeSequenceAssert>) CodeSequenceAssert::lushr),
             Arguments.of("Lxor.jasm", (Function<CodeSequenceAssert, CodeSequenceAssert>) CodeSequenceAssert::lxor),
+            Arguments.of("Monitorenter.jasm", (Function<CodeSequenceAssert, CodeSequenceAssert>) CodeSequenceAssert::monitorenter),
+            Arguments.of("Monitorexit.jasm", (Function<CodeSequenceAssert, CodeSequenceAssert>) CodeSequenceAssert::monitorexit),
             Arguments.of("Return.jasm", (Function<CodeSequenceAssert, CodeSequenceAssert>) CodeSequenceAssert::vreturn)
         );
     }

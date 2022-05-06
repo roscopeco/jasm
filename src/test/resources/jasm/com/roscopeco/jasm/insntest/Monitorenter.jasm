@@ -1,0 +1,5 @@
+class com/roscopeco/jasm/insntest/Monitorenter {
+    insnTest()V {
+        monitorenter
+    }
+}

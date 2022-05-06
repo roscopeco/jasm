@@ -189,10 +189,8 @@ membername
  | LSUB
  | LUSHR
  | LXOR
- | NEW
- | PUTFIELD
- | PUTSTATIC
- | RETURN
+ | MONITORENTER
+ | MONITOREXIT
  | NEW
  | PUTFIELD
  | PUTSTATIC
@@ -412,6 +410,8 @@ instruction
  | insn_lsub
  | insn_lushr
  | insn_lxor
+ | insn_monitorenter
+ | insn_monitorexit
  | insn_new
  | insn_putfield
  | insn_putstatic
@@ -979,6 +979,14 @@ insn_lxor
  : LXOR
  ;
 
+insn_monitorenter
+ : MONITORENTER
+ ;
+
+insn_monitorexit
+ : MONITOREXIT
+ ;
+
 insn_new
  : NEW QNAME
  ;
@@ -1188,6 +1196,8 @@ LSTORE          : 'lstore';
 LSUB            : 'lsub';
 LUSHR           : 'lushr';
 LXOR            : 'lxor';
+MONITORENTER    : 'monitorenter';
+MONITOREXIT     : 'monitorexit';
 NEW             : 'new';
 PUTFIELD        : 'putfield';
 PUTSTATIC       : 'putstatic';

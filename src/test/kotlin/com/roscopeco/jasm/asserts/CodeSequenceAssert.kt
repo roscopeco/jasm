@@ -564,6 +564,10 @@ class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private
 
     fun lxor() = genericNoOperandCheck("lxor", InstructionContext::insn_lxor)
 
+    fun monitorenter() = genericNoOperandCheck("monitorenter", InstructionContext::insn_monitorenter)
+
+    fun monitorexit() = genericNoOperandCheck("monitorexit", InstructionContext::insn_monitorexit)
+
     fun putField(expectedOwner: String, expectedName: String, expectedDescriptor: String) =
         genericFieldAccessCheck(
             "putfield",
