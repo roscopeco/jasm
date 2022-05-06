@@ -193,6 +193,7 @@ membername
  | MONITOREXIT
  | MULTIANEWARRAY
  | NEW
+ | NEWARRAY
  | PUTFIELD
  | PUTSTATIC
  | RETURN
@@ -415,6 +416,7 @@ instruction
  | insn_monitorexit
  | insn_multianewarray
  | insn_new
+ | insn_newarray
  | insn_putfield
  | insn_putstatic
  | insn_return
@@ -997,6 +999,10 @@ insn_new
  : NEW QNAME
  ;
 
+insn_newarray
+ : NEWARRAY prim_type
+ ;
+
 insn_putfield
  : PUTFIELD owner DOT membername type
  ;
@@ -1206,6 +1212,7 @@ MONITORENTER    : 'monitorenter';
 MONITOREXIT     : 'monitorexit';
 MULTIANEWARRAY  : 'multianewarray';
 NEW             : 'new';
+NEWARRAY        : 'newarray';
 PUTFIELD        : 'putfield';
 PUTSTATIC       : 'putstatic';
 RETURN          : 'return';

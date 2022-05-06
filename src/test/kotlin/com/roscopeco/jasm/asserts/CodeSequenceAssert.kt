@@ -52,6 +52,10 @@ class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private
             anew -> anew.QNAME().text
     }
 
+    fun anewarray(expected: String) = genericStringOperandCheck("anewarray", expected, InstructionContext::insn_anewarray) {
+            anewarray -> anewarray.QNAME().text
+    }
+
     fun areturn() = genericNoOperandCheck("areturn", InstructionContext::insn_areturn)
 
     fun arraylength() = genericNoOperandCheck("arraylength", InstructionContext::insn_arraylength)
@@ -602,6 +606,11 @@ class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private
         pc++
         return this
     }
+
+    fun newarray(expected: String) = genericStringOperandCheck("newarray", expected, InstructionContext::insn_newarray) {
+            newarray -> newarray.prim_type().text
+    }
+
 
     fun putField(expectedOwner: String, expectedName: String, expectedDescriptor: String) =
         genericFieldAccessCheck(

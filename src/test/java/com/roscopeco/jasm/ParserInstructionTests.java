@@ -119,6 +119,7 @@ class ParserInstructionTests {
         return Stream.of(
             Arguments.of("Aload.jasm", 0, (BiFunction<CodeSequenceAssert, Integer, CodeSequenceAssert>) CodeSequenceAssert::aload),
             Arguments.of("Astore.jasm", 1, (BiFunction<CodeSequenceAssert, Integer, CodeSequenceAssert>) CodeSequenceAssert::astore),
+            Arguments.of("Anewarray.jasm", "java/lang/String", (BiFunction<CodeSequenceAssert, String, CodeSequenceAssert>) CodeSequenceAssert::anewarray),
             Arguments.of("Bipush.jasm", 100, (BiFunction<CodeSequenceAssert, Integer, CodeSequenceAssert>) CodeSequenceAssert::bipush),
             Arguments.of("Checkcast.jasm", "java/util/ArrayList", (BiFunction<CodeSequenceAssert, String, CodeSequenceAssert>) CodeSequenceAssert::checkcast),
             Arguments.of("Dconst.jasm", 0, (BiFunction<CodeSequenceAssert, Integer, CodeSequenceAssert>) CodeSequenceAssert::dconst),

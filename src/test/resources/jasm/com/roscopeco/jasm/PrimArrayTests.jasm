@@ -89,6 +89,12 @@ public class com/roscopeco/jasm/PrimArrayTests implements com/roscopeco/jasm/mod
         lreturn
     }
 
+    public testNewarray(int)[I {
+        iload 1
+        newarray I
+        areturn
+    }
+
     public <init>()V {
         aload 0
         invokespecial java/lang/Object.<init>()V

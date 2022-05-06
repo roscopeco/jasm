@@ -512,7 +512,7 @@ class JasmE2ETests {
         assertThat(clz.getDeclaredClasses()).isEmpty();
         assertThat(clz.getDeclaredFields()).isEmpty();
         assertThat(clz.getDeclaredConstructors()).hasSize(1);
-        assertThat(clz.getDeclaredMethods()).hasSize(12);
+        assertThat(clz.getDeclaredMethods()).hasSize(13);
 
         final var obj = instantiate(clz, PrimArrayTests.class);
 
@@ -545,6 +545,8 @@ class JasmE2ETests {
         obj.testLastore(lary, 42L);
         assertThat(lary[0]).isEqualTo(42L);
         assertThat(obj.testLaload(lary)).isEqualTo(42L);
+
+        assertThat(obj.testNewarray(10)).hasSize(10);
     }
 
     @Test

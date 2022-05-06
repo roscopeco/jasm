@@ -13,4 +13,6 @@ public interface PrimArrayTests {
     int testIaload(final int[] in);
     void testLastore(final long[] in, final long testval);
     long testLaload(final long[] in);
+
+    int[] testNewarray(int size);
 }

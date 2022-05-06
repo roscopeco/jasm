@@ -1115,6 +1115,18 @@ class LexerInstructionTests {
     }
 
     @Test
+    void shouldLexNewarray() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Newarray.jasm", lexer -> {
+            assertNextToken(lexer)
+                .hasType(JasmLexer.NEWARRAY);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.TYPE_INT);
+        });
+    }
+
+
+    @Test
     void shouldLexPutField() {
         runInstructionTest("com/roscopeco/jasm/insntest/PutField.jasm", lexer -> assertTokens(lexer, tokens -> {
             tokens.next().hasType(JasmLexer.PUTFIELD);

@@ -880,6 +880,23 @@ class JasmAssemblingVisitor(
             super.visitInsn_new(ctx)
         }
 
+        override fun visitInsn_newarray(ctx: JasmParser.Insn_newarrayContext) {
+            methodVisitor.visitIntInsn(Opcodes.NEWARRAY, typeForNewarray(ctx.prim_type()))
+            super.visitInsn_newarray(ctx)
+        }
+
+        private fun typeForNewarray(ctx: JasmParser.Prim_typeContext) = when {
+            ctx.TYPE_BOOL() != null     -> Opcodes.T_BOOLEAN
+            ctx.TYPE_BYTE() != null     -> Opcodes.T_BYTE
+            ctx.TYPE_CHAR() != null     -> Opcodes.T_CHAR
+            ctx.TYPE_DOUBLE() != null   -> Opcodes.T_DOUBLE
+            ctx.TYPE_FLOAT() != null    -> Opcodes.T_FLOAT
+            ctx.TYPE_INT() != null      -> Opcodes.T_INT
+            ctx.TYPE_LONG() != null     -> Opcodes.T_LONG
+            ctx.TYPE_SHORT() != null    -> Opcodes.T_SHORT
+            else -> throw SyntaxErrorException("Unknown primitive type for newarray " + ctx.text)
+        }
+
         override fun visitInsn_putfield(ctx: JasmParser.Insn_putfieldContext) {
             methodVisitor.visitFieldInsn(
                 Opcodes.PUTFIELD,
