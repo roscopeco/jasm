@@ -1,0 +1,5 @@
+class com/roscopeco/jasm/insntest/Jsr {
+    insnTest()V {
+        jsr label
+    }
+}

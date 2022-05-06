@@ -1,0 +1,5 @@
+class com/roscopeco/jasm/insntest/Ret {
+    insnTest()V {
+        ret 1
+    }
+}

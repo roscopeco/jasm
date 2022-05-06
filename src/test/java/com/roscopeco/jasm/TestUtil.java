@@ -22,6 +22,7 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.TokenStream;
 import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.util.TraceClassVisitor;
 import org.opentest4j.AssertionFailedError;
 
@@ -175,8 +176,9 @@ public class TestUtil {
         return iface.cast(instantiate(implementation));
     }
 
-    public static byte[] assemble(final String testCase) {
-        final var bytes = new JasmAssembler(testCase, () -> inputStreamForTestCase(testCase)).assemble();
+    public static byte[] assemble(final String testCase, final int formatVersion) {
+        final var bytes
+            = new JasmAssembler(testCase, formatVersion, () -> inputStreamForTestCase(testCase)).assemble();
 
         if (Boolean.parseBoolean(System.getProperty("jasmTestDumpClass"))) {
             final var classReader = new ClassReader(bytes);
@@ -189,7 +191,11 @@ public class TestUtil {
     }
 
     public static Class<?> assembleAndDefine(final String testCase) {
-        return defineClass(assemble(testCase));
+        return defineClass(assemble(testCase, Opcodes.V17));
+    }
+
+    public static Class<?> assembleAndDefine(final String testCase, final int formatVersion) {
+        return defineClass(assemble(testCase, formatVersion));
     }
 
     public static Class<?> defineClass(final byte[] bytes) {

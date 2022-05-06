@@ -1,0 +1,19 @@
+public class com/roscopeco/jasm/JsrRetTest implements com/roscopeco/jasm/model/JsrRetTest {
+    public testJsrAndRet()I {
+        iconst 1
+        jsr subroutine
+        ireturn
+
+    subroutine:
+        astore 1
+        iconst 1
+        iadd
+        ret 1
+    }
+
+    public <init>()V {
+        aload 0
+        invokespecial java/lang/Object.<init>()V
+        return
+    }
+}

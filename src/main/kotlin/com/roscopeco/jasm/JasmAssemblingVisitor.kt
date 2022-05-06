@@ -52,7 +52,7 @@ class JasmAssemblingVisitor(
 
     override fun visitClass(ctx: JasmParser.ClassContext) {
         visitor.visit(
-            Opcodes.V17,
+            classFormat,
             modifiers.mapModifiers(ctx.type_modifier()),
             ctx.classname().text,
             null,
@@ -710,6 +710,9 @@ class JasmAssemblingVisitor(
             super.visitInsn_ixor(ctx)
         }
 
+        override fun visitInsn_jsr(ctx: JasmParser.Insn_jsrContext)
+                = methodVisitor.visitJumpInsn(Opcodes.JSR, getLabel(ctx.NAME().text).label)
+
         override fun visitInsn_l2d(ctx: JasmParser.Insn_l2dContext) {
             methodVisitor.visitInsn(Opcodes.L2D)
             super.visitInsn_l2d(ctx)
@@ -886,6 +889,9 @@ class JasmAssemblingVisitor(
             methodVisitor.visitInsn(Opcodes.POP2)
             super.visitInsn_pop2(ctx)
         }
+
+        override fun visitInsn_ret(ctx: JasmParser.Insn_retContext)
+            = methodVisitor.visitIntInsn(Opcodes.RET, ctx.int_atom().text.toInt())
 
         override fun visitInsn_putfield(ctx: JasmParser.Insn_putfieldContext) {
             methodVisitor.visitFieldInsn(

@@ -870,11 +870,23 @@ class LexerInstructionTests {
     void shouldLexIstore() {
         runInstructionTest("com/roscopeco/jasm/insntest/Istore.jasm", lexer -> {
             assertNextToken(lexer)
-                    .hasType(JasmLexer.ISTORE);
+                .hasType(JasmLexer.ISTORE);
 
             assertNextToken(lexer)
-                    .hasType(JasmLexer.INT)
-                    .hasText("0");
+                .hasType(JasmLexer.INT)
+                .hasText("0");
+        });
+    }
+
+    @Test
+    void shouldLexJsr() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Jsr.jasm", lexer -> {
+            assertNextToken(lexer)
+                .hasType(JasmLexer.JSR);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.NAME)
+                .hasText("label");
         });
     }
 
@@ -1169,6 +1181,18 @@ class LexerInstructionTests {
                 .hasType(JasmLexer.QNAME)
                 .hasText("java/lang/String");
         }));
+    }
+
+    @Test
+    void shouldLexRet() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Ret.jasm", lexer -> {
+            assertNextToken(lexer)
+                .hasType(JasmLexer.RET);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.INT)
+                .hasText("1");
+        });
     }
 
     @ParameterizedTest

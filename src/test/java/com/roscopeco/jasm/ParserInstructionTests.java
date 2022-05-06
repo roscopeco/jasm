@@ -135,10 +135,13 @@ class ParserInstructionTests {
             Arguments.of("Iload.jasm", 0, (BiFunction<CodeSequenceAssert, Integer, CodeSequenceAssert>) CodeSequenceAssert::iload),
             Arguments.of("Instanceof.jasm", "java/lang/Object", (BiFunction<CodeSequenceAssert, String, CodeSequenceAssert>) CodeSequenceAssert::instance_of),
             Arguments.of("Istore.jasm", 0, (BiFunction<CodeSequenceAssert, Integer, CodeSequenceAssert>) CodeSequenceAssert::istore),
+            Arguments.of("Jsr.jasm", "label", (BiFunction<CodeSequenceAssert, String, CodeSequenceAssert>) CodeSequenceAssert::jsr),
             Arguments.of("Lconst.jasm", 1, (BiFunction<CodeSequenceAssert, Integer, CodeSequenceAssert>) CodeSequenceAssert::lconst),
             Arguments.of("Lload.jasm", 0, (BiFunction<CodeSequenceAssert, Integer, CodeSequenceAssert>) CodeSequenceAssert::lload),
             Arguments.of("Lstore.jasm", 0, (BiFunction<CodeSequenceAssert, Integer, CodeSequenceAssert>) CodeSequenceAssert::lstore),
-            Arguments.of("New.jasm", "java/util/ArrayList", (BiFunction<CodeSequenceAssert, String, CodeSequenceAssert>) CodeSequenceAssert::anew)
+            Arguments.of("New.jasm", "java/util/ArrayList", (BiFunction<CodeSequenceAssert, String, CodeSequenceAssert>) CodeSequenceAssert::anew),
+            Arguments.of("Ret.jasm", 1, (BiFunction<CodeSequenceAssert, Integer, CodeSequenceAssert>) CodeSequenceAssert::ret),
+            Arguments.of("Newarray.jasm", "I", (BiFunction<CodeSequenceAssert, String, CodeSequenceAssert>) CodeSequenceAssert::newarray)
         );
     }
 

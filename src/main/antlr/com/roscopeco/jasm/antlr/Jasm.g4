@@ -165,6 +165,7 @@ membername
  | ISUB
  | IUSHR
  | IXOR
+ | JSR
  | L2D
  | L2F
  | L2I
@@ -200,6 +201,7 @@ membername
  | PUTFIELD
  | PUTSTATIC
  | RETURN
+ | RET
  ;
 
 type
@@ -391,6 +393,7 @@ instruction
  | insn_isub
  | insn_iushr
  | insn_ixor
+ | insn_jsr
  | insn_l2d
  | insn_l2f
  | insn_l2i
@@ -426,6 +429,7 @@ instruction
  | insn_putfield
  | insn_putstatic
  | insn_return
+ | insn_ret
  | label
  ;
 
@@ -889,6 +893,10 @@ insn_ixor
  : IXOR
  ;
 
+insn_jsr
+ : JSR NAME
+ ;
+
 insn_l2d
  : L2D
  ;
@@ -1033,6 +1041,10 @@ insn_return
  : RETURN
  ;
 
+insn_ret
+ : RET int_atom
+ ;
+
 label
  : LABEL
  ;
@@ -1042,19 +1054,10 @@ owner
  | NAME
  ;
 
-atom
- : int_atom
- | float_atom
- | bool_atom
- | name_atom
- | string_atom
- ;
-
 int_atom    : INT;
 float_atom  : FLOAT;
 bool_atom   : (TRUE | FALSE);
-name_atom   : NAME;
-string_atom: STRING;
+string_atom : STRING;
 
 LPAREN  : '(';
 RPAREN  : ')';
@@ -1202,6 +1205,7 @@ ISTORE          : 'istore';
 ISUB            : 'isub';
 IUSHR           : 'iushr';
 IXOR            : 'ixor';
+JSR             : 'jsr';
 L2D             : 'l2d';
 L2F             : 'l2f';
 L2I             : 'l2i';
@@ -1237,6 +1241,7 @@ POP2            : 'pop2';
 PUTFIELD        : 'putfield';
 PUTSTATIC       : 'putstatic';
 RETURN          : 'return';
+RET             : 'ret';
 
 NEWINVOKESPECIAL: 'newinvokespecial';
 CONSTDYNAMIC    : 'constdynamic';

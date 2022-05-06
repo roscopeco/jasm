@@ -19,6 +19,7 @@ import com.roscopeco.jasm.model.Interface1;
 import com.roscopeco.jasm.model.Interface2;
 import com.roscopeco.jasm.model.IfNullNonNullTest;
 import com.roscopeco.jasm.model.InvokedynamicTest;
+import com.roscopeco.jasm.model.JsrRetTest;
 import com.roscopeco.jasm.model.LdcAconstAreturn;
 import com.roscopeco.jasm.model.LoadsAndStoresTest;
 import com.roscopeco.jasm.model.LongMathTests;
@@ -28,6 +29,7 @@ import com.roscopeco.jasm.model.RefArrayTests;
 import com.roscopeco.jasm.model.Superclass;
 import com.roscopeco.jasm.model.SwitchTests;
 import org.junit.jupiter.api.Test;
+import org.objectweb.asm.Opcodes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -787,7 +789,7 @@ class JasmE2ETests {
     }
 
     @Test
-    void shouldAssemblePopsNamesToValidJavaClass() {
+    void shouldAssemblePopsTestToValidJavaClass() {
         final var clz = assembleAndDefine("com/roscopeco/jasm/PopsTest.jasm");
 
         assertThat(clz.getName()).isEqualTo("com.roscopeco.jasm.PopsTest");
@@ -801,5 +803,22 @@ class JasmE2ETests {
 
         assertThat(obj.testPop()).isEqualTo(1);
         assertThat(obj.testPop2()).isEqualTo(1);
+    }
+
+    @Test
+    void shouldAssembleJsrRetTestToValidJavaClass() {
+        // Not supported with stack frames (format 50, Java 1.6), so generate a class for that 1.5 for this test...
+        final var clz = assembleAndDefine("com/roscopeco/jasm/JsrRetTest.jasm", Opcodes.V1_5);
+
+        assertThat(clz.getName()).isEqualTo("com.roscopeco.jasm.JsrRetTest");
+
+        assertThat(clz.getDeclaredClasses()).isEmpty();
+        assertThat(clz.getDeclaredFields()).isEmpty();
+        assertThat(clz.getDeclaredConstructors()).hasSize(1);
+        assertThat(clz.getDeclaredMethods()).hasSize(1);
+
+        final var obj = instantiate(clz, JsrRetTest.class);
+
+        assertThat(obj.testJsrAndRet()).isEqualTo(2);
     }
 }

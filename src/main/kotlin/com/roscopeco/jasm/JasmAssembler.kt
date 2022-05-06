@@ -27,7 +27,11 @@ import java.util.function.Supplier
  * @param unitName The (display) name of the compilation unit
  * @param source A supplier of `InputStream`
  */
-class JasmAssembler(private val unitName: String, private val classFormat: Int, private val source: Supplier<InputStream>) {
+class JasmAssembler(
+    private val unitName: String,
+    private val classFormat: Int,
+    private val source: Supplier<InputStream>,
+) {
 
     /**
      * Convenience constructor which will use the class format for Java 17 (61.0).
@@ -50,12 +54,12 @@ class JasmAssembler(private val unitName: String, private val classFormat: Int, 
                     CommonTokenStream(
                         buildLexer(
                             Objects.requireNonNull(CharStreams.fromStream(input),
-                                "Failed to open stream for ${unitName}")
+                                "Failed to open stream for $unitName")
                         )
                     )
                 )
                 val classWriter =
-                    ClassWriter(ClassWriter.COMPUTE_FRAMES)
+                    ClassWriter(if (classFormat >= Opcodes.V1_6) ClassWriter.COMPUTE_FRAMES else ClassWriter.COMPUTE_MAXS)
                 val assembler = JasmAssemblingVisitor(classWriter, unitName, classFormat)
 
                 parser.class_().accept(assembler)

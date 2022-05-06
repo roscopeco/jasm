@@ -445,6 +445,10 @@ class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private
 
     fun ixor() = genericNoOperandCheck("ixor", InstructionContext::insn_ixor)
 
+    fun jsr(expected: String) = genericStringOperandCheck("jsr", expected, InstructionContext::insn_jsr) {
+        jsr -> jsr.NAME().text
+    }
+
     fun l2d() = genericNoOperandCheck("l2d", InstructionContext::insn_l2d)
 
     fun l2f() = genericNoOperandCheck("l2f", InstructionContext::insn_l2f)
@@ -617,6 +621,9 @@ class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private
             newarray -> newarray.prim_type().text
     }
 
+    fun ret(expected: Int) = genericIntOperandCheck("ret", expected, InstructionContext::insn_ret) {
+            ret -> ret.int_atom().text
+    }
 
     fun putField(expectedOwner: String, expectedName: String, expectedDescriptor: String) =
         genericFieldAccessCheck(
