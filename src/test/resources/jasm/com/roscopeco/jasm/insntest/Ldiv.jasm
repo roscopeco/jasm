@@ -1,0 +1,5 @@
+class com/roscopeco/jasm/insntest/Ldiv {
+    insnTest()V {
+        ldiv
+    }
+}

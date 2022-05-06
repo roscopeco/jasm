@@ -1,0 +1,141 @@
+public class com/roscopeco/jasm/LongMathTests implements com/roscopeco/jasm/model/LongMathTests {
+    public testL2d(long) double {
+        lload 1
+        l2d
+        dreturn
+    }
+
+    public testL2f(long) float {
+        lload 1
+        l2f
+        freturn
+    }
+
+    public testL2i(long) int {
+        lload 1 
+        l2i
+        ireturn
+    }
+
+    public testLadd(long, long) long {
+        lload 1
+        lload 3
+
+        ladd
+
+        lreturn
+    }
+
+    public testLand(long, long) long {
+        lload 1
+        lload 3
+
+        land
+
+        lreturn
+    }
+
+    public testLcmp(long, long) int {
+        lload 1
+        lload 3
+
+        lcmp
+
+        ireturn
+    }
+
+    public testLdiv(long, long) long {
+        lload 1
+        lload 3
+
+        ldiv
+
+        lreturn
+    }
+
+    public testLmul(long, long) long {
+        lload 1
+        lload 3
+
+        lmul
+
+        lreturn
+    }
+
+    public testLneg(long) long {
+        lload 1
+
+        lneg
+
+        lreturn
+    }
+
+    public testLor(long, long) long {
+        lload 1
+        lload 3
+
+        lor
+
+        lreturn
+    }
+
+    public testLrem(long, long) long {
+        lload 1
+        lload 3
+
+        lrem
+
+        lreturn
+    }
+
+    public testLshl(long, int) long {
+        lload 1
+        iload 3
+
+        lshl
+
+        lreturn
+    }
+
+    public testLshr(long, int) long {
+        lload 1
+        iload 3
+
+        lshr
+
+        lreturn
+    }
+
+    public testLsub(long, long) long {
+        lload 1
+        lload 3
+
+        lsub
+
+        lreturn
+    }
+
+    public testLushr(long, int) long {
+        lload 1
+        iload 3
+
+        lushr
+
+        lreturn
+    }
+
+    public testLxor(long, long) long {
+        lload 1
+        lload 3
+
+        lxor
+
+        lreturn
+    }
+
+    public <init>()V {
+        aload 0
+        invokespecial java/lang/Object.<init>()V
+        return
+    }
+}

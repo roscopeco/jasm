@@ -1,0 +1,5 @@
+class com/roscopeco/jasm/insntest/Lushr {
+    insnTest()V {
+        lushr
+    }
+}

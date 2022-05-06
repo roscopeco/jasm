@@ -21,6 +21,7 @@ import com.roscopeco.jasm.model.IfNullNonNullTest;
 import com.roscopeco.jasm.model.InvokedynamicTest;
 import com.roscopeco.jasm.model.LdcAconstAreturn;
 import com.roscopeco.jasm.model.LoadsAndStoresTest;
+import com.roscopeco.jasm.model.LongMathTests;
 import com.roscopeco.jasm.model.PrimArrayTests;
 import com.roscopeco.jasm.model.RefArrayTests;
 import com.roscopeco.jasm.model.Superclass;
@@ -743,5 +744,39 @@ class JasmE2ETests {
         assertThat(obj.testLookupswitch(999)).isEqualTo("No match");
         assertThat(obj.testLookupswitch(1000)).isEqualTo("Thousand");
         assertThat(obj.testLookupswitch(1001)).isEqualTo("No match");
+    }
+
+    @Test
+    void shouldAssembleLongMathTestsToValidJavaClass() {
+        final var clz = assembleAndDefine("com/roscopeco/jasm/LongMathTests.jasm");
+
+        assertThat(clz.getName()).isEqualTo("com.roscopeco.jasm.LongMathTests");
+
+        assertThat(clz.getDeclaredClasses()).isEmpty();
+        assertThat(clz.getDeclaredFields()).isEmpty();
+        assertThat(clz.getDeclaredConstructors()).hasSize(1);
+        assertThat(clz.getDeclaredMethods()).hasSize(16);
+
+        final var obj = instantiate(clz, LongMathTests.class);
+
+        assertThat(obj.testL2d(1001)).isEqualTo(1001d);
+        assertThat(obj.testL2f(1001)).isEqualTo(1001f);
+        assertThat(obj.testL2i(Integer.MAX_VALUE)).isEqualTo(Integer.MAX_VALUE);
+        assertThat(obj.testLadd(10, 20)).isEqualTo(30);
+        assertThat(obj.testLand(0x6, 0x4)).isEqualTo(0x4);
+        assertThat(obj.testLcmp(10, 1)).isEqualTo(1);
+        assertThat(obj.testLcmp(1, 10)).isEqualTo(-1);
+        assertThat(obj.testLcmp(1, 1)).isEqualTo(0);
+        assertThat(obj.testLdiv(20, 10)).isEqualTo(2);
+        assertThat(obj.testLmul(10, 20)).isEqualTo(200);
+        assertThat(obj.testLneg(10)).isEqualTo(-10);
+        assertThat(obj.testLor(0x2, 0x4)).isEqualTo(0x6);
+        assertThat(obj.testLrem(20, 15)).isEqualTo(5);
+        assertThat(obj.testLshl(0x1, 0x2)).isEqualTo(0x4);
+        assertThat(obj.testLshr(0x10, 0x2)).isEqualTo(0x4);
+        assertThat(obj.testLsub(20, 10)).isEqualTo(10);
+        assertThat(obj.testLxor(0x7, 0x5)).isEqualTo(0x2);
+        assertThat(obj.testLshr(-16, 2)).isEqualTo(-4);
+        assertThat(obj.testLushr(-16, 2)).isEqualTo(4611686018427387900L);
     }
 }

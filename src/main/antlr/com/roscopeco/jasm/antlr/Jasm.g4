@@ -165,13 +165,34 @@ membername
  | ISUB
  | IUSHR
  | IXOR
+ | L2D
+ | L2F
+ | L2I
+ | LADD
  | LALOAD
+ | LAND
  | LASTORE
+ | LCMP
+ | LCONST
  | LDC
+ | LDIV
  | LLOAD
+ | LMUL
+ | LNEG
  | LOOKUPSWITCH
+ | LOR
+ | LREM
  | LRETURN
+ | LSHL
+ | LSHR
  | LSTORE
+ | LSUB
+ | LUSHR
+ | LXOR
+ | NEW
+ | PUTFIELD
+ | PUTSTATIC
+ | RETURN
  | NEW
  | PUTFIELD
  | PUTSTATIC
@@ -367,13 +388,30 @@ instruction
  | insn_isub
  | insn_iushr
  | insn_ixor
+ | insn_l2d
+ | insn_l2f
+ | insn_l2i
+ | insn_ladd
  | insn_laload
+ | insn_land
  | insn_lastore
+ | insn_lcmp
+ | insn_lconst
  | insn_ldc
+ | insn_ldiv
  | insn_lload
+ | insn_lmul
+ | insn_lneg
  | insn_lookupswitch
+ | insn_lor
+ | insn_lrem
  | insn_lreturn
+ | insn_lshl
+ | insn_lshr
  | insn_lstore
+ | insn_lsub
+ | insn_lushr
+ | insn_lxor
  | insn_new
  | insn_putfield
  | insn_putstatic
@@ -654,7 +692,12 @@ insn_iastore
  ;
 
 insn_iconst
- : ICONST atom
+ : ICONST ilconst_atom
+ ;
+
+ilconst_atom
+ : int_atom
+ | bool_atom
  ;
 
 insn_idiv
@@ -836,20 +879,60 @@ insn_ixor
  : IXOR
  ;
 
+insn_l2d
+ : L2D
+ ;
+
+insn_l2f
+ : L2F
+ ;
+
+insn_l2i
+ : L2I
+ ;
+
+insn_ladd
+ : LADD
+ ;
+
 insn_laload
  : LALOAD
+ ;
+
+insn_land
+ : LAND
  ;
 
 insn_lastore
  : LASTORE
  ;
 
+insn_lcmp
+ : LCMP
+ ;
+
+insn_lconst
+ : LCONST ilconst_atom
+ ;
+
 insn_ldc
  : LDC const_arg
  ;
 
+insn_ldiv
+ : LDIV
+ ;
+
 insn_lload
  : LLOAD int_atom
+ ;
+
+insn_lmul
+ : LMUL
+ ;
+
+insn_lneg
+ : LNEG
  ;
 
 insn_lookupswitch
@@ -860,12 +943,40 @@ switch_case
  : (int_atom COLON NAME COMMA?)
  ;
 
+insn_lor
+ : LOR
+ ;
+
+insn_lrem
+ : LREM
+ ;
+
 insn_lreturn
  : LRETURN
  ;
 
+insn_lshl
+ : LSHL
+ ;
+
+insn_lshr
+ : LSHR
+ ;
+
 insn_lstore
  : LSTORE int_atom
+ ;
+
+insn_lsub
+ : LSUB
+ ;
+
+insn_lushr
+ : LUSHR
+ ;
+
+insn_lxor
+ : LXOR
  ;
 
 insn_new
@@ -1053,13 +1164,30 @@ ISTORE          : 'istore';
 ISUB            : 'isub';
 IUSHR           : 'iushr';
 IXOR            : 'ixor';
+L2D             : 'l2d';
+L2F             : 'l2f';
+L2I             : 'l2i';
+LADD            : 'ladd';
 LALOAD          : 'laload';
+LAND            : 'land';
 LASTORE         : 'lastore';
+LCMP            : 'lcmp';
+LCONST          : 'lconst';
 LDC             : 'ldc';
+LDIV            : 'ldiv';
 LLOAD           : 'lload';
+LMUL            : 'lmul';
+LNEG            : 'lneg';
 LOOKUPSWITCH    : 'lookupswitch';
+LOR             : 'lor';
+LREM            : 'lrem';
 LRETURN         : 'lreturn';
+LSHL            : 'lshl';
+LSHR            : 'lshr';
 LSTORE          : 'lstore';
+LSUB            : 'lsub';
+LUSHR           : 'lushr';
+LXOR            : 'lxor';
 NEW             : 'new';
 PUTFIELD        : 'putfield';
 PUTSTATIC       : 'putstatic';

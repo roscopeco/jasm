@@ -90,9 +90,25 @@ class ParserInstructionTests {
             Arguments.of("Isub.jasm", (Function<CodeSequenceAssert, CodeSequenceAssert>) CodeSequenceAssert::isub),
             Arguments.of("Iushr.jasm", (Function<CodeSequenceAssert, CodeSequenceAssert>) CodeSequenceAssert::iushr),
             Arguments.of("Ixor.jasm", (Function<CodeSequenceAssert, CodeSequenceAssert>) CodeSequenceAssert::ixor),
+            Arguments.of("L2d.jasm", (Function<CodeSequenceAssert, CodeSequenceAssert>) CodeSequenceAssert::l2d),
+            Arguments.of("L2f.jasm", (Function<CodeSequenceAssert, CodeSequenceAssert>) CodeSequenceAssert::l2f),
+            Arguments.of("L2i.jasm", (Function<CodeSequenceAssert, CodeSequenceAssert>) CodeSequenceAssert::l2i),
+            Arguments.of("Ladd.jasm", (Function<CodeSequenceAssert, CodeSequenceAssert>) CodeSequenceAssert::ladd),
             Arguments.of("Laload.jasm", (Function<CodeSequenceAssert, CodeSequenceAssert>) CodeSequenceAssert::laload),
+            Arguments.of("Land.jasm", (Function<CodeSequenceAssert, CodeSequenceAssert>) CodeSequenceAssert::land),
             Arguments.of("Lastore.jasm", (Function<CodeSequenceAssert, CodeSequenceAssert>) CodeSequenceAssert::lastore),
+            Arguments.of("Lcmp.jasm", (Function<CodeSequenceAssert, CodeSequenceAssert>) CodeSequenceAssert::lcmp),
+            Arguments.of("Ldiv.jasm", (Function<CodeSequenceAssert, CodeSequenceAssert>) CodeSequenceAssert::ldiv),
+            Arguments.of("Lmul.jasm", (Function<CodeSequenceAssert, CodeSequenceAssert>) CodeSequenceAssert::lmul),
+            Arguments.of("Lneg.jasm", (Function<CodeSequenceAssert, CodeSequenceAssert>) CodeSequenceAssert::lneg),
+            Arguments.of("Lor.jasm", (Function<CodeSequenceAssert, CodeSequenceAssert>) CodeSequenceAssert::lor),
+            Arguments.of("Lrem.jasm", (Function<CodeSequenceAssert, CodeSequenceAssert>) CodeSequenceAssert::lrem),
             Arguments.of("Lreturn.jasm", (Function<CodeSequenceAssert, CodeSequenceAssert>) CodeSequenceAssert::lreturn),
+            Arguments.of("Lshl.jasm", (Function<CodeSequenceAssert, CodeSequenceAssert>) CodeSequenceAssert::lshl),
+            Arguments.of("Lshr.jasm", (Function<CodeSequenceAssert, CodeSequenceAssert>) CodeSequenceAssert::lshr),
+            Arguments.of("Lsub.jasm", (Function<CodeSequenceAssert, CodeSequenceAssert>) CodeSequenceAssert::lsub),
+            Arguments.of("Lushr.jasm", (Function<CodeSequenceAssert, CodeSequenceAssert>) CodeSequenceAssert::lushr),
+            Arguments.of("Lxor.jasm", (Function<CodeSequenceAssert, CodeSequenceAssert>) CodeSequenceAssert::lxor),
             Arguments.of("Return.jasm", (Function<CodeSequenceAssert, CodeSequenceAssert>) CodeSequenceAssert::vreturn)
         );
     }
@@ -113,6 +129,7 @@ class ParserInstructionTests {
             Arguments.of("Iload.jasm", 0, (BiFunction<CodeSequenceAssert, Integer, CodeSequenceAssert>) CodeSequenceAssert::iload),
             Arguments.of("Instanceof.jasm", "java/lang/Object", (BiFunction<CodeSequenceAssert, String, CodeSequenceAssert>) CodeSequenceAssert::instance_of),
             Arguments.of("Istore.jasm", 0, (BiFunction<CodeSequenceAssert, Integer, CodeSequenceAssert>) CodeSequenceAssert::istore),
+            Arguments.of("Lconst.jasm", 1, (BiFunction<CodeSequenceAssert, Integer, CodeSequenceAssert>) CodeSequenceAssert::lconst),
             Arguments.of("Lload.jasm", 0, (BiFunction<CodeSequenceAssert, Integer, CodeSequenceAssert>) CodeSequenceAssert::lload),
             Arguments.of("Lstore.jasm", 0, (BiFunction<CodeSequenceAssert, Integer, CodeSequenceAssert>) CodeSequenceAssert::lstore),
             Arguments.of("New.jasm", "java/util/ArrayList", (BiFunction<CodeSequenceAssert, String, CodeSequenceAssert>) CodeSequenceAssert::anew)

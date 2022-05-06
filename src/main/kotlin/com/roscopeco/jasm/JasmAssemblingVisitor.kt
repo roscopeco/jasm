@@ -492,7 +492,7 @@ class JasmAssemblingVisitor(
         }
 
         override fun visitInsn_iconst(ctx: JasmParser.Insn_iconstContext) {
-            methodVisitor.visitInsn(generateIconstOpcode(ctx.atom()))
+            methodVisitor.visitInsn(generateIconstOpcode(ctx.ilconst_atom()))
             super.visitInsn_iconst(ctx)
         }
 
@@ -720,9 +720,34 @@ class JasmAssemblingVisitor(
             super.visitInsn_ixor(ctx)
         }
 
+        override fun visitInsn_l2d(ctx: JasmParser.Insn_l2dContext) {
+            methodVisitor.visitInsn(Opcodes.L2D)
+            super.visitInsn_l2d(ctx)
+        }
+
+        override fun visitInsn_l2f(ctx: JasmParser.Insn_l2fContext) {
+            methodVisitor.visitInsn(Opcodes.L2F)
+            super.visitInsn_l2f(ctx)
+        }
+
+        override fun visitInsn_l2i(ctx: JasmParser.Insn_l2iContext) {
+            methodVisitor.visitInsn(Opcodes.L2I)
+            super.visitInsn_l2i(ctx)
+        }
+
+        override fun visitInsn_ladd(ctx: JasmParser.Insn_laddContext) {
+            methodVisitor.visitInsn(Opcodes.LADD)
+            super.visitInsn_ladd(ctx)
+        }
+
         override fun visitInsn_laload(ctx: JasmParser.Insn_laloadContext) {
             methodVisitor.visitInsn(Opcodes.LALOAD)
             super.visitInsn_laload(ctx)
+        }
+
+        override fun visitInsn_land(ctx: JasmParser.Insn_landContext) {
+            methodVisitor.visitInsn(Opcodes.LAND)
+            super.visitInsn_land(ctx)
         }
 
         override fun visitInsn_lastore(ctx: JasmParser.Insn_lastoreContext) {
@@ -730,16 +755,47 @@ class JasmAssemblingVisitor(
             super.visitInsn_lastore(ctx)
         }
 
+        override fun visitInsn_lcmp(ctx: JasmParser.Insn_lcmpContext) {
+            methodVisitor.visitInsn(Opcodes.LCMP)
+            super.visitInsn_lcmp(ctx)
+        }
+
+        override fun visitInsn_lconst(ctx: JasmParser.Insn_lconstContext) {
+            when (ctx.ilconst_atom().text) {
+                "0", "false" -> methodVisitor.visitInsn(Opcodes.LCONST_0)
+                "1", "true" -> methodVisitor.visitInsn(Opcodes.LCONST_1)
+                else -> throw SyntaxErrorException(
+                    "Invalid operand to LCONST: ${ctx.ilconst_atom().text} (expecting 0, 1, true or false)")
+            }
+            
+            super.visitInsn_lconst(ctx)
+        }
+
         override fun visitInsn_ldc(ctx: JasmParser.Insn_ldcContext) {
             methodVisitor.visitLdcInsn(generateSingleConstArg(0, ctx.const_arg()))
             super.visitInsn_ldc(ctx)
         }
 
+        override fun visitInsn_ldiv(ctx: JasmParser.Insn_ldivContext) {
+            methodVisitor.visitInsn(Opcodes.LDIV)
+            super.visitInsn_ldiv(ctx)
+        }
+        
         override fun visitInsn_lload(ctx: JasmParser.Insn_lloadContext) {
             methodVisitor.visitVarInsn(Opcodes.LLOAD, ctx.int_atom().text.toInt())
             super.visitInsn_lload(ctx)
         }
 
+        override fun visitInsn_lmul(ctx: JasmParser.Insn_lmulContext) {
+            methodVisitor.visitInsn(Opcodes.LMUL)
+            super.visitInsn_lmul(ctx)
+        }
+        
+        override fun visitInsn_lneg(ctx: JasmParser.Insn_lnegContext) {
+            methodVisitor.visitInsn(Opcodes.LNEG)
+            super.visitInsn_lneg(ctx)
+        }
+        
         override fun visitInsn_lookupswitch(ctx: JasmParser.Insn_lookupswitchContext) {
             val keys = ctx.switch_case().map { c -> c.int_atom().text.toInt() }.toIntArray()
             val labels = ctx.switch_case().map { c -> getLabel(c.NAME().text).label }.toTypedArray()
@@ -753,14 +809,49 @@ class JasmAssemblingVisitor(
             super.visitInsn_lookupswitch(ctx)
         }
 
+        override fun visitInsn_lor(ctx: JasmParser.Insn_lorContext) {
+            methodVisitor.visitInsn(Opcodes.LOR)
+            super.visitInsn_lor(ctx)
+        }
+
+        override fun visitInsn_lrem(ctx: JasmParser.Insn_lremContext) {
+            methodVisitor.visitInsn(Opcodes.LREM)
+            super.visitInsn_lrem(ctx)
+        }
+
         override fun visitInsn_lreturn(ctx: JasmParser.Insn_lreturnContext) {
             methodVisitor.visitInsn(Opcodes.LRETURN)
             super.visitInsn_lreturn(ctx)
         }
 
+        override fun visitInsn_lshl(ctx: JasmParser.Insn_lshlContext) {
+            methodVisitor.visitInsn(Opcodes.LSHL)
+            super.visitInsn_lshl(ctx)
+        }
+
+        override fun visitInsn_lshr(ctx: JasmParser.Insn_lshrContext) {
+            methodVisitor.visitInsn(Opcodes.LSHR)
+            super.visitInsn_lshr(ctx)
+        }
+
         override fun visitInsn_lstore(ctx: JasmParser.Insn_lstoreContext) {
             methodVisitor.visitVarInsn(Opcodes.LSTORE, ctx.int_atom().text.toInt())
             super.visitInsn_lstore(ctx)
+        }
+
+        override fun visitInsn_lsub(ctx: JasmParser.Insn_lsubContext) {
+            methodVisitor.visitInsn(Opcodes.LSUB)
+            super.visitInsn_lsub(ctx)
+        }
+
+        override fun visitInsn_lushr(ctx: JasmParser.Insn_lushrContext) {
+            methodVisitor.visitInsn(Opcodes.LUSHR)
+            super.visitInsn_lushr(ctx)
+        }
+
+        override fun visitInsn_lxor(ctx: JasmParser.Insn_lxorContext) {
+            methodVisitor.visitInsn(Opcodes.LXOR)
+            super.visitInsn_lxor(ctx)
         }
 
         override fun visitInsn_new(ctx: JasmParser.Insn_newContext) {
@@ -840,20 +931,16 @@ class JasmAssemblingVisitor(
             }
         }
 
-        private fun generateIconstOpcode(ctx: JasmParser.AtomContext): Int = try {
-                when (ctx.text.toInt()) {
-                    -1 -> Opcodes.ICONST_M1
-                    0  -> Opcodes.ICONST_0
-                    1  -> Opcodes.ICONST_1
-                    2  -> Opcodes.ICONST_2
-                    3  -> Opcodes.ICONST_3
-                    4  -> Opcodes.ICONST_4
-                    5  -> Opcodes.ICONST_5
-                    else -> throw SyntaxErrorException("Invalid operand to ICONST (must be in range -1 to 5)")
-                }
-            } catch (e: NumberFormatException) {
-                throw SyntaxErrorException("Invalid non-numeric operand for ICONST (found '" + ctx.text + "')")
-            }
+        private fun generateIconstOpcode(ctx: JasmParser.Ilconst_atomContext): Int = when (ctx.text) {
+            "-1"        -> Opcodes.ICONST_M1
+            "0", "false"-> Opcodes.ICONST_0
+            "1", "true" -> Opcodes.ICONST_1
+            "2"         -> Opcodes.ICONST_2
+            "3"         -> Opcodes.ICONST_3
+            "4"         -> Opcodes.ICONST_4
+            "5"         -> Opcodes.ICONST_5
+            else -> throw SyntaxErrorException("Invalid operand to ICONST (must be in range -1 to 5, or true/false)")
+        }
 
         private fun normaliseLabelName(labelName: String) =
             if (labelName.endsWith(":")) {

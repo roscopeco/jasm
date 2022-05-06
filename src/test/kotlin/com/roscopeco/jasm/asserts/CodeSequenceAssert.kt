@@ -217,7 +217,7 @@ class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private
     fun iastore() = genericNoOperandCheck("iastore", InstructionContext::insn_iastore)
 
     fun iconst(expected: Int) = genericIntOperandCheck("iconst", expected, InstructionContext::insn_iconst) {
-            iconst -> iconst.atom().text
+            iconst -> iconst.ilconst_atom().text
     }
 
     fun idiv() = genericNoOperandCheck("idiv", InstructionContext::insn_idiv)
@@ -441,8 +441,25 @@ class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private
 
     fun ixor() = genericNoOperandCheck("ixor", InstructionContext::insn_ixor)
 
+    fun l2d() = genericNoOperandCheck("l2d", InstructionContext::insn_l2d)
+
+    fun l2f() = genericNoOperandCheck("l2f", InstructionContext::insn_l2f)
+
+    fun l2i() = genericNoOperandCheck("l2i", InstructionContext::insn_l2i)
+
+    fun ladd() = genericNoOperandCheck("ladd", InstructionContext::insn_ladd)
+
     fun laload() = genericNoOperandCheck("laload", InstructionContext::insn_laload)
+
+    fun land() = genericNoOperandCheck("land", InstructionContext::insn_land)
+
     fun lastore() = genericNoOperandCheck("lastore", InstructionContext::insn_lastore)
+
+    fun lcmp() = genericNoOperandCheck("lcmp", InstructionContext::insn_lcmp)
+
+    fun lconst(expected: Int) = genericIntOperandCheck("lconst", expected, InstructionContext::insn_lconst) {
+            lconst -> lconst.ilconst_atom().text
+    }
 
     fun label(expected: String) = genericStringOperandCheck("label", expected, InstructionContext::label) {
             label -> label.text
@@ -467,9 +484,15 @@ class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private
             constarg -> expected == cleanConstantString(constarg.string_atom().text)
     }
 
+    fun ldiv() = genericNoOperandCheck("ldiv", InstructionContext::insn_ldiv)
+
     fun lload(expected: Int) = genericIntOperandCheck("lload", expected, InstructionContext::insn_lload) {
             lload -> lload.int_atom().text
     }
+
+    fun lmul() = genericNoOperandCheck("lmul", InstructionContext::insn_lmul)
+
+    fun lneg() = genericNoOperandCheck("lneg", InstructionContext::insn_lneg)
 
     fun lookupswitch(): SwitchAssert {
         isNotNull
@@ -521,11 +544,25 @@ class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private
         fun end() = this@CodeSequenceAssert
     }
 
+    fun lor() = genericNoOperandCheck("lor", InstructionContext::insn_lor)
+
+    fun lrem() = genericNoOperandCheck("lrem", InstructionContext::insn_lrem)
+
     fun lreturn() = genericNoOperandCheck("lreturn", InstructionContext::insn_lreturn)
+
+    fun lshl() = genericNoOperandCheck("lshl", InstructionContext::insn_lshl)
+
+    fun lshr() = genericNoOperandCheck("lshr", InstructionContext::insn_lshr)
 
     fun lstore(expected: Int) = genericIntOperandCheck("lstore", expected, InstructionContext::insn_lstore) {
             lstore -> lstore.int_atom().text
     }
+
+    fun lsub() = genericNoOperandCheck("lsub", InstructionContext::insn_lsub)
+
+    fun lushr() = genericNoOperandCheck("lushr", InstructionContext::insn_lushr)
+
+    fun lxor() = genericNoOperandCheck("lxor", InstructionContext::insn_lxor)
 
     fun putField(expectedOwner: String, expectedName: String, expectedDescriptor: String) =
         genericFieldAccessCheck(

@@ -1,0 +1,5 @@
+class com/roscopeco/jasm/insntest/L2d {
+    insnTest()V {
+        l2d
+    }
+}

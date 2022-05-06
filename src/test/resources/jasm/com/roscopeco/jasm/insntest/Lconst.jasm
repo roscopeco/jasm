@@ -1,0 +1,5 @@
+class com/roscopeco/jasm/insntest/Lconst {
+    insnTest()V {
+        lconst 1
+    }
+}

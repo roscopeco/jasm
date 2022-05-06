@@ -87,9 +87,25 @@ class LexerInstructionTests {
             Arguments.of("Isub", JasmLexer.ISUB),
             Arguments.of("Iushr", JasmLexer.IUSHR),
             Arguments.of("Ixor", JasmLexer.IXOR),
+            Arguments.of("L2d", JasmLexer.L2D),
+            Arguments.of("L2f", JasmLexer.L2F),
+            Arguments.of("L2i", JasmLexer.L2I),
+            Arguments.of("Ladd", JasmLexer.LADD),
             Arguments.of("Laload", JasmLexer.LALOAD),
+            Arguments.of("Land", JasmLexer.LAND),
             Arguments.of("Lastore", JasmLexer.LASTORE),
+            Arguments.of("Lcmp", JasmLexer.LCMP),
+            Arguments.of("Ldiv", JasmLexer.LDIV),
+            Arguments.of("Lmul", JasmLexer.LMUL),
+            Arguments.of("Lneg", JasmLexer.LNEG),
+            Arguments.of("Lor", JasmLexer.LOR),
+            Arguments.of("Lrem", JasmLexer.LREM),
             Arguments.of("Lreturn", JasmLexer.LRETURN),
+            Arguments.of("Lshl", JasmLexer.LSHL),
+            Arguments.of("Lshr", JasmLexer.LSHR),
+            Arguments.of("Lsub", JasmLexer.LSUB),
+            Arguments.of("Lushr", JasmLexer.LUSHR),
+            Arguments.of("Lxor", JasmLexer.LXOR),
             Arguments.of("Return", JasmLexer.RETURN)
         );
     }
@@ -934,6 +950,19 @@ class LexerInstructionTests {
             lexer.nextToken();
         });
     }
+
+    @Test
+    void shouldLexLconst() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Lconst.jasm", lexer -> {
+            assertNextToken(lexer)
+                .hasType(JasmLexer.LCONST);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.INT)
+                .hasText("1");
+        });
+    }
+
 
     @Test
     void shouldLexLload() {
