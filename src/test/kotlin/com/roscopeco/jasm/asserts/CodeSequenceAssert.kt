@@ -499,6 +499,7 @@ class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private
 
         Assertions.assertThat(actual.stat()).isNotNull
         hasNotUnderflowed("lookupswitch")
+
         val stat = actual.stat()[pc]
         val lookup = stat?.instruction()?.insn_lookupswitch()
 
@@ -567,6 +568,40 @@ class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private
     fun monitorenter() = genericNoOperandCheck("monitorenter", InstructionContext::insn_monitorenter)
 
     fun monitorexit() = genericNoOperandCheck("monitorexit", InstructionContext::insn_monitorexit)
+
+    fun multianewarray(expectedType: String) = multianewarray(expectedType, null)
+    fun multianewarray(expectedType: String, expectedDims: Int?): CodeSequenceAssert {
+        isNotNull
+        Assertions.assertThat(actual.stat()).isNotNull
+        hasNotUnderflowed("invokedynamic")
+
+        val stat = actual.stat()[pc]
+        val insn = stat.instruction()?.insn_multianewarray()
+
+        if (insn == null) {
+            failWithMessage("Expected multianewarray at pc($pc) but was ${insn?.text ?: "<unknown>"}")
+        } else {
+            if (expectedType != insn.array_type().text) {
+                failWithMessage("Expected multianewarray with type $expectedType at pc($pc) but "
+                        + "had type ${insn.array_type().text} instead")
+            }
+
+            if (expectedDims != null) {
+                if (expectedDims != insn.int_atom().text.toInt()) {
+                    failWithMessage("Expected multianewarray with $expectedDims dimensions at pc($pc) but "
+                            + "had ${insn.int_atom().text} dimensions instead")
+                }
+            } else {
+                if (insn.int_atom() != null) {
+                    failWithMessage("Expected multianewarray with automatic dimensions at pc($pc) but "
+                            + "had explicit ${insn.int_atom().text} dimensions instead")
+                }
+            }
+        }
+
+        pc++
+        return this
+    }
 
     fun putField(expectedOwner: String, expectedName: String, expectedDescriptor: String) =
         genericFieldAccessCheck(

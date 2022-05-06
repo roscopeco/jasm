@@ -288,10 +288,22 @@ class ParserInstructionTests {
     void shouldParseLookupswitch() {
         runInstructionTest("com/roscopeco/jasm/insntest/Lookupswitch.jasm", code -> code
             .lookupswitch()
-            .withDefault("defaultLabel")
-            .withCase(1, "oneLabel")
-            .withCase(100, "hundredLabel")
-            .withCase(1000, "thousandLabel")
+                .withDefault("defaultLabel")
+                .withCase(1, "oneLabel")
+                .withCase(100, "hundredLabel")
+                .withCase(1000, "thousandLabel")
+                .end()
+            .noMoreCode()
+        );
+    }
+
+    @Test
+    void shouldParseMultianewarray() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Multianewarray.jasm", code -> code
+            .multianewarray("[[java/lang/String")
+            .multianewarray("[[java/lang/String", 2)
+            .multianewarray("[[java/lang/String", 2)
+            .noMoreCode()
         );
     }
 

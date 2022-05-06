@@ -191,6 +191,7 @@ membername
  | LXOR
  | MONITORENTER
  | MONITOREXIT
+ | MULTIANEWARRAY
  | NEW
  | PUTFIELD
  | PUTSTATIC
@@ -412,6 +413,7 @@ instruction
  | insn_lxor
  | insn_monitorenter
  | insn_monitorexit
+ | insn_multianewarray
  | insn_new
  | insn_putfield
  | insn_putstatic
@@ -987,6 +989,10 @@ insn_monitorexit
  : MONITOREXIT
  ;
 
+insn_multianewarray
+ : MULTIANEWARRAY array_type COMMA? int_atom?
+ ;
+
 insn_new
  : NEW QNAME
  ;
@@ -1198,6 +1204,7 @@ LUSHR           : 'lushr';
 LXOR            : 'lxor';
 MONITORENTER    : 'monitorenter';
 MONITOREXIT     : 'monitorexit';
+MULTIANEWARRAY  : 'multianewarray';
 NEW             : 'new';
 PUTFIELD        : 'putfield';
 PUTSTATIC       : 'putstatic';

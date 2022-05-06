@@ -864,6 +864,17 @@ class JasmAssemblingVisitor(
             super.visitInsn_monitorexit(ctx)
         }
 
+        override fun visitInsn_multianewarray(ctx: JasmParser.Insn_multianewarrayContext) {
+            methodVisitor.visitMultiANewArrayInsn(
+                TypeVisitor().visitArray_type(ctx.array_type()),
+                getOrComputeArrayDims(ctx)
+            )
+            super.visitInsn_multianewarray(ctx)
+        }
+
+        private fun getOrComputeArrayDims(ctx: JasmParser.Insn_multianewarrayContext)
+                = ctx.int_atom()?.text?.toInt() ?: ctx.array_type().text.count { c -> '[' == c }
+
         override fun visitInsn_new(ctx: JasmParser.Insn_newContext) {
             methodVisitor.visitTypeInsn(Opcodes.NEW, ctx.QNAME().text)
             super.visitInsn_new(ctx)

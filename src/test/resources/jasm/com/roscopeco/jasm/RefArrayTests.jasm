@@ -26,6 +26,20 @@ public class com/roscopeco/jasm/RefArrayTests implements com/roscopeco/jasm/mode
         ireturn
     }
 
+    public multiANewArrayTest()[[java/lang/String {
+        iconst 2
+        iconst 1
+        multianewarray [[java/lang/String
+        areturn
+    }
+
+    public multiANewArrayExplicitDimsTest()[[java/lang/String {
+        iconst 2
+        iconst 1
+        multianewarray [[java/lang/String, 2
+        areturn
+    }
+
     public <init>()V {
         aload 0
         invokespecial java/lang/Object.<init>()V

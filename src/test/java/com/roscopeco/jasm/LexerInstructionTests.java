@@ -1044,6 +1044,65 @@ class LexerInstructionTests {
     }
 
     @Test
+    void shouldLexMultianewarray() {
+        runInstructionTest("com/roscopeco/jasm/insntest/Multianewarray.jasm", lexer -> {
+            // First form, automatic dimensions
+            assertNextToken(lexer)
+                .hasType(JasmLexer.MULTIANEWARRAY);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.LSQUARE);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.LSQUARE);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.QNAME)
+                .hasText("java/lang/String");
+
+            // Second form, explicit dimensions
+            assertNextToken(lexer)
+                .hasType(JasmLexer.MULTIANEWARRAY);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.LSQUARE);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.LSQUARE);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.QNAME)
+                .hasText("java/lang/String");
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.INT)
+                .hasText("2");
+
+            // Second form, explicit dimensions with optional comma
+            assertNextToken(lexer)
+                .hasType(JasmLexer.MULTIANEWARRAY);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.LSQUARE);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.LSQUARE);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.QNAME)
+                .hasText("java/lang/String");
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.COMMA);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.INT)
+                .hasText("2");
+
+        });
+    }
+
+    @Test
     void shouldLexNew() {
         runInstructionTest("com/roscopeco/jasm/insntest/New.jasm", lexer -> {
             assertNextToken(lexer)

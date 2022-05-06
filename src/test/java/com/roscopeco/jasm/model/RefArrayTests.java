@@ -5,4 +5,7 @@ public interface RefArrayTests {
     void putInArray(final String[] array, final String data);
     String getFromArray(final String[] array);
     int getArrayLength(final String[] array);
+
+    String[][] multiANewArrayTest();
+    String[][] multiANewArrayExplicitDimsTest();
 }

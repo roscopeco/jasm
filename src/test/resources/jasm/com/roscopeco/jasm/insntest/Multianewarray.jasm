@@ -1,0 +1,7 @@
+class com/roscopeco/jasm/insntest/Multianewarray {
+    insnTest()V {
+        multianewarray [[java/lang/String
+        multianewarray [[java/lang/String 2
+        multianewarray [[java/lang/String, 2
+    }
+}

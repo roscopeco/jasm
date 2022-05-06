@@ -465,7 +465,7 @@ class JasmE2ETests {
         assertThat(clz.getDeclaredClasses()).isEmpty();
         assertThat(clz.getDeclaredFields()).isEmpty();
         assertThat(clz.getDeclaredConstructors()).hasSize(1);
-        assertThat(clz.getDeclaredMethods()).hasSize(4);
+        assertThat(clz.getDeclaredMethods()).hasSize(6);
 
         final var obj = instantiate(clz, RefArrayTests.class);
         final var ary = obj.newSingleElementArray();
@@ -479,6 +479,9 @@ class JasmE2ETests {
         assertThat(obj.getFromArray(ary)).isEqualTo("Testing");
 
         assertThat(obj.getArrayLength(ary)).isEqualTo(1);
+
+        assertThat(obj.multiANewArrayTest()).hasSameDimensionsAs(new String[2][1]);
+        assertThat(obj.multiANewArrayExplicitDimsTest()).hasSameDimensionsAs(new String[2][1]);
     }
 
     @Test
