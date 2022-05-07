@@ -22,7 +22,7 @@ class Jasm(private val args: ToolArgs) : Runnable {
                     Jasm(args).run()
                 }
             } catch (e: ParameterException) {
-                System.err.println("ERROR: " + e.message)
+                System.err.println("\u001B[1;31mERROR:\u001B[0m " + e.message)
             }
         }
     }
@@ -31,7 +31,7 @@ class Jasm(private val args: ToolArgs) : Runnable {
         val tasks = Tasks.createTasks(args)
 
         if (tasks.isEmpty()) {
-            println("No input files (specify --help for usage")
+            println("No input files (specify --help for usage)")
         } else {
             val failed = tasks
                 .map { it.perform() }
