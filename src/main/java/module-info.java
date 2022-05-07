@@ -5,6 +5,7 @@
  */
 module com.roscopeco.jasm {
     requires static kotlin.stdlib;
+    requires jcommander;
     requires org.antlr.antlr4.runtime;
     requires transitive org.objectweb.asm;
 
