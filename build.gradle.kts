@@ -7,6 +7,7 @@ plugins {
     id("io.freefair.lombok") version "6.3.0"
     antlr
     `maven-publish`
+    application
 }
 
 group = "com.roscopeco.jasm"
@@ -41,6 +42,11 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.8.2")
     testImplementation("org.assertj:assertj-core:3.22.0")
     testImplementation("org.mockito:mockito-junit-jupiter:4.5.1")
+}
+
+application {
+    mainModule.set("com.roscopeco.jasm") // name defined in module-info.java
+    mainClass.set("com.roscopeco.jasm.tool.Jasm")
 }
 
 tasks.getByName<Test>("test") {

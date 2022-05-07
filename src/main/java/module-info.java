@@ -4,11 +4,11 @@
  * Licensed under the MIT license. See LICENSE.md for details.
  */
 module com.roscopeco.jasm {
-    requires static kotlin.stdlib;
-    requires jcommander;
+    requires kotlin.stdlib;
     requires org.antlr.antlr4.runtime;
     requires transitive org.objectweb.asm;
 
     exports com.roscopeco.jasm;
     exports com.roscopeco.jasm.antlr;
+    exports com.roscopeco.jasm.tool;
 }
