@@ -8,7 +8,6 @@ package com.roscopeco.jasm;
 import com.roscopeco.jasm.asserts.CodeSequenceAssert;
 import lombok.NonNull;
 import org.assertj.core.api.ThrowingConsumer;
-import org.checkerframework.checker.units.qual.C;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
