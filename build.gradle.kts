@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "com.roscopeco.jasm"
-version = "1.0-SNAPSHOT"
+version = "0.1-SNAPSHOT"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
@@ -77,9 +77,7 @@ publishing {
     publications {
         create<MavenPublication>("maven") {
             from(components["java"])
-            groupId = "com.roscopeco.jasm"
             artifactId = "jasm"
-            version = "0.1-SNAPSHOT"
             pom {
                 name.set("JASM")
                 description.set("A JVM Assembler for the modern age")
