@@ -5,13 +5,6 @@
 JASM is an assembler for JVM bytecode. Because how many times have you needed
 _that_ already today?
 
-It shares some things with other similar projects, but has a few advantages:
-
-* It has a nicer syntax than most (YMMV)
-* It's written from the ground up in modern tools
-* It supports all the cool new JVM features that, as a Java programmer, you never got to see
-* It's easily extensible, even I might manage to keep it somewhat up-to-date!
-
 Let's just get this out of the way, shall we?
 
 ```java
@@ -25,7 +18,7 @@ public class com/example/HelloWorld {
 }
 ```
 
-All your favourite instructions (and some you probably forgot about) are supported:
+All your favourite instructions (in fact, nearly _all_ the JVM instructions) are supported:
 
 ```java
 public class com/example/MyClass
@@ -77,11 +70,7 @@ public doBasicInvokeDynamicTest()Ljava/lang/String {
 }
 ```
 
-If you're familiar with method descriptors at this level, you'll notice I've
-had to take some license with them for the poor lexer's sake. This way makes
-it nicer to read (and hand-write) the descriptors though, so I'm keeping it.
-
-Also FWIW there's a smidge of syntactic sugar around types in case you just can't 
+There's a smidge of syntactic sugar around types in case you just can't 
 get used to the JVM internal names (for primitives), so you can do e.g. :
 
 ```java
@@ -92,21 +81,50 @@ public myGreatMethod(int, long, java/util/List) java/util/List {
 }
 ```
 
-(Note though that you still have to use binary names for classes, and descriptors
-still follow the JVM internal ordering. You're free to mix the longhand names 
-with shorthand ones though, and there's no L; needed on reference types :-) ).
+There are lots of examples in [the tests](src/test/resources/jasm) showing the syntax for
+the different instructions and with examples of how they're used.
 
-### How??
+### How?
 
-The main code and most of the test support code is written in Kotlin. Tests 
-themselves are written in Java however, because I felt like mixing it up
-(and wanted to validate the custom AssertJ stuff interop with Java was good).
+#### Requirements
 
-Lexing, parsing and syntax trees are handled by Antlr4 (https://www.antlr.org).
-Bytecode generation is done with ASM (https://asm.ow2.io). Both of these
-projects are awesome and deserve your attention.
+* Java 17 or higher
+* `JAVA_HOME` set up correctly
+* Patience and curiousity :D
 
-### Why??!?
+#### Using the command-line tool
+
+If you [downloaded a binary distribution](https://github.com/roscopeco/jasm/releases) then
+you should be all set. Inside the archive you'll find a `bin/jasm' script that will take
+care of running the command-line tool for you.
+
+To see usage details:
+
+`bin/jasm --help`
+
+To simply assemble a file `src/com/example/MyClass.jasm` to the `classes` directory:
+
+`bin/jasm -i src -o classes com/example/MyClass.jasm`
+
+Notice that you set the source and destination directories, and just pass the relative
+path to the files within them - this is how the assembler creates the class files in the
+appropriate place the JVM expects to find them.
+
+#### Building with Gradle
+
+If you grabbed the source from [Github](https://github.com/roscopeco/jasm) you can 
+easily build a binary distribution with `./gradlew clean assemble` (pun not intended).
+
+#### Using as a library 
+
+If you want to use this as a library (with Maven or Gradle), you'll currently need to
+publish it to your local Maven repository manually. 
+
+`./gradlew clean build publishToMavenLocal`
+
+As it matures a bit and things stabilise, I'll look at putting it in Maven Central.
+
+### Why??
 
 Well, **why not**?
 
@@ -139,7 +157,7 @@ pursuit of this project, how about these (some lifted from Jasmin's README):
 * Teachers - Perhaps you're teaching a compiler course, maybe you could use this
   to introduce students to JVM bytecode, or even as an IL for the compilers.
 
-### Who???!1
+### Who?
 
 JASM is copyright 2022 Ross Bamford (roscopeco AT gmail DOT com). 
 
