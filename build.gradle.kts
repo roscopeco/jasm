@@ -34,7 +34,7 @@ dependencies {
     antlr("org.antlr:antlr4:4.10.1")
 
     implementation("org.ow2.asm:asm:9.3")
-    implementation("com.beust:jcommander:1.82")
+    implementation("com.beust:jcommander:1.75")
 
     testImplementation("org.ow2.asm:asm-util:9.3")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
@@ -47,6 +47,14 @@ dependencies {
 application {
     mainModule.set("com.roscopeco.jasm") // name defined in module-info.java
     mainClass.set("com.roscopeco.jasm.tool.Jasm")
+}
+
+distributions {
+    main {
+        contents {
+            from("README.md", "LICENSE.md")
+        }
+    }
 }
 
 tasks.getByName<Test>("test") {
