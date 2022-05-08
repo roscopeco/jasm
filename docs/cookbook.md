@@ -245,3 +245,90 @@ private static final CONST_FLOAT F = 42.0
 
 Note that this is **only** for static fields, a `SyntaxErrorException` will be thrown if you
 try to use this for non-statics.
+
+#### invokedynamic & constdynamic
+
+`invokedynamic` (and its somewhat-related cousin CONSTDYNAMIC) is quite possibly the best JVM instruction you never 
+heard of. If you're primarily a Java programmer, you almost certainly use it every day without knowing it.
+
+Briefly, `invokedynamic` is a mechanism by which the totally static, single-dispatch JVM supports less-static multiple
+dispatch in a type-safe and hotspot-friendly fashion. Added to ease support for dynamic languages in Java 1.7 (at the
+time mostly focused on JRuby and Groovy) it became a fundamental part of every Java developer's toolkit from Java 8
+onward, without ever being surfaced into the Java language. This was thanks in no small part to the `LambdaMetafactory`
+introduced in J8 to support the new Lambda (and especially method reference) features in the language.
+
+If you're so inclined, you can read more about `invokedynamic` under [JSR-292](https://jcp.org/en/jsr/detail?id=292)
+from back the late 2000s/early 2010s when it was finally released.
+
+Put simply, `invokedynamic` allows one to implement a method call which is linked at runtime. One does this by specifying
+a so-called "bootstrap method" which will be called directly by the JVM when it encounters an `invokedynamic` instruction.
+This method receives a few arguments stacked by the JVM itself, together with an arbitrary number of arguments that are
+specified in the instruction itself (and which are constrained to those types that can be stored in the constant pool, 
+though thanks to CONSTDYNAMIC this is quite flexible). This bootstrap method must then return a 
+`java.lang.invoke.Callsite` which links the dynamic invocation to a regular call.
+
+`invokedynamic` is fully supported by JASM, along with all the variants and argument types. A typical use of the
+instruction looks like this:
+
+```java
+public doBasicInvokeDynamicTest()Ljava/lang/String {
+    invokedynamic get()Ljava/util/function/Supplier {
+        invokestatic java/lang/invoke/LambdaMetafactory.metafactory(
+            Ljava/lang/invoke/MethodHandles$Lookup,
+            Ljava/lang/String,
+            Ljava/lang/invoke/MethodType,
+            Ljava/lang/invoke/MethodType,
+            Ljava/lang/invoke/MethodHandle,
+            Ljava/lang/invoke/MethodType
+        )Ljava/lang/invoke/CallSite
+        [
+            ()Ljava/lang/Object,
+            invokestatic com/roscopeco/jasm/model/TestBootstrap.lambdaGetImpl()Ljava/lang/String,
+            ()Ljava/lang/String
+        ]
+    }
+
+    invokeinterface java/util/function/Supplier.get()Ljava/lang/Object
+    checkcast java/lang/String
+    areturn
+}
+```
+
+while a full-featured one (**note** this is a contrived example intented to demonstrate the syntax):
+
+```java
+        invokedynamic get()java/lang/Object {
+            invokestatic com/roscopeco/jasm/model/TestBootstrap.testBootstrap(
+                java/lang/invoke/MethodHandles$Lookup,
+                java/lang/String,
+                java/lang/invoke/MethodType,
+                I,
+                F,
+                java/lang/String,
+                java/lang/Class,
+                java/lang/invoke/MethodHandle,
+                java/lang/invoke/MethodType,
+                java/lang/String,
+            )java/lang/invoke/CallSite
+            [
+                42,                                                                                             // Static int
+                10.0,                                                                                           // Static float
+                "Bootstrap test",                                                                               // Static string
+                java/util/List,                                                                                 // Static class
+                invokestatic com/roscopeco/jasm/model/TestBootstrap.staticForHandleTest()java/lang/String,      // Static MethodHandle
+                (java/lang/String)I,                                                                            // Static MethodType
+                constdynamic DYNAMIC_CONST_FOR_TEST java/lang/String {                                          // Dynamic const
+                    invokestatic java/lang/invoke/ConstantBootstraps.getStaticFinal(
+                        java/lang/invoke/MethodHandles$Lookup,
+                        java/lang/String,
+                        java/lang/Class,
+                        java/lang/Class
+                    )java/lang/Object
+                    [com/roscopeco/jasm/model/TestBootstrap]
+                }
+            ]
+        }
+```
+
+See [here](https://github.com/roscopeco/jasm/blob/main/src/test/java/com/roscopeco/jasm/model/TestBootstrap.java) for
+the bootstrap method and other support used in that example.
