@@ -9,6 +9,8 @@ plugins {
     `maven-publish`
     application
     id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
+    id("org.jetbrains.dokka") version "1.6.21"
+    signing
 }
 
 group = "com.roscopeco.jasm"
@@ -17,6 +19,7 @@ version = "0.1"
 java {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
+    withSourcesJar()
 }
 
 tasks.withType<KotlinCompile>().all {
@@ -74,11 +77,20 @@ tasks.withType<LombokTask>().all {
     dependsOn(tasks.getByName<AntlrTask>("generateGrammarSource"))
 }
 
+val dokkaHtml by tasks.getting(org.jetbrains.dokka.gradle.DokkaTask::class)
+
+val javadocJar: TaskProvider<Jar> by tasks.registering(Jar::class) {
+    dependsOn(dokkaHtml)
+    archiveClassifier.set("javadoc")
+    from(dokkaHtml.outputDirectory)
+}
+
 publishing {
     publications {
         create<MavenPublication>("maven") {
             from(components["java"])
             artifactId = "jasm"
+            artifact(javadocJar)
             pom {
                 name.set("JASM")
                 description.set("A JVM Assembler for the modern age")
@@ -110,5 +122,9 @@ nexusPublishing {
     repositories {
         sonatype()
     }
+}
+
+signing {
+    sign(publishing.publications)
 }
 

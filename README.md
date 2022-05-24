@@ -117,12 +117,16 @@ easily build a binary distribution with `./gradlew clean assemble` (pun not inte
 
 #### Using as a library 
 
-If you want to use this as a library (with Maven or Gradle), you'll currently need to
-publish it to your local Maven repository manually. 
+If you want to use this as a library (with Maven or Gradle), you'll want to 
+pull in the dependency from Maven central.
 
-`./gradlew clean build publishToMavenLocal`
+E.g. (for Gradle):
 
-As it matures a bit and things stabilise, I'll look at putting it in Maven Central.
+```kotlin
+dependencies {
+  implementation("com.roscopeco.jasm:jasm:0.1")
+}
+```
 
 ### Why??
 
