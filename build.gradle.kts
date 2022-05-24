@@ -8,6 +8,7 @@ plugins {
     antlr
     `maven-publish`
     application
+    id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
 }
 
 group = "com.roscopeco.jasm"
@@ -104,3 +105,10 @@ publishing {
         }
     }
 }
+
+nexusPublishing {
+    repositories {
+        sonatype()
+    }
+}
+
