@@ -12,7 +12,7 @@ plugins {
 }
 
 group = "com.roscopeco.jasm"
-version = "0.1-SNAPSHOT"
+version = "0.1"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
