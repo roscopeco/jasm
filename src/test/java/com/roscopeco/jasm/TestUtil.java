@@ -75,8 +75,8 @@ public class TestUtil {
 
     public static Method getAccessibleMethod(final Object receiver, final String name, Class<?>... paramTypes)
             throws NoSuchMethodException {
-        final var m = receiver instanceof Class<?> c
-                ? c.getDeclaredMethod(name, paramTypes)
+        final var m = receiver instanceof Class<?>
+                ? ((Class<?>)receiver).getDeclaredMethod(name, paramTypes)
                 : receiver.getClass().getDeclaredMethod(name, paramTypes);
 
         m.setAccessible(true);
@@ -191,7 +191,7 @@ public class TestUtil {
     }
 
     public static Class<?> assembleAndDefine(final String testCase) {
-        return defineClass(assemble(testCase, Opcodes.V17));
+        return defineClass(assemble(testCase, Opcodes.V11));
     }
 
     public static Class<?> assembleAndDefine(final String testCase, final int formatVersion) {

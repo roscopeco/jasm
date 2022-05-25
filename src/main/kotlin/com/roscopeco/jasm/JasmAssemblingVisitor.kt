@@ -14,6 +14,7 @@ import org.objectweb.asm.Label
 import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Type
+import java.util.stream.Collectors
 import java.util.stream.IntStream
 
 /**
@@ -569,7 +570,7 @@ class JasmAssemblingVisitor(
                 default,
                 *IntStream.rangeClosed(min, max).mapToObj {
                         i -> pairs.find { p -> p.first == i }?.second ?: default
-                }.toList().toTypedArray()
+                }.collect(Collectors.toList()).toTypedArray()
             )
         }
 
