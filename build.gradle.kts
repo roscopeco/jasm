@@ -14,17 +14,17 @@ plugins {
 }
 
 group = "com.roscopeco.jasm"
-version = "0.1"
+version = "0.2.0"
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
     withSourcesJar()
 }
 
 tasks.withType<KotlinCompile>().all {
     kotlinOptions {
-        jvmTarget = "17"
+        jvmTarget = "11"
     }
 
     dependsOn(tasks.getByName<AntlrTask>("generateGrammarSource"))
@@ -128,3 +128,8 @@ signing {
     sign(publishing.publications)
 }
 
+tasks.findByName("generateGrammarSource")?.let { dependency ->
+    listOf("sourcesJar", "dokkaHtml")
+        .mapNotNull { tasks.findByName(it) }
+        .forEach { dependent -> dependent.dependsOn(dependency) }
+}

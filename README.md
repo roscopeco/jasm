@@ -35,7 +35,7 @@ implements com/example/SomeInterface {
 
         aload 1
         ldc "CANARY"
-        invokeinterface java/util/List.add(Ljava/lang/Object)Z 
+        invokeinterface java/util/List.add(java/lang/Object)Z 
         
     skipAdd:
         return
@@ -47,24 +47,24 @@ And you can use advanced JVM features like `invokedynamic` and dynamic constants
 directly available in the Java language:
 
 ```java
-public doBasicInvokeDynamicTest()Ljava/lang/String {
-    invokedynamic get()Ljava/util/function/Supplier {
+public doBasicInvokeDynamicTest()java/lang/String {
+    invokedynamic get()java/util/function/Supplier {
         invokestatic java/lang/invoke/LambdaMetafactory.metafactory(
-            Ljava/lang/invoke/MethodHandles$Lookup,
-            Ljava/lang/String,
-            Ljava/lang/invoke/MethodType,
-            Ljava/lang/invoke/MethodType,
-            Ljava/lang/invoke/MethodHandle,
-            Ljava/lang/invoke/MethodType
-        )Ljava/lang/invoke/CallSite
+            java/lang/invoke/MethodHandles$Lookup,
+            java/lang/String,
+            java/lang/invoke/MethodType,
+            java/lang/invoke/MethodType,
+            java/lang/invoke/MethodHandle,
+            java/lang/invoke/MethodType,
+        )java/lang/invoke/CallSite
         [
-            ()Ljava/lang/Object,
-            invokestatic com/roscopeco/jasm/model/TestBootstrap.lambdaGetImpl()Ljava/lang/String,
-            ()Ljava/lang/String
+            ()java/lang/Object,
+            invokestatic com/roscopeco/jasm/model/TestBootstrap.lambdaGetImpl()java/lang/String,
+            ()java/lang/String
         ]
     }
-
-    invokeinterface java/util/function/Supplier.get()Ljava/lang/Object
+    
+    invokeinterface java/util/function/Supplier.get()java/lang/Object
     checkcast java/lang/String
     areturn
 }
@@ -88,7 +88,7 @@ the different instructions and with examples of how they're used.
 
 #### Requirements
 
-* Java 17 or higher
+* Java 11 or higher
 * `JAVA_HOME` set up correctly
 * Patience and curiousity :D
 
@@ -124,7 +124,7 @@ E.g. (for Gradle):
 
 ```kotlin
 dependencies {
-  implementation("com.roscopeco.jasm:jasm:0.1")
+  implementation("com.roscopeco.jasm:jasm:0.2.0")
 }
 ```
 
