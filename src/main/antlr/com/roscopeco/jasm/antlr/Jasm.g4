@@ -1355,11 +1355,11 @@ STRING
  ;
 
 COMMENT
- : '//' ~[\r\n]* -> skip
+ : '//' ~[\r\n]* -> channel(HIDDEN)
  ;
 
 SPACE
- : [ \t\r\n] -> skip
+ : [ \t\r\n] -> channel(HIDDEN)
  ;
 
 OTHER

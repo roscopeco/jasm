@@ -13,6 +13,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static com.roscopeco.jasm.TestUtil.testCaseLexer;
@@ -937,36 +938,7 @@ class LexerInstructionTests {
                     .hasText("java/util/List");
 
             // Skip remaining tokens, the rest of these are covered by the invokedynamic lex tests
-            lexer.nextToken();
-            lexer.nextToken();
-            lexer.nextToken();
-            lexer.nextToken();
-            lexer.nextToken();
-            lexer.nextToken();
-            lexer.nextToken();
-            lexer.nextToken();
-            lexer.nextToken();
-            lexer.nextToken();
-            lexer.nextToken();
-            lexer.nextToken();
-            lexer.nextToken();
-            lexer.nextToken();
-            lexer.nextToken();
-            lexer.nextToken();
-            lexer.nextToken();
-            lexer.nextToken();
-            lexer.nextToken();
-            lexer.nextToken();
-            lexer.nextToken();
-            lexer.nextToken();
-            lexer.nextToken();
-            lexer.nextToken();
-            lexer.nextToken();
-            lexer.nextToken();
-            lexer.nextToken();
-            lexer.nextToken();
-            lexer.nextToken();
-            lexer.nextToken();
+            IntStream.range(0, 100).forEach(i -> lexer.nextToken());
         });
     }
 
