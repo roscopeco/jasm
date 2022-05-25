@@ -625,4 +625,36 @@ class LexerTests {
             /* no need to go further */
         });
     }
+
+    @Test
+    void shouldLexClassWithBlockComments() {
+        final var lexer = testCaseLexer("ClassWithBlockComments.jasm");
+
+        assertNextToken(lexer)
+            .hasType(JasmLexer.BLOCK_COMMENT)
+            .hasText("/*\n" +
+                     " * This is a block comment\n" +
+                     " */");
+
+        assertNextToken(lexer)
+            .hasType(JasmLexer.CLASS);
+
+        assertNextToken(lexer)
+            .hasType(JasmLexer.BLOCK_COMMENT)
+            .hasText("/* This is also a block comment */");
+
+        assertNextToken(lexer)
+            .hasType(JasmLexer.NAME)
+            .hasText("ClassWithBlockComments");
+
+        assertNextToken(lexer)
+            .hasType(JasmLexer.LBRACE);
+
+        assertNextToken(lexer)
+            .hasType(JasmLexer.RBRACE);
+
+        assertNextToken(lexer)
+            .hasType(JasmLexer.EOF);
+    }
+
 }

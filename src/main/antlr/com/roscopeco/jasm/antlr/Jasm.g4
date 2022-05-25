@@ -1358,6 +1358,10 @@ COMMENT
  : '//' ~[\r\n]* -> channel(HIDDEN)
  ;
 
+BLOCK_COMMENT
+ : '/*' .*? ('*/' | EOF)  -> channel(HIDDEN)
+ ;
+
 SPACE
  : [ \t\r\n] -> channel(HIDDEN)
  ;
