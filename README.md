@@ -124,7 +124,7 @@ E.g. (for Gradle):
 
 ```kotlin
 dependencies {
-  implementation("com.roscopeco.jasm:jasm:0.1")
+  implementation("com.roscopeco.jasm:jasm:0.2.0")
 }
 ```
 
