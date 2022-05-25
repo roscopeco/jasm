@@ -191,7 +191,7 @@ public class TestUtil {
     }
 
     public static Class<?> assembleAndDefine(final String testCase) {
-        return defineClass(assemble(testCase, Opcodes.V17));
+        return defineClass(assemble(testCase, Opcodes.V11));
     }
 
     public static Class<?> assembleAndDefine(final String testCase, final int formatVersion) {

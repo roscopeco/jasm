@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -83,7 +84,7 @@ class ModifiersTest {
             final var mock = mock(JasmParser.Method_modifierContext.class);
             when(mock.getText()).thenReturn(mockFunc);
             return mock;
-        }).toList();
+        }).collect(Collectors.toList());
 
         assertThat(modifiers.mapModifiers(mockContexts)).isEqualTo(expectedBitmap);
     }
