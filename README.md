@@ -88,7 +88,7 @@ the different instructions and with examples of how they're used.
 
 #### Requirements
 
-* Java 17 or higher
+* Java 11 or higher
 * `JAVA_HOME` set up correctly
 * Patience and curiousity :D
 
