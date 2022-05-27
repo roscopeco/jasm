@@ -58,9 +58,9 @@ class JasmAssemblingVisitor(
             modifiers.mapModifiers(ctx.type_modifier()),
             ctx.classname().text,
             null,
-            ctx.extends_()?.QNAME()?.text ?: "java/lang/Object",
-            ctx.implements_()?.QNAME()
-                ?.map { it.text }
+            ctx.extends_()?.classname()?.QNAME()?.text ?: "java/lang/Object",
+            ctx.implements_()?.classname()
+                ?.map { it.QNAME().text }
                 ?.toTypedArray()
                     ?: emptyArray<String>()
         )

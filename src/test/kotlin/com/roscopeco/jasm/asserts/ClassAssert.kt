@@ -27,7 +27,7 @@ class ClassAssert internal constructor(actual: ClassContext) :
     fun hasSuperclass(qname: String): ClassAssert {
         isNotNull
         
-        if (qname != actual.extends_().QNAME().text) {
+        if (qname != actual.extends_().classname().QNAME().text) {
             failWithMessage(
                 "Expected class to extend '"
                         + qname
@@ -42,7 +42,7 @@ class ClassAssert internal constructor(actual: ClassContext) :
     fun hasInterfaces(vararg qnames: String?): ClassAssert {
         isNotNull
 
-        assertThat(actual.implements_().QNAME().stream().map { obj: TerminalNode -> obj.text })
+        assertThat(actual.implements_().classname().stream().map { obj -> obj.QNAME().text })
             .`as`("Interface list")
             .containsExactly(*qnames)
 

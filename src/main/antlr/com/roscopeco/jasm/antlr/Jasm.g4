@@ -14,11 +14,11 @@ classname
  ;
 
 extends
- : EXTENDS QNAME
+ : EXTENDS classname
  ;
 
 implements
- : IMPLEMENTS QNAME QNAME*
+ : IMPLEMENTS classname (COMMA? classname)*
  ;
 
 member
@@ -1101,6 +1101,7 @@ SEMI    : ';';  /* not used but defining for saner errors in descriptors */
 COLON   : ':';
 COMMA   : ',';
 EQUALS  : '=';
+DQUOTE  : '"';
 
 CLASS       : 'class';
 EXTENDS     : 'extends';
@@ -1351,7 +1352,7 @@ FLOAT
  ;
 
 STRING
- : '"' (~["\r\n] | '""')* '"'
+ : DQUOTE (~["\r\n] | '""')* DQUOTE
  ;
 
 COMMENT
