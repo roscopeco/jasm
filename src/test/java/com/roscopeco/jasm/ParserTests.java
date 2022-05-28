@@ -26,12 +26,22 @@ class ParserTests {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { "EmptyClass", "ClassWithEmptyBody", "com/roscopeco/jasm/EmptyClassInPackage" })
+    @ValueSource(strings = { "EmptyClass", "com/roscopeco/jasm/EmptyClassInPackage" })
     void shouldParseEmptyClasses(@NonNull final String testCase) {
         final var test  = doParse(testCase + ".jasm");
 
         assertClass(test).hasName(testCase);
-        assertThat(test.member()).isEmpty();
+
+        assertThat(test.classbody()).isNull();
+    }
+
+    @Test
+    void shouldParseClassWithEmptyBody() {
+        final var test  = doParse("ClassWithEmptyBody.jasm");
+
+        assertClass(test).hasName("ClassWithEmptyBody");
+
+        assertThat(test.classbody().member()).isEmpty();
     }
 
     @Test
@@ -39,7 +49,7 @@ class ParserTests {
         final var test  = doParse("PublicFinalEmptyClass.jasm");
 
         assertClass(test).hasName("PublicFinalEmptyClass");
-        assertThat(test.member()).isEmpty();
+        assertThat(test.classbody()).isNull();
 
         assertThat(test.type_modifier(0).PUBLIC()).isNotNull();
         assertThat(test.type_modifier(1).FINAL()).isNotNull();
@@ -51,8 +61,8 @@ class ParserTests {
 
         assertClass(test).hasName("ClassWithSingleField");
 
-        assertThat(test.member()).hasSize(1);
-        final var member = test.member(0);
+        assertThat(test.classbody().member()).hasSize(1);
+        final var member = test.classbody().member(0);
 
         assertMember(member)
                 .isNotNull()
@@ -67,8 +77,8 @@ class ParserTests {
 
         assertClass(test).hasName("ClassWithObjectField");
 
-        assertThat(test.member()).hasSize(1);
-        final var member = test.member(0);
+        assertThat(test.classbody().member()).hasSize(1);
+        final var member = test.classbody().member(0);
 
         assertMember(member)
                 .isNotNull()
@@ -83,8 +93,8 @@ class ParserTests {
 
         assertClass(test).hasName("com/roscopeco/jasm/MinimalMethodTest");
 
-        assertThat(test.member()).hasSize(1);
-        final var member = test.member(0);
+        assertThat(test.classbody().member()).hasSize(1);
+        final var member = test.classbody().member(0);
 
         assertMember(member)
                 .isNotNull()
@@ -102,30 +112,30 @@ class ParserTests {
 
         assertClass(test).hasName("MethodArgParsingTests");
 
-        assertThat(test.member()).hasSize(4);
+        assertThat(test.classbody().member()).hasSize(4);
 
-        assertMember(test.member(0))
+        assertMember(test.classbody().member(0))
                 .isNotNull()
                 .isMethod()
                 .hasName("allPrims")
                 .isVoid()
                 .hasDescriptor("(BCDFIJSZ)V");
 
-        assertMember(test.member(1))
+        assertMember(test.classbody().member(1))
                 .isNotNull()
                 .isMethod()
                 .hasName("allPrimsLong")
                 .isVoid()
                 .hasDescriptor("(BCDFIJSZ)V");
 
-        assertMember(test.member(2))
+        assertMember(test.classbody().member(2))
                 .isNotNull()
                 .isMethod()
                 .hasName("allRefs")
                 .isReference("java/util/List")
                 .hasDescriptor("(Ljava/lang/String;Ljava/lang/Object;)Ljava/util/List;");
 
-        assertMember(test.member(3))
+        assertMember(test.classbody().member(3))
                 .isNotNull()
                 .isMethod()
                 .hasName("mixPrimsAndRefsLongAndShort")
@@ -150,24 +160,24 @@ class ParserTests {
         assertClass(test)
                 .hasName("com/roscopeco/jasm/ArrayTypesTest");
 
-        assertThat(test.member()).hasSize(5);
+        assertThat(test.classbody().member()).hasSize(5);
 
-        assertMember(test.member(0))
+        assertMember(test.classbody().member(0))
                 .isField()
                 .hasName("arrayField")
                 .isReference("[java/lang/Object");
 
-        assertMember(test.member(1))
+        assertMember(test.classbody().member(1))
                 .isField()
                 .hasName("primArrayField")
                 .isPrimitiveArray("[I");
 
-        assertMember(test.member(2))
+        assertMember(test.classbody().member(2))
                 .isMethod()
                 .hasName("arrayTypesTest")
                 .hasDescriptor("([I[[Ljava/lang/String;)Ljava/lang/Object;");
 
-        assertMember(test.member(3))
+        assertMember(test.classbody().member(3))
                 .isMethod()
                 .hasName("arrayTypesTestMultiple")
                 .hasDescriptor("(Ljava/lang/String;[Ljava/lang/String;[[Ljava/lang/String;)Ljava/lang/Object;");

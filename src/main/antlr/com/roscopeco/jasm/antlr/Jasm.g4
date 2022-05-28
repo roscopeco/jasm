@@ -5,7 +5,7 @@ grammar Jasm;
 }
 
 class
- : type_modifier* CLASS classname extends? implements? (LBRACE member* RBRACE)?
+ : type_modifier* CLASS classname extends? implements? (LBRACE classbody RBRACE)?
  ;
 
 classname
@@ -14,11 +14,15 @@ classname
  ;
 
 extends
- : EXTENDS QNAME
+ : EXTENDS classname
  ;
 
 implements
- : IMPLEMENTS QNAME QNAME*
+ : IMPLEMENTS classname (COMMA? classname)*
+ ;
+
+classbody
+ : member*
  ;
 
 member
@@ -37,7 +41,7 @@ field_initializer
  ;
 
 method
- : method_modifier* membername method_descriptor stat_block
+ : method_modifier* membername method_descriptor (LBRACE stat_block RBRACE)?
  ;
 
 method_descriptor
@@ -284,7 +288,7 @@ method_modifier
  ;
 
 stat_block
- : LBRACE stat* RBRACE
+ : stat*
  ;
 
 stat
@@ -813,7 +817,15 @@ insn_instanceof
  ;
 
 insn_invokedynamic
- : INVOKEDYNAMIC membername method_descriptor LBRACE method_handle (LSQUARE const_arg (COMMA const_arg)* RSQUARE)? RBRACE
+ : INVOKEDYNAMIC membername method_descriptor LBRACE invokedynamic_body RBRACE
+ ;
+
+invokedynamic_body
+ : method_handle (LSQUARE const_args RSQUARE)?
+ ;
+
+const_args
+ : const_arg (COMMA const_arg)*
  ;
 
 method_handle
@@ -1101,6 +1113,7 @@ SEMI    : ';';  /* not used but defining for saner errors in descriptors */
 COLON   : ':';
 COMMA   : ',';
 EQUALS  : '=';
+DQUOTE  : '"';
 
 CLASS       : 'class';
 EXTENDS     : 'extends';
@@ -1351,15 +1364,19 @@ FLOAT
  ;
 
 STRING
- : '"' (~["\r\n] | '""')* '"'
+ : DQUOTE (~["\r\n] | '""')* DQUOTE
  ;
 
 COMMENT
- : '//' ~[\r\n]* -> skip
+ : '//' ~[\r\n]* -> channel(HIDDEN)
+ ;
+
+BLOCK_COMMENT
+ : '/*' .*? ('*/' | EOF)  -> channel(HIDDEN)
  ;
 
 SPACE
- : [ \t\r\n] -> skip
+ : [ \t\r\n] -> channel(HIDDEN)
  ;
 
 OTHER
