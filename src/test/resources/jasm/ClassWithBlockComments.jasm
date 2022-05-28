@@ -1,0 +1,6 @@
+/*
+ * This is a block comment
+ */
+class /* This is also a block comment */ ClassWithBlockComments {
+
+}

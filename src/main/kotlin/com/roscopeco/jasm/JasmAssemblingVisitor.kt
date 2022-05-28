@@ -58,9 +58,9 @@ class JasmAssemblingVisitor(
             modifiers.mapModifiers(ctx.type_modifier()),
             ctx.classname().text,
             null,
-            ctx.extends_()?.QNAME()?.text ?: "java/lang/Object",
-            ctx.implements_()?.QNAME()
-                ?.map { it.text }
+            ctx.extends_()?.classname()?.QNAME()?.text ?: "java/lang/Object",
+            ctx.implements_()?.classname()
+                ?.map { it.QNAME().text }
                 ?.toTypedArray()
                     ?: emptyArray<String>()
         )
@@ -371,8 +371,8 @@ class JasmAssemblingVisitor(
                  = methodVisitor.visitInvokeDynamicInsn(
                     ctx.membername().text,
                     TypeVisitor().visitMethod_descriptor(ctx.method_descriptor()),
-                    buildBootstrapHandle(ctx.method_handle()),
-                    *generateConstArgs(ctx.const_arg())
+                    buildBootstrapHandle(ctx.invokedynamic_body().method_handle()),
+                    *generateConstArgs(ctx.invokedynamic_body().const_args().const_arg())
                 )
 
         override fun visitInsn_invokeinterface(ctx: JasmParser.Insn_invokeinterfaceContext)
