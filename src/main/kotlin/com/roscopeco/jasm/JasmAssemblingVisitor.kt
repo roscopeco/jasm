@@ -371,8 +371,8 @@ class JasmAssemblingVisitor(
                  = methodVisitor.visitInvokeDynamicInsn(
                     ctx.membername().text,
                     TypeVisitor().visitMethod_descriptor(ctx.method_descriptor()),
-                    buildBootstrapHandle(ctx.method_handle()),
-                    *generateConstArgs(ctx.const_arg())
+                    buildBootstrapHandle(ctx.invokedynamic_body().method_handle()),
+                    *generateConstArgs(ctx.invokedynamic_body().const_args().const_arg())
                 )
 
         override fun visitInsn_invokeinterface(ctx: JasmParser.Insn_invokeinterfaceContext)

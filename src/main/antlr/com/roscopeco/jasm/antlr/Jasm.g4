@@ -24,7 +24,7 @@ implements
 classbody
  : member*
  ;
- 
+
 member
  : field
  | method
@@ -41,7 +41,7 @@ field_initializer
  ;
 
 method
- : method_modifier* membername method_descriptor stat_block
+ : method_modifier* membername method_descriptor (LBRACE stat_block RBRACE)?
  ;
 
 method_descriptor
@@ -288,7 +288,7 @@ method_modifier
  ;
 
 stat_block
- : LBRACE stat* RBRACE
+ : stat*
  ;
 
 stat
@@ -817,7 +817,15 @@ insn_instanceof
  ;
 
 insn_invokedynamic
- : INVOKEDYNAMIC membername method_descriptor LBRACE method_handle (LSQUARE const_arg (COMMA const_arg)* RSQUARE)? RBRACE
+ : INVOKEDYNAMIC membername method_descriptor LBRACE invokedynamic_body RBRACE
+ ;
+
+invokedynamic_body
+ : method_handle (LSQUARE const_args RSQUARE)?
+ ;
+
+const_args
+ : const_arg (COMMA const_arg)*
  ;
 
 method_handle
