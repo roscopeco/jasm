@@ -374,8 +374,8 @@ class ParserInstructionTests {
     private void runInstructionTest(@NonNull final String testCase, ThrowingConsumer<CodeSequenceAssert> codeAssertions) {
         final var test  = doParse(testCase);
 
-        assertThat(test.member()).hasSize(1);
-        final var member = test.member(0);
+        assertThat(test.classbody().member()).hasSize(1);
+        final var member = test.classbody().member(0);
 
         final var codeAsserter = assertMember(member)
                 .isNotNull()

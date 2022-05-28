@@ -36,7 +36,7 @@ class TokenAssert internal constructor(actual: Token) :
                 "Expected token to have type "
                         + JasmLexer.VOCABULARY.getSymbolicName(expected)
                         + " but was "
-                        + JasmLexer.VOCABULARY.getSymbolicName(actual.type)
+                        + JasmLexer.VOCABULARY.getSymbolicName(actual.type) + "[" + actual.text + "]"
             )
         }
 
