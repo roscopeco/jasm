@@ -5,7 +5,7 @@ grammar Jasm;
 }
 
 class
- : type_modifier* CLASS classname extends? implements? (LBRACE member* RBRACE)?
+ : type_modifier* CLASS classname extends? implements? (LBRACE classbody RBRACE)?
  ;
 
 classname
@@ -21,6 +21,10 @@ implements
  : IMPLEMENTS classname (COMMA? classname)*
  ;
 
+classbody
+ : member*
+ ;
+ 
 member
  : field
  | method
