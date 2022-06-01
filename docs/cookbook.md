@@ -12,7 +12,7 @@
   every instruction. Bear in mind what effect each instruction has on the stack, and take care to manage  
   the stack properly. Remember you can always massage the stack with `POP` and `SWAP` if you need to, but 
   this can usually be avoided with a bit of careful planning. If all else fails the verifier (discussed below) 
-  will pretty-much _always_ catch any stack-related errors before it passes your code.
+  will pretty-much _always_ catch any stack-related com.roscopeco.jasm.errors before it passes your code.
 
 * If you've done any JNI programming, you already have a lot of transferable knowledge that will work here!
 
@@ -26,10 +26,10 @@ The rules used by the verifier change with JVM versions, but classes will be ver
 the rules that the verifier for their particular class format version used (which is why you can still use 
 `JSR` and `RET` on modern JVMs if the classes are targeted to version < 50, for example).
 
-Being an assembler, JASM only provides the bare minimum protection from verifier errors (after all, you might
+Being an assembler, JASM only provides the bare minimum protection from verifier com.roscopeco.jasm.errors (after all, you might
 want to generate deliberately-shady classes to test the verifier or see if you can beat it). 
 
-Most of the time, when you see errors while loading classes assembled with JASM, those errors are
+Most of the time, when you see com.roscopeco.jasm.errors while loading classes assembled with JASM, those com.roscopeco.jasm.errors are
 coming from the verifier. In these cases:
 
 * Check that the stack / locals contain what you think they do (the error message will tell you)

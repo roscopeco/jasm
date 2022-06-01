@@ -1,0 +1,7 @@
+class com/roscopeco/jasm/ClassWithMultipleErrors {
+    private afield V
+
+    provate someMethod() {
+
+    }
+}
