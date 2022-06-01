@@ -843,7 +843,7 @@ class JasmE2ETests {
         assertThatThrownBy(() -> assembleAndDefine("com/roscopeco/jasm/ClassWithMultipleErrors.jasm"))
             .isInstanceOf(AssemblyException.class)
             .hasMessageContaining("ClassWithMultipleErrors.jasm:[4:22]")
-            .hasMessageContaining("mismatched input '(' expecting {'}'")
+            .hasMessageContaining("mismatched input '('")
             .hasMessageContaining("ClassWithMultipleErrors.jasm:[2:4]")
             .hasMessageContaining("Field afield cannot have void type");
     }

@@ -8,5 +8,5 @@ class AssemblyException(val codeErrors: List<BaseError>) : JasmException() {
     }
 
     override val message: String
-        get() = "Errors: $EOL" + codeErrors.joinToString(separator = EOL) { "    $it" }
+        get() = "Errors: $EOL" + codeErrors.joinToString(separator = EOL) { "    ${it.displayMessage}" }
 }

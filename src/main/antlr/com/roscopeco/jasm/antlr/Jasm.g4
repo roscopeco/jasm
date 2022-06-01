@@ -1109,7 +1109,7 @@ LSQUARE : '[';
 RSQUARE : ']';
 DOT     : '.';
 MINUS   : '-';
-SEMI    : ';';  /* not used but defining for saner com.roscopeco.jasm.errors in descriptors */
+SEMI    : ';';  /* not used but defining for saner errors in descriptors */
 COLON   : ':';
 COMMA   : ',';
 EQUALS  : '=';
