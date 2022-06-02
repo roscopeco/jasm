@@ -80,7 +80,7 @@ class JasmAssemblingVisitor(
                 CodeError(
                     unitName,
                     ctx,
-                    "Unexpected value for non-static field ${ctx.membername().text}"
+                    "Unexpected initializer value for non-static field ${ctx.membername().text}"
                 )
             )
         }
@@ -204,7 +204,8 @@ class JasmAssemblingVisitor(
                 0 -> methodVisitor.visitInsn(Opcodes.DCONST_0)
                 1 -> methodVisitor.visitInsn(Opcodes.DCONST_1)
                 else -> errorCollector.addError(
-                    CodeError(unitName, ctx,"Invalid operand to DCONST: ${ctx.int_atom().text} (expecting 0 or 1)")
+                    CodeError(unitName, ctx.int_atom(),
+                        "Invalid operand to DCONST: ${ctx.int_atom().text} (expecting 0 or 1)")
                 )
             }
         }
@@ -259,7 +260,8 @@ class JasmAssemblingVisitor(
             0 -> methodVisitor.visitInsn(Opcodes.FCONST_0)
             1 -> methodVisitor.visitInsn(Opcodes.FCONST_1)
             else -> errorCollector.addError(
-                CodeError(unitName, ctx,"Invalid operand to FCONST: ${ctx.int_atom().text} (expecting 0 or 1)")
+                CodeError(unitName, ctx.int_atom(),
+                    "Invalid operand to FCONST: ${ctx.int_atom().text} (expecting 0 or 1)")
             )
         }
 
@@ -473,7 +475,8 @@ class JasmAssemblingVisitor(
             "0", "false" -> methodVisitor.visitInsn(Opcodes.LCONST_0)
             "1", "true" -> methodVisitor.visitInsn(Opcodes.LCONST_1)
             else -> errorCollector.addError(
-                CodeError(unitName, ctx, "Invalid operand to LCONST: ${ctx.ilconst_atom().text} (expecting 0, 1, true or false)")
+                CodeError(unitName, ctx.ilconst_atom(),
+                    "Invalid operand to LCONST: ${ctx.ilconst_atom().text} (expecting 0, 1, true or false)")
             )
         }
 
@@ -686,7 +689,8 @@ class JasmAssemblingVisitor(
             "5"         -> Opcodes.ICONST_5
             else -> {
                 errorCollector.addError(
-                    CodeError(unitName, ctx, "Invalid operand to ICONST (must be in range -1 to 5, or true/false)")
+                    CodeError(unitName, ctx,
+                        "Invalid operand to ICONST: ${ctx.int_atom().text} (must be in range -1 to 5, or true/false)")
                 )
 
                 Opcodes.ICONST_0
