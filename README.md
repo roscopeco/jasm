@@ -5,6 +5,9 @@
 JASM is an assembler for JVM bytecode. Because how many times have you needed
 _that_ already today?
 
+JASM has a [Gradle plugin](https://github.com/roscopeco/jasm-gradle-plugin) and 
+a (WIP) [Plugin for IntelliJ](https://github.com/roscopeco/jasm-intellij-plugin).
+
 Let's just get this out of the way, shall we?
 
 ```java
@@ -18,7 +21,7 @@ public class com/example/HelloWorld {
 }
 ```
 
-All your favourite instructions (in fact, nearly _all_ the JVM instructions) are supported:
+All your favourite instructions (in fact, _all_ the JVM instructions) are supported:
 
 ```java
 public class com/example/MyClass
@@ -141,7 +144,7 @@ Well, **why not**?
 
 I wrote this for fun, which I had both in writing it and playing with it. 
 
-I release it without any expectation that it will be at all _useful_, but with 
+I release it without any real expectation that it will be _useful_, but with 
 the sincere hope that you too might find it fun.
 
 If you really need some use-cases to justify the electrons squandered in
