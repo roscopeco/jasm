@@ -6,6 +6,8 @@ import kotlin.system.exitProcess
 
 class Jasm(private val args: ToolArgs) : Runnable {
     companion object {
+        private val EOL: String = System.lineSeparator()
+
         @JvmStatic
         fun main(argv: Array<String>) {
             val args = ToolArgs()
@@ -39,8 +41,8 @@ class Jasm(private val args: ToolArgs) : Runnable {
 
             if (failed.isNotEmpty()) {
                 System.err.print(
-                    "\u001b[1;31mERROR:\u001b[0m There were failed tasks: \n    ${
-                        failed.map { "[" + it.unitName + "]: " + it.message }.joinToString(separator = "\n    ")
+                    "\u001b[1;31mERROR:\u001b[0m There were failed tasks: $EOL$EOL${
+                        failed.map { "${it.unitName} : ${it.message}" }.joinToString(separator = "$EOL$EOL")
                     }"
                 )
                 exitProcess(1)

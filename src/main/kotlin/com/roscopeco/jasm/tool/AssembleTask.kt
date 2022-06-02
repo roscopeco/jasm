@@ -15,7 +15,7 @@ class AssembleTask(val src: File, val dest: File, val targetVersion: Int) : Task
             File(dest.parent ?: ".").mkdirs()
             FileOutputStream(dest).use { it.write(assembler.assemble()) }
         } catch (e: Exception) {
-            return AssemblyResult(unitName(), false, e.toString())
+            return AssemblyResult(unitName(), false, e.message ?: "[BUG]: <Unknown> [${e}")
         }
 
         return AssemblyResult(unitName(), true)

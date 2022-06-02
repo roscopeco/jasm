@@ -7,6 +7,8 @@ package com.roscopeco.jasm
 
 import com.roscopeco.jasm.antlr.JasmBaseVisitor
 import com.roscopeco.jasm.antlr.JasmParser
+import com.roscopeco.jasm.errors.CodeError
+import com.roscopeco.jasm.errors.ErrorCollector
 import org.objectweb.asm.ClassVisitor
 import org.objectweb.asm.ConstantDynamic
 import org.objectweb.asm.Handle
@@ -22,35 +24,36 @@ import java.util.stream.IntStream
  *
  * @param visitor An ASM class visitor to do generation with
  * @param modifiers An instance of the {@link Modifiers} class to handle modifier-related stuff
- * @param unitName The name of the compilation unit (shows up in errors and as an attribute in the class)
+ * @param unitName The name of the compilation unit (shows up in com.roscopeco.jasm.errors and as an attribute in the class)
  * @param classFormat One of the ASM {@code Vxx} constants from the {@code org.objectweb.asm. class
  */
 class JasmAssemblingVisitor(
     private val visitor: ClassVisitor,
     private val modifiers: Modifiers,
     private val unitName: String,
-    private val classFormat: Int
+    private val classFormat: Int,
+    private val errorCollector: ErrorCollector
 ) : JasmBaseVisitor<Unit>() {
 
     /**
-     * Convenience constructor which will use the class format for Java 17 (61.0) and a default
+     * Convenience constructor which will use the class format for Java 11 (55.0) and a default
      * Modifiers instance.
      *
      * @param visitor An ASM class visitor to do generation with
-     * @param unitName The name of the compilation unit (shows up in errors and as an attribute in the class)
+     * @param unitName The name of the compilation unit (shows up in com.roscopeco.jasm.errors and as an attribute in the class)
      */
-    constructor(visitor: ClassVisitor, unitName: String) : this(visitor, unitName, Opcodes.V17)
+    constructor(visitor: ClassVisitor, unitName: String, errorCollector: ErrorCollector) : this(visitor, unitName, Opcodes.V11, errorCollector)
 
     /**
      * Convenience constructor which will use the specified class format and a default
      * Modifiers instance.
      *
      * @param visitor An ASM class visitor to do generation with
-     * @param unitName The name of the compilation unit (shows up in errors and as an attribute in the class)
+     * @param unitName The name of the compilation unit (shows up in com.roscopeco.jasm.errors and as an attribute in the class)
      * @param classFormat One of the ASM {@code Vxx} constants from the {@code org.objectweb.asm.Opcodes} class
      */
-    constructor(visitor: ClassVisitor, unitName: String, classFormat: Int)
-            : this(visitor, Modifiers(), unitName, classFormat)
+    constructor(visitor: ClassVisitor, unitName: String, classFormat: Int, errorCollector: ErrorCollector)
+            : this(visitor, Modifiers(), unitName, classFormat, errorCollector)
 
     override fun visitClass(ctx: JasmParser.ClassContext) {
         visitor.visit(
@@ -73,13 +76,25 @@ class JasmAssemblingVisitor(
 
     override fun visitField(ctx: JasmParser.FieldContext) {
         if ((ctx.field_initializer() != null) && (modifiers.mapModifiers(ctx.field_modifier()) and Opcodes.ACC_STATIC) == 0) {
-            throw SyntaxErrorException("Unexpected value for non-static field ${ctx.membername().text}")
+            errorCollector.addError(
+                CodeError(
+                    unitName,
+                    ctx,
+                    "Unexpected initializer value for non-static field ${ctx.membername().text}"
+                )
+            )
+        }
+
+        val type = TypeVisitor(unitName, errorCollector).visitType(ctx.type())
+
+        if ("V" == type) {
+            errorCollector.addError(CodeError(unitName, ctx, "Field ${ctx.membername().text} cannot have void type"))
         }
 
         val fv = visitor.visitField(
             modifiers.mapModifiers(ctx.field_modifier()),
             ctx.membername().text,
-            TypeVisitor().visitType(ctx.type()),
+            type,
             null,
             generateFieldInitializer(ctx.field_initializer())
         )
@@ -109,7 +124,7 @@ class JasmAssemblingVisitor(
         private val methodVisitor: MethodVisitor = visitor.visitMethod(
             modifiers.mapModifiers(ctx.method_modifier()),
             ctx.membername().text,
-            TypeVisitor().visitMethod_descriptor(ctx.method_descriptor()),
+            TypeVisitor(unitName, errorCollector).visitMethod_descriptor(ctx.method_descriptor()),
             null,
             null
         )
@@ -120,7 +135,7 @@ class JasmAssemblingVisitor(
             // Do this **before** computing frames, as if a label hasn't been visited
             // but is referenced in the code it can cause NPE from ASM (with message
             // "Cannot read field "inputLocals" because "dstFrame" is null").
-            guardAllLabelsDeclared()
+            guardAllLabelsDeclared(ctx)
 
             methodVisitor.visitMaxs(0, 0)
             methodVisitor.visitEnd()
@@ -188,7 +203,10 @@ class JasmAssemblingVisitor(
             when (ctx.int_atom().text.toInt()) {
                 0 -> methodVisitor.visitInsn(Opcodes.DCONST_0)
                 1 -> methodVisitor.visitInsn(Opcodes.DCONST_1)
-                else -> throw SyntaxErrorException("Invalid operand to DCONST: ${ctx.int_atom().text} (expecting 0 or 1)")
+                else -> errorCollector.addError(
+                    CodeError(unitName, ctx.int_atom(),
+                        "Invalid operand to DCONST: ${ctx.int_atom().text} (expecting 0 or 1)")
+                )
             }
         }
 
@@ -241,7 +259,10 @@ class JasmAssemblingVisitor(
         override fun visitInsn_fconst(ctx: JasmParser.Insn_fconstContext) = when (ctx.int_atom().text.toInt()) {
             0 -> methodVisitor.visitInsn(Opcodes.FCONST_0)
             1 -> methodVisitor.visitInsn(Opcodes.FCONST_1)
-            else -> throw SyntaxErrorException("Invalid operand to DCONST: ${ctx.int_atom().text} (expecting 0 or 1)")
+            else -> errorCollector.addError(
+                CodeError(unitName, ctx.int_atom(),
+                    "Invalid operand to FCONST: ${ctx.int_atom().text} (expecting 0 or 1)")
+            )
         }
 
         override fun visitInsn_fdiv(ctx: JasmParser.Insn_fdivContext) = methodVisitor.visitInsn(Opcodes.FDIV)
@@ -267,7 +288,7 @@ class JasmAssemblingVisitor(
                     Opcodes.GETFIELD,
                     ctx.owner().text,
                     ctx.membername().text,
-                    TypeVisitor().visitType(ctx.type())
+                    TypeVisitor(unitName, errorCollector).visitType(ctx.type())
                 )
 
         override fun visitInsn_getstatic(ctx: JasmParser.Insn_getstaticContext)
@@ -275,7 +296,7 @@ class JasmAssemblingVisitor(
                     Opcodes.GETSTATIC,
                     ctx.owner().text,
                     ctx.membername().text,
-                    TypeVisitor().visitType(ctx.type())
+                    TypeVisitor(unitName, errorCollector).visitType(ctx.type())
                 )
 
         override fun visitInsn_goto(ctx: JasmParser.Insn_gotoContext)
@@ -370,7 +391,7 @@ class JasmAssemblingVisitor(
         override fun visitInsn_invokedynamic(ctx: JasmParser.Insn_invokedynamicContext)
                  = methodVisitor.visitInvokeDynamicInsn(
                     ctx.membername().text,
-                    TypeVisitor().visitMethod_descriptor(ctx.method_descriptor()),
+                    TypeVisitor(unitName, errorCollector).visitMethod_descriptor(ctx.method_descriptor()),
                     buildBootstrapHandle(ctx.invokedynamic_body().method_handle()),
                     *generateConstArgs(ctx.invokedynamic_body().const_args().const_arg())
                 )
@@ -380,7 +401,7 @@ class JasmAssemblingVisitor(
                     Opcodes.INVOKEINTERFACE,
                     ctx.owner().text,
                     ctx.membername().text,
-                    TypeVisitor().visitMethod_descriptor(ctx.method_descriptor()),
+                    TypeVisitor(unitName, errorCollector).visitMethod_descriptor(ctx.method_descriptor()),
                     true
                 )
 
@@ -389,7 +410,7 @@ class JasmAssemblingVisitor(
                     Opcodes.INVOKESPECIAL,
                     ctx.owner().text,
                     ctx.membername().text,
-                    TypeVisitor().visitMethod_descriptor(ctx.method_descriptor()),
+                    TypeVisitor(unitName, errorCollector).visitMethod_descriptor(ctx.method_descriptor()),
                     false
                 )
 
@@ -398,7 +419,7 @@ class JasmAssemblingVisitor(
                     Opcodes.INVOKESTATIC,
                     ctx.owner().text,
                     ctx.membername().text,
-                    TypeVisitor().visitMethod_descriptor(ctx.method_descriptor()),
+                    TypeVisitor(unitName, errorCollector).visitMethod_descriptor(ctx.method_descriptor()),
                     false
                 )
 
@@ -407,7 +428,7 @@ class JasmAssemblingVisitor(
                     Opcodes.INVOKEVIRTUAL,
                     ctx.owner().text,
                     ctx.membername().text,
-                    TypeVisitor().visitMethod_descriptor(ctx.method_descriptor()),
+                    TypeVisitor(unitName, errorCollector).visitMethod_descriptor(ctx.method_descriptor()),
                     false
                 )
 
@@ -453,8 +474,10 @@ class JasmAssemblingVisitor(
         override fun visitInsn_lconst(ctx: JasmParser.Insn_lconstContext) = when (ctx.ilconst_atom().text) {
             "0", "false" -> methodVisitor.visitInsn(Opcodes.LCONST_0)
             "1", "true" -> methodVisitor.visitInsn(Opcodes.LCONST_1)
-            else -> throw SyntaxErrorException(
-                "Invalid operand to LCONST: ${ctx.ilconst_atom().text} (expecting 0, 1, true or false)")
+            else -> errorCollector.addError(
+                CodeError(unitName, ctx.ilconst_atom(),
+                    "Invalid operand to LCONST: ${ctx.ilconst_atom().text} (expecting 0, 1, true or false)")
+            )
         }
 
         override fun visitInsn_ldc(ctx: JasmParser.Insn_ldcContext)
@@ -507,7 +530,7 @@ class JasmAssemblingVisitor(
 
         override fun visitInsn_multianewarray(ctx: JasmParser.Insn_multianewarrayContext)
                 = methodVisitor.visitMultiANewArrayInsn(
-                    TypeVisitor().visitArray_type(ctx.array_type()),
+                    TypeVisitor(unitName, errorCollector).visitArray_type(ctx.array_type()),
                     getOrComputeArrayDims(ctx)
                 )
 
@@ -531,7 +554,7 @@ class JasmAssemblingVisitor(
                     Opcodes.PUTFIELD,
                     ctx.owner().text,
                     ctx.membername().text,
-                    TypeVisitor().visitType(ctx.type())
+                    TypeVisitor(unitName, errorCollector).visitType(ctx.type())
                 )
 
         override fun visitInsn_putstatic(ctx: JasmParser.Insn_putstaticContext)
@@ -539,7 +562,7 @@ class JasmAssemblingVisitor(
                     Opcodes.PUTSTATIC,
                     ctx.owner().text,
                     ctx.membername().text,
-                    TypeVisitor().visitType(ctx.type())
+                    TypeVisitor(unitName, errorCollector).visitType(ctx.type())
                 )
 
         override fun visitInsn_return(ctx: JasmParser.Insn_returnContext) = methodVisitor.visitInsn(Opcodes.RETURN)
@@ -555,6 +578,7 @@ class JasmAssemblingVisitor(
 
         override fun visitInsn_swap(ctx: JasmParser.Insn_swapContext)
                 = methodVisitor.visitInsn(Opcodes.SWAP)
+
 
         override fun visitInsn_tableswitch(ctx: JasmParser.Insn_tableswitchContext) {
             val keys = ctx.switch_case().map { c -> c.int_atom().text.toInt() }
@@ -596,7 +620,10 @@ class JasmAssemblingVisitor(
             ctx.TYPE_INT() != null      -> Opcodes.T_INT
             ctx.TYPE_LONG() != null     -> Opcodes.T_LONG
             ctx.TYPE_SHORT() != null    -> Opcodes.T_SHORT
-            else -> throw SyntaxErrorException("Unknown primitive type for newarray " + ctx.text)
+            else -> {
+                errorCollector.addError(CodeError(unitName, ctx, "Unknown primitive type for newarray " + ctx.text))
+                Opcodes.T_INT
+            }
         }
 
         private fun buildBootstrapHandle(ctx: JasmParser.Method_handleContext): Handle {
@@ -604,7 +631,7 @@ class JasmAssemblingVisitor(
                 generateTagForHandle(ctx),
                 ctx.bootstrap_spec().owner().text,
                 ctx.bootstrap_spec().membername().text,
-                TypeVisitor().visitMethod_descriptor(ctx.bootstrap_spec().method_descriptor()),
+                TypeVisitor(unitName, errorCollector).visitMethod_descriptor(ctx.bootstrap_spec().method_descriptor()),
                 ctx.handle_tag().INVOKEINTERFACE() != null,
             )
         }
@@ -619,7 +646,10 @@ class JasmAssemblingVisitor(
             ctx.handle_tag().GETSTATIC() != null        -> Opcodes.H_GETSTATIC
             ctx.handle_tag().PUTFIELD() != null         -> Opcodes.H_PUTFIELD
             ctx.handle_tag().PUTSTATIC() != null        -> Opcodes.H_PUTSTATIC
-            else -> throw SyntaxErrorException("Unknown handle tag " + ctx.handle_tag().text)
+            else -> {
+                errorCollector.addError(CodeError(unitName, ctx, "Unknown handle tag " + ctx.handle_tag().text))
+                Opcodes.H_INVOKESTATIC
+            }
         }
 
         private fun generateConstArgs(ctx: MutableList<JasmParser.Const_argContext>): Array<Any> {
@@ -634,14 +664,18 @@ class JasmAssemblingVisitor(
                 ctx.bool_atom() != null         -> if (java.lang.Boolean.parseBoolean(ctx.bool_atom().text)) 1 else 0
                 ctx.QNAME() != null             -> Type.getType("L" + ctx.QNAME().text + ";")
                 ctx.method_handle() != null     -> buildBootstrapHandle(ctx.method_handle())
-                ctx.method_descriptor() != null -> Type.getMethodType(TypeVisitor().visitMethod_descriptor(ctx.method_descriptor()))
+                ctx.method_descriptor() != null -> Type.getMethodType(TypeVisitor(unitName, errorCollector).visitMethod_descriptor(ctx.method_descriptor()))
                 ctx.constdynamic() != null      -> ConstantDynamic(
                     ctx.constdynamic().membername().text,
-                    TypeVisitor().visitType(ctx.constdynamic().type()),
+                    TypeVisitor(unitName, errorCollector).visitType(ctx.constdynamic().type()),
                     buildBootstrapHandle(ctx.constdynamic().method_handle()),
                     *generateConstArgs(ctx.constdynamic().const_arg())
                 )
-                else -> throw SyntaxErrorException("Unsupported constant arg at #${idx}: " + ctx.text)
+                else -> {
+                    errorCollector.addError(CodeError(unitName, ctx, "Unsupported constant arg at #${idx}: " + ctx.text))
+
+                    "<error>"
+                }
             }
         }
 
@@ -653,7 +687,14 @@ class JasmAssemblingVisitor(
             "3"         -> Opcodes.ICONST_3
             "4"         -> Opcodes.ICONST_4
             "5"         -> Opcodes.ICONST_5
-            else -> throw SyntaxErrorException("Invalid operand to ICONST (must be in range -1 to 5, or true/false)")
+            else -> {
+                errorCollector.addError(
+                    CodeError(unitName, ctx,
+                        "Invalid operand to ICONST: ${ctx.int_atom().text} (must be in range -1 to 5, or true/false)")
+                )
+
+                Opcodes.ICONST_0
+            }
         }
 
         private fun normaliseLabelName(labelName: String) =
@@ -679,13 +720,13 @@ class JasmAssemblingVisitor(
             return labels[normalName]!!
         }
 
-        private fun guardAllLabelsDeclared() {
+        private fun guardAllLabelsDeclared(ctx: JasmParser.MethodContext) {
             val undeclaredLabels = labels.entries
                 .filter { (_, value) -> !value.declared }
                 .joinToString { (key, _) -> key }
 
             if (undeclaredLabels.isNotEmpty()) {
-                throw SyntaxErrorException("Labels used but not declared: [$undeclaredLabels]")
+                errorCollector.addError(CodeError(unitName, ctx, "Labels used but not declared: [$undeclaredLabels]"))
             }
         }
 

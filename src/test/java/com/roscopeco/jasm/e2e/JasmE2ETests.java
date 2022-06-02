@@ -5,6 +5,7 @@
  */
 package com.roscopeco.jasm.e2e;
 
+import com.roscopeco.jasm.AssemblyException;
 import com.roscopeco.jasm.model.AthrowTest;
 import com.roscopeco.jasm.model.CheckcastTest;
 import com.roscopeco.jasm.model.ConstFieldTests;
@@ -34,6 +35,7 @@ import org.objectweb.asm.Opcodes;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.roscopeco.jasm.TestUtil.assemble;
 import static com.roscopeco.jasm.TestUtil.assembleAndDefine;
 import static com.roscopeco.jasm.TestUtil.boolVoidInvoker;
 import static com.roscopeco.jasm.TestUtil.instantiate;
@@ -834,5 +836,15 @@ class JasmE2ETests {
         final var obj = instantiate(clz, JsrRetTest.class);
 
         assertThat(obj.testJsrAndRet()).isEqualTo(2);
+    }
+
+    @Test
+    void shouldCollectMultipleErrors() {
+        assertThatThrownBy(() -> assembleAndDefine("com/roscopeco/jasm/ClassWithMultipleErrors.jasm"))
+            .isInstanceOf(AssemblyException.class)
+            .hasMessageContaining("ClassWithMultipleErrors.jasm:[4:22]")
+            .hasMessageContaining("mismatched input '('")
+            .hasMessageContaining("ClassWithMultipleErrors.jasm:[2:4]")
+            .hasMessageContaining("Field afield cannot have void type");
     }
 }

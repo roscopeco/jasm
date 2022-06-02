@@ -66,7 +66,7 @@ class ToolArgsTest {
     @Test
     void testTargetDefaultWorks() {
         final var args = doTest();
-        assertThat(args.getTarget()).isEqualTo(Opcodes.V17);
+        assertThat(args.getTarget()).isEqualTo(Opcodes.V11);
     }
 
     @Test
