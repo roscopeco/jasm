@@ -88,9 +88,16 @@ the different instructions and with examples of how they're used.
 
 #### Requirements
 
-* Java 11 or higher
-* `JAVA_HOME` set up correctly
-* Patience and curiousity :D
+* Java 11 or higher is required to run the tool and/or gradle plugin
+  * (However, JASM can assemble classes targeted at any JVM version!)
+
+#### Using the Gradle plugin
+
+If you just want to use some JASM code in your own Gradle project, the easiest way to get started is
+via the [Gradle plugin](https://plugins.gradle.org/plugin/com.roscopeco.jasm).
+
+For more information and some documentation about the plugin, see the 
+[Github repo](https://github.com/roscopeco/jasm-gradle-plugin)
 
 #### Using the command-line tool
 
@@ -110,12 +117,12 @@ Notice that you set the source and destination directories, and just pass the re
 path to the files within them - this is how the assembler creates the class files in the
 appropriate place the JVM expects to find them.
 
-#### Building with Gradle
+#### Building the tool with Gradle
 
 If you grabbed the source from [Github](https://github.com/roscopeco/jasm) you can 
 easily build a binary distribution with `./gradlew clean assemble` (pun not intended).
 
-#### Using as a library 
+#### Using JASM as a library 
 
 If you want to use this as a library (with Maven or Gradle), you'll want to 
 pull in the dependency from Maven central.
