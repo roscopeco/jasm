@@ -34,13 +34,13 @@ class JasmAssembler(
 ) {
 
     /**
-     * Convenience constructor which will use the class format for Java 17 (61.0).
+     * Convenience constructor which will use the class format for Java 11 (55.0).
      *
      * @param unitName The name of the compilation unit (shows up in errors and as an attribute in the class)
      * @param source A supplier of `InputStream`
      */
     constructor(unitName: String, source: Supplier<InputStream>)
-            : this(unitName, Opcodes.V17, source)
+            : this(unitName, Opcodes.V11, source)
 
     /**
      * Assemble to Java bytecode.

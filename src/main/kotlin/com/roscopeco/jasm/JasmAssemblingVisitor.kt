@@ -33,13 +33,13 @@ class JasmAssemblingVisitor(
 ) : JasmBaseVisitor<Unit>() {
 
     /**
-     * Convenience constructor which will use the class format for Java 17 (61.0) and a default
+     * Convenience constructor which will use the class format for Java 11 (55.0) and a default
      * Modifiers instance.
      *
      * @param visitor An ASM class visitor to do generation with
      * @param unitName The name of the compilation unit (shows up in errors and as an attribute in the class)
      */
-    constructor(visitor: ClassVisitor, unitName: String) : this(visitor, unitName, Opcodes.V17)
+    constructor(visitor: ClassVisitor, unitName: String) : this(visitor, unitName, Opcodes.V11)
 
     /**
      * Convenience constructor which will use the specified class format and a default
