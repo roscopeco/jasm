@@ -14,7 +14,7 @@ class ToolArgs {
     var outputDirectory: String = "."
 
     @Parameter(names = ["-target", "--target"], description = "Generate class files suitable for the specified class format versionx")
-    var target: Int = Opcodes.V17;
+    var target: Int = Opcodes.V11;
 
     @Parameter(description = "List of files to assemble (names relative to input directory)")
     var inputFiles: List<String> = mutableListOf()
