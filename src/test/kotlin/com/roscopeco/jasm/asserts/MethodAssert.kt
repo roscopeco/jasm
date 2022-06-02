@@ -5,6 +5,7 @@
  */
 package com.roscopeco.jasm.asserts
 
+import TestErrorCollector
 import com.roscopeco.jasm.TypeVisitor
 import com.roscopeco.jasm.antlr.JasmParser.MethodContext
 import org.assertj.core.api.AbstractAssert
@@ -12,6 +13,8 @@ import org.assertj.core.api.Assertions.assertThat
 
 class MethodAssert internal constructor(actual: MethodContext) :
     AbstractAssert<MethodAssert, MethodContext>(actual, MethodAssert::class.java) {
+
+    private val errorCollector = TestErrorCollector()
 
     fun hasName(expected: String): MethodAssert {
         isNotNull
@@ -87,7 +90,7 @@ class MethodAssert internal constructor(actual: MethodContext) :
             .isNotNull
             .isNotEmpty
 
-        assertThat(TypeVisitor().visitMethod_descriptor(actual.method_descriptor()))
+        assertThat(TypeVisitor("<testcase>", errorCollector).visitMethod_descriptor(actual.method_descriptor()))
             .`as`("Method parameter types for ${actual.membername().text}")
             .isEqualTo(types)
 

@@ -12,6 +12,7 @@ module com.roscopeco.jasm {
     exports com.roscopeco.jasm;
     exports com.roscopeco.jasm.antlr;
     exports com.roscopeco.jasm.tool;
+    exports com.roscopeco.jasm.errors;
 
     opens com.roscopeco.jasm.tool to com.beust.jcommander;
 }

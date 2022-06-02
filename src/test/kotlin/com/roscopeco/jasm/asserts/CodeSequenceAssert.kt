@@ -5,6 +5,7 @@
  */
 package com.roscopeco.jasm.asserts
 
+import TestErrorCollector
 import com.roscopeco.jasm.TypeVisitor
 import com.roscopeco.jasm.antlr.JasmParser
 import org.assertj.core.api.Assertions
@@ -19,12 +20,12 @@ import com.roscopeco.jasm.antlr.JasmParser.Insn_invokespecialContext
 import com.roscopeco.jasm.antlr.JasmParser.Insn_invokestaticContext
 import com.roscopeco.jasm.antlr.JasmParser.Insn_invokevirtualContext
 import com.roscopeco.jasm.antlr.JasmParser.Const_argContext
-import org.antlr.v4.runtime.Token
 import org.antlr.v4.runtime.tree.TerminalNode
 
 class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private val caller: MethodAssert) :
     AbstractAssert<CodeSequenceAssert, Stat_blockContext>(actual, CodeSequenceAssert::class.java) {
 
+    private val errorCollector = TestErrorCollector()
     private var pc = 0
     
     fun noMoreCode(): MethodAssert {
@@ -351,7 +352,7 @@ class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private
 
         val insn = stat.instruction().insn_invokedynamic()
         val extractedName = insn.membername().text
-        val extractedDesc = TypeVisitor().visitMethod_descriptor(insn.method_descriptor())
+        val extractedDesc = TypeVisitor("<testcase>", errorCollector).visitMethod_descriptor(insn.method_descriptor())
 
         if (name != extractedName) {
             failWithMessage(
@@ -818,7 +819,7 @@ class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private
             invokeExtractor,
             { t: T -> ownerExtractor.invoke(t).text },
             { t: T -> membernameExtractor.invoke(t).text },
-            { t: T -> TypeVisitor().visitMethod_descriptor(descriptorExtractor.invoke(t)) }
+            { t: T -> TypeVisitor("<testcase>", errorCollector).visitMethod_descriptor(descriptorExtractor.invoke(t)) }
         )
     }
 
@@ -841,7 +842,7 @@ class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private
             accessExtractor,
             { t: T -> ownerExtractor.invoke(t).text },
             { t: T -> membernameExtractor.invoke(t).text },
-            { t: T -> TypeVisitor().visitType(typeExtractor.invoke(t)) }
+            { t: T -> TypeVisitor("<testcase>", errorCollector).visitType(typeExtractor.invoke(t)) }
         )
     }
 
