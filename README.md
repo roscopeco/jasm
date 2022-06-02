@@ -8,6 +8,9 @@ _that_ already today?
 JASM has a [Gradle plugin](https://github.com/roscopeco/jasm-gradle-plugin) and 
 a (WIP) [Plugin for IntelliJ](https://github.com/roscopeco/jasm-intellij-plugin).
 
+See the [Example Gradle project](https://github.com/roscopeco/jasm-example) for
+an example of how JASM might fit in to your project.
+
 Let's just get this out of the way, shall we?
 
 ```java
