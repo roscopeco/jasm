@@ -90,6 +90,23 @@ public myGreatMethod(int, long, java/util/List) java/util/List {
 There are lots of examples in [the tests](src/test/resources/jasm) showing the syntax for
 the different instructions and with examples of how they're used.
 
+### Why not just use Jasmin?
+
+The venerable [Jasmin](https://github.com/davidar/jasmin) project has been around for years,
+and has the advantage of being mature, stable, and well supported everywhere (for example, 
+Github does syntax highlighting for it). So why not just use that?
+
+Of course it's totally personal choice which you use, but there are a few reasons to choose
+JASM over Jasmin:
+
+* JASM supports all the modern features of the latest JVMs, such as
+  * `invokedynamic` and dynamic constants
+  * `record` classes etc
+* JASM has some nice "quality of life" features, such as automatically computing stack map frames / maxlocals for you
+* JASM is built on modern tooling, whereas Jasmin's code is showing its age a bit
+  * This makes it easy, for example, to build [Gradle](https://github.com/roscopeco/jasm-gradle-plugin) and [IntelliJ](https://github.com/roscopeco/jasm-intellij-plugin) integration for JASM
+* JASM has (IMHO) a cleaner syntax than Jasmin
+
 ### How?
 
 #### Requirements
