@@ -871,4 +871,11 @@ class JasmE2ETests {
         assertThat(obj.tryMultipleCatchTest(new NullPointerException())).isEqualTo("NPE");
         assertThat(obj.tryMultipleCatchTest(new Exception())).isEqualTo("EXCEPTION");
     }
+
+    @Test
+    void shouldFailNicelyOnGetfieldWithMissingType() {
+        assertThatThrownBy(() -> assemble("BadGetFieldTest.jasm", Opcodes.V11))
+            .isInstanceOf(AssemblyException.class)
+            .hasMessageContaining("mismatched input 'ldc'");
+    }
 }

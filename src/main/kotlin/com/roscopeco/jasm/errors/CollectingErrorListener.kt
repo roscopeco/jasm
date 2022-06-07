@@ -7,6 +7,7 @@ import org.antlr.v4.runtime.Recognizer
 import org.antlr.v4.runtime.misc.Interval
 
 class CollectingErrorListener(private val unitName: String, private val errorCollector: ErrorCollector) : BaseErrorListener() {
+
     override fun syntaxError(
         recognizer: Recognizer<*, *>?,
         offendingSymbol: Any?,
