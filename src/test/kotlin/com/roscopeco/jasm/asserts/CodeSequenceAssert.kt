@@ -22,13 +22,13 @@ import com.roscopeco.jasm.antlr.JasmParser.Insn_invokevirtualContext
 import com.roscopeco.jasm.antlr.JasmParser.Const_argContext
 import org.antlr.v4.runtime.tree.TerminalNode
 
-class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private val caller: MethodAssert) :
-    AbstractAssert<CodeSequenceAssert, Stat_blockContext>(actual, CodeSequenceAssert::class.java) {
+class CodeSequenceAssert<Caller> internal constructor(actual: Stat_blockContext, private val caller: Caller) :
+    AbstractAssert<CodeSequenceAssert<Caller>, Stat_blockContext>(actual, CodeSequenceAssert::class.java) {
 
     private val errorCollector = TestErrorCollector()
     private var pc = 0
     
-    fun noMoreCode(): MethodAssert {
+    fun noMoreCode(): Caller {
         if (pc != actual.stat().size) {
             failWithMessage(
                 "Expected end of code reached at "
@@ -296,7 +296,7 @@ class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private
             ifnonnull -> ifnonnull.NAME().text
     }
 
-    fun iinc(expectedVarNum: Int, expectedAmount: Int): CodeSequenceAssert {
+    fun iinc(expectedVarNum: Int, expectedAmount: Int): CodeSequenceAssert<Caller> {
         isNotNull
 
         val insn = actual.stat()[pc]?.instruction()?.insn_iinc()
@@ -329,7 +329,7 @@ class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private
     fun invokeDynamic(
         name: String,
         descriptor: String
-    ): CodeSequenceAssert {
+    ): CodeSequenceAssert<Caller> {
 
         val failMessageSupplier = { insn: InstructionContext ->
             ("Expected invokedynamic "
@@ -544,7 +544,7 @@ class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private
     fun pop2() = genericNoOperandCheck("pop2", InstructionContext::insn_pop2)
 
     fun multianewarray(expectedType: String) = multianewarray(expectedType, null)
-    fun multianewarray(expectedType: String, expectedDims: Int?): CodeSequenceAssert {
+    fun multianewarray(expectedType: String, expectedDims: Int?): CodeSequenceAssert<Caller> {
         isNotNull
         Assertions.assertThat(actual.stat()).isNotNull
         hasNotUnderflowed("invokedynamic")
@@ -619,8 +619,60 @@ class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private
 
     fun swap() = genericNoOperandCheck("swap", InstructionContext::insn_swap)
 
-    fun vreturn(): CodeSequenceAssert {
+    fun vreturn(): CodeSequenceAssert<Caller> {
         return genericNoOperandCheck("vreturn", InstructionContext::insn_return)
+    }
+
+    fun exception(tryBegin: String, tryEnd: String, catchBegin: String, type: String): CodeSequenceAssert<Caller> {
+        Assertions.assertThat(actual.stat()).isNotNull
+        hasNotUnderflowed("try")
+        val stat = actual.stat()[pc]
+
+        if (stat == null || stat.instruction().exception_handler() == null) {
+            failWithMessage("Expected exception handler at pc($pc) but was ${stat.instruction().text}")
+        }
+
+        val ex = stat.instruction().exception_handler()
+
+        Assertions.assertThat(ex.NAME(0).text).`as`("Unexpected try begin label").isEqualTo(tryBegin)
+        Assertions.assertThat(ex.NAME(1).text).`as`("Unexpected try end label").isEqualTo(tryEnd)
+        Assertions.assertThat(ex.NAME(2).text).`as`("Unexpected handler begin label").isEqualTo(catchBegin)
+        Assertions.assertThat(ex.ref_type().text).`as`("Unexpected exception type begin label").isEqualTo(type)
+
+        pc++
+        return this
+    }
+
+    fun tryBlock(): CodeSequenceAssert<CodeSequenceAssert<Caller>> {
+        Assertions.assertThat(actual.stat()).isNotNull
+        hasNotUnderflowed("try")
+        val stat = actual.stat()[pc]
+
+        if (stat == null || stat.instruction().try_catch_block() == null) {
+            failWithMessage("Expected try block at pc($pc) but was ${stat.instruction().text}")
+        }
+
+        pc++
+
+        return CodeSequenceAssert(stat.instruction().try_catch_block().stat_block(), this)
+    }
+
+    // TODO This is a bit messy, currently has a "hidden" relationship (must be called after tryBlock)
+    //      Probably not the end of the world, but might cause confusion somewhere later...
+    fun catchBlock(num: Int, type: String): CodeSequenceAssert<CodeSequenceAssert<Caller>> {
+        Assertions.assertThat(actual.stat()).isNotNull
+        hasNotUnderflowed("try")
+        val stat = actual.stat()[pc - 1]
+
+        if (stat == null || stat.instruction().try_catch_block() == null) {
+            failWithMessage("Expected catch block at pc($pc) but was ${stat.instruction().text}")
+        }
+
+        Assertions.assertThat(stat.instruction().try_catch_block().catch_block(num).ref_type().text)
+            .`as`("Unexpected catch exception type")
+            .isEqualTo(type)
+
+        return CodeSequenceAssert(stat.instruction().try_catch_block().catch_block(num).stat_block(), this)
     }
 
     fun tableswitch() = switchAssert(
@@ -707,7 +759,7 @@ class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private
     private fun genericNoOperandCheck(
         name: String,
         getInsnFunc: (InstructionContext) -> Any?
-    ): CodeSequenceAssert {
+    ): CodeSequenceAssert<Caller> {
         isNotNull
 
         Assertions.assertThat(actual.stat()).isNotNull
@@ -749,7 +801,7 @@ class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private
         getInsnFunc: (InstructionContext) -> T,
         getAtomTextFunc: (T) -> String,
         getOperandTextFunc: (O) -> String
-    ): CodeSequenceAssert {
+    ): CodeSequenceAssert<Caller> {
 
         isNotNull
         Assertions.assertThat(actual.stat()).isNotNull
@@ -778,7 +830,7 @@ class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private
     private fun genericLdcCheck(
         expectedStr: String,
         atomPredicate: (Const_argContext) -> Boolean
-    ): CodeSequenceAssert {
+    ): CodeSequenceAssert<Caller> {
 
         isNotNull
         Assertions.assertThat(actual.stat()).isNotNull
@@ -810,7 +862,7 @@ class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private
         ownerExtractor: (T) -> OwnerContext,
         membernameExtractor: (T) -> MembernameContext,
         descriptorExtractor: (T) -> Method_descriptorContext
-    ): CodeSequenceAssert {
+    ): CodeSequenceAssert<Caller> {
         return genericOwnerNameTypeCheckCheck(
             invokeType,
             owner,
@@ -833,7 +885,7 @@ class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private
         ownerExtractor: (T) -> OwnerContext,
         membernameExtractor: (T) -> MembernameContext,
         typeExtractor: (T) -> JasmParser.TypeContext
-    ): CodeSequenceAssert {
+    ): CodeSequenceAssert<Caller> {
         return genericOwnerNameTypeCheckCheck(
             accessType,
             owner,
@@ -855,7 +907,7 @@ class CodeSequenceAssert internal constructor(actual: Stat_blockContext, private
         ownerExtractor: (T) -> String,
         membernameExtractor: (T) -> String,
         descriptorExtractor: (T) -> String
-    ): CodeSequenceAssert {
+    ): CodeSequenceAssert<Caller> {
 
         val failMessageSupplier = { insn: InstructionContext ->
             ("Expected "

@@ -598,6 +598,41 @@ class JasmAssemblingVisitor(
             )
         }
 
+        override fun visitException_handler(ctx: JasmParser.Exception_handlerContext) {
+            methodVisitor.visitTryCatchBlock(
+                getLabel(ctx.NAME(0).text).label,
+                getLabel(ctx.NAME(1).text).label,
+                getLabel(ctx.NAME(2).text).label,
+                ctx.ref_type().text
+            )
+        }
+
+        override fun visitTry_catch_block(ctx: JasmParser.Try_catch_blockContext) {
+            val start = Label()
+            val end = Label()
+            val handlers = (0..ctx.catch_block().size).map { Label() }
+            val skip = Label()
+
+            methodVisitor.visitLabel(start)
+            this.visitStat_block(ctx.stat_block())
+            methodVisitor.visitLabel(end)
+            methodVisitor.visitJumpInsn(Opcodes.GOTO, skip)
+            ctx.catch_block().forEachIndexed { i, block ->
+                methodVisitor.visitLabel(handlers[i])
+                this.visitStat_block(block.stat_block())
+            }
+            methodVisitor.visitLabel(skip)
+
+            ctx.catch_block().forEachIndexed { i, block ->
+                methodVisitor.visitTryCatchBlock(
+                    start,
+                    end,
+                    handlers[i],
+                    block.ref_type().text
+                )
+            }
+        }
+
         private fun visitNonDynamicInvoke(
             opcode: Int,
             owner: String,

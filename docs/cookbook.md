@@ -191,10 +191,90 @@ whenever you like at the bytecode level.
 The `.class` format _does_ allow methods to be annotated with what exceptions they throw, but since this is mostly
 pointless JASM doesn't expose it.
 
-_Catching_ exceptions is a different matter, and is done with a bunch of annotations (not the Java language ones, these
-are the OG attributes in the class file) on a method that specify instruction offsets and jumps to take on exceptions.
+_Catching_ exceptions is a different matter - JASM fully supports this. You can either do it manually, using
+labels for your `try` and `catch` blocks, e.g.
 
-Currently, the latter is not implemented in JASM (but is pretty close to the top of my list of things to add!)
+```java
+    public manualExceptionHandler()V {
+        // The handler is wired to the labels and the caught type with the exception statement
+        // This can be anywhere in the method, and you can have as many as you need...
+        //
+        exception tryBegin, tryEnd, catchBegin, java/lang/Exception
+        
+      tryBegin:
+        
+        // Stuff that might throw
+        
+      tryEnd:
+
+        // Stuff to do if it didn't throw
+
+      catchBegin:
+        
+        // Stuff to do if it did throw. Usually you'll want the previous bit to 
+        // return or otherwise skip this, or it'll get executed as part of normal flow
+        
+    }
+```
+
+or you can use the convenient syntactic-sugar JASM provides that looks (and works) a lot like Java:
+
+```java
+    public tryCatchSyntax()V {
+        try {
+            
+            // regular JASM instructions that might throw
+        
+        } catch (java/lang/Exception) {
+            
+            // Stuff to do if it threw
+        
+        }
+    }
+```
+
+`try/catch` as shown in the latter example is fully supported by the syntax, and so can (for example) be nested as 
+deep as you need.
+
+It's worth noting that the (Java) feature in which a single catch can handle multiple exception types
+(with the `|` operator) is _not_ supported. If you need to catch multiple types, you'll have to have
+multiple catches, e.g:
+
+```java
+        try {
+    
+            // code...
+        
+        } catch (java/lang/RuntimeException) {
+    
+            // code...
+        
+        } catch (java/lang/Exception) {
+    
+            // code...
+        }
+```
+
+However, if the handlers are common you can easily use `goto` in the catch blocks to redirect execution to a
+common handler (or just use the more manual syntax as detailed above).
+
+> **Note**: Where you have multiple catch blocks for a single try, order **does** matter. You always want more
+> specific types first, followed by more general ones below, e.g.:
+>
+> ```java
+>        try {
+>            // ...
+>        } catch (java/io/FileNotFoundException) {
+>            // ...
+>        } catch (java/io/IOException) {
+>            // ...
+>        } catch (java/lang/Exception) {
+>            // ...
+>        }   
+>```
+> 
+> If you don't do this, then the more generic handlers will always be used by the JVM.
+
 
 #### Static initializers
 
