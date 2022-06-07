@@ -412,3 +412,46 @@ while a full-featured one (**note** this is a contrived example intented to demo
 
 See [here](https://github.com/roscopeco/jasm/blob/main/src/test/java/com/roscopeco/jasm/model/TestBootstrap.java) for
 the bootstrap method and other support used in that example.
+
+#### Loading constants from the constant pool with `ldc`
+
+Speaking of `constdynamic`, it's worth noting that the `ldc` instruction has full support for dynamic
+constants, as well as the other types of const you see in the `invokedynamic` examples above.
+
+So, in addition to loading the usual strings, ints and floats you can also load classes, `java/lang/invoke/MethodType`
+and `java/lang/invoke/MethodHandle` objects and, as mentioned, dynamic consts. Specifically, all the following are 
+valid JASM:
+
+```java
+        // Load a java/lang/String constant
+        ldc "The test string"
+
+        // Load an int constant
+        ldc 10
+
+        // Load a float constant
+        ldc 5.5
+
+        // Load a bool (This is syntactic sugar for an int 0 or 1)
+        ldc true
+
+        // Load a java/lang/Class
+        ldc java/util/List
+
+        // Load a java/lang/invoke/MethodType
+        ldc (java/util/List)I
+
+        // Load a java/lang/invoke/MethodHandle (for an invokestatic in this case)
+        ldc invokestatic com/roscopeco/jasm/model/TestBootstrap.staticForHandleTest()java/lang/String
+
+        // Load a constdynamic (in this case calling a static method on ConstantBootstraps) 
+        ldc constdynamic DYNAMIC_CONST_FOR_TEST java/lang/String {
+            invokestatic java/lang/invoke/ConstantBootstraps.getStaticFinal(
+                java/lang/invoke/MethodHandles$Lookup,
+                java/lang/String,
+                java/lang/Class,
+                java/lang/Class,
+            )java/lang/Object
+            [com/roscopeco/jasm/model/TestBootstrap]
+```
+
