@@ -16,7 +16,7 @@ Let's just get this out of the way, shall we?
 ```java
 public class com/example/HelloWorld {
     public static main([java/lang/String)V {
-        getstatic java/lang/System.out
+        getstatic java/lang/System.out java/io/PrintStream
         ldc "Hello, World"
         invokevirtual java/io/PrintStream.println(java/lang/String)V
         return

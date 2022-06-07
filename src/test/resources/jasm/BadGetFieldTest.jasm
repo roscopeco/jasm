@@ -1,0 +1,9 @@
+// Thanks to neomafo88; https://github.com/roscopeco/jasm/issues/20
+public class com/example/HelloWorld {
+    public static main([java/lang/String)V {
+        getstatic java/lang/System.out // MISSING TYPE
+        ldc "Hello, World"
+        invokevirtual java/io/PrintStream.println(java/lang/String)V
+        return
+    }
+}

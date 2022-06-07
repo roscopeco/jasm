@@ -291,13 +291,22 @@ class JasmAssemblingVisitor(
                     TypeVisitor(unitName, errorCollector).visitType(ctx.type())
                 )
 
-        override fun visitInsn_getstatic(ctx: JasmParser.Insn_getstaticContext)
-                = methodVisitor.visitFieldInsn(
-                    Opcodes.GETSTATIC,
-                    ctx.owner().text,
-                    ctx.membername().text,
-                    TypeVisitor(unitName, errorCollector).visitType(ctx.type())
-                )
+        override fun visitInsn_getstatic(ctx: JasmParser.Insn_getstaticContext) {
+            var type = TypeVisitor(unitName, errorCollector).visitType(ctx.type())
+
+            // This can happen if we had mismatched input during the parse, default it here
+            // so we can keep collecting errors...
+            //
+            // https://github.com/roscopeco/jasm/issues/20
+            if (type.isEmpty()) type = "I"
+
+            methodVisitor.visitFieldInsn(
+                Opcodes.GETSTATIC,
+                ctx.owner().text,
+                ctx.membername().text,
+                type
+            )
+        }
 
         override fun visitInsn_goto(ctx: JasmParser.Insn_gotoContext)
                 = methodVisitor.visitJumpInsn(Opcodes.GOTO, getLabel(ctx.NAME().text).label)
