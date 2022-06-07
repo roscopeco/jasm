@@ -29,9 +29,11 @@ import com.roscopeco.jasm.model.PrimArrayTests;
 import com.roscopeco.jasm.model.RefArrayTests;
 import com.roscopeco.jasm.model.Superclass;
 import com.roscopeco.jasm.model.SwitchTests;
+import com.roscopeco.jasm.model.TryCatchTest;
 import org.junit.jupiter.api.Test;
 import org.objectweb.asm.Opcodes;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -846,5 +848,27 @@ class JasmE2ETests {
             .hasMessageContaining("mismatched input '('")
             .hasMessageContaining("ClassWithMultipleErrors.jasm:[2:4]")
             .hasMessageContaining("Field afield cannot have void type");
+    }
+
+    @Test
+    void shouldAssembleTryCatchToValidJavaClass() {
+        final var clz = assembleAndDefine("com/roscopeco/jasm/TryCatchTest.jasm");
+
+        assertThat(clz.getName()).isEqualTo("com.roscopeco.jasm.TryCatchTest");
+
+        assertThat(clz.getDeclaredClasses()).isEmpty();
+        assertThat(clz.getDeclaredFields()).isEmpty();
+        assertThat(clz.getDeclaredConstructors()).hasSize(1);
+        assertThat(clz.getDeclaredMethods()).hasSize(4);
+
+        final var obj = instantiate(clz, TryCatchTest.class);
+
+        assertThat(obj.manualExceptionHandlerTest()).hasMessageContaining("Pass");
+        assertThat(obj.basicTryCatchTest()).isEqualTo("Pass");
+        assertThat(obj.nestedTryCatchTest()).isEqualTo(1950);
+
+        assertThat(obj.tryMultipleCatchTest(new IOException())).isEqualTo("IOE");
+        assertThat(obj.tryMultipleCatchTest(new NullPointerException())).isEqualTo("NPE");
+        assertThat(obj.tryMultipleCatchTest(new Exception())).isEqualTo("EXCEPTION");
     }
 }
