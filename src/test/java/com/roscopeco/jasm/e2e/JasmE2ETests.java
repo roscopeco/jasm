@@ -24,6 +24,7 @@ import com.roscopeco.jasm.model.JsrRetTest;
 import com.roscopeco.jasm.model.LdcAconstAreturn;
 import com.roscopeco.jasm.model.LoadsAndStoresTest;
 import com.roscopeco.jasm.model.LongMathTests;
+import com.roscopeco.jasm.model.MultiCatchFallthroughTest;
 import com.roscopeco.jasm.model.StackOpsTest;
 import com.roscopeco.jasm.model.PrimArrayTests;
 import com.roscopeco.jasm.model.RefArrayTests;
@@ -877,5 +878,23 @@ class JasmE2ETests {
         assertThatThrownBy(() -> assemble("BadGetFieldTest.jasm", Opcodes.V11))
             .isInstanceOf(AssemblyException.class)
             .hasMessageContaining("mismatched input 'ldc'");
+    }
+
+    @Test
+    void shouldAssembleMultiCatchOnTryWithoutFallthrough() {
+        final var clz = assembleAndDefine("com/roscopeco/jasm/MultiCatchFallthroughTest.jasm");
+
+        assertThat(clz.getName()).isEqualTo("com.roscopeco.jasm.MultiCatchFallthroughTest");
+
+        assertThat(clz.getDeclaredClasses()).isEmpty();
+        assertThat(clz.getDeclaredFields()).isEmpty();
+        assertThat(clz.getDeclaredConstructors()).hasSize(1);
+        assertThat(clz.getDeclaredMethods()).hasSize(1);
+
+        final var obj = instantiate(clz, MultiCatchFallthroughTest.class);
+
+        assertThat(obj.multiCatchFallthroughTest(new IOException())).isEqualTo("IOE");
+        assertThat(obj.multiCatchFallthroughTest(new NullPointerException())).isEqualTo("NPE");
+        assertThat(obj.multiCatchFallthroughTest(new Exception())).isEqualTo("EXCEPTION");
     }
 }

@@ -275,6 +275,9 @@ common handler (or just use the more manual syntax as detailed above).
 > 
 > If you don't do this, then the more generic handlers will always be used by the JVM.
 
+When you use `try`/`catch` blocks, JASM will generate a bunch of labels and `goto` instructions under the hood for
+you. If you don't want this, then you should use the `exception` statement and manage the flow manually with 
+labels.
 
 #### Static initializers
 

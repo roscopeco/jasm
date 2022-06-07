@@ -629,7 +629,12 @@ class JasmAssemblingVisitor(
             ctx.catch_block().forEachIndexed { i, block ->
                 methodVisitor.visitLabel(handlers[i])
                 this.visitStat_block(block.stat_block())
+
+                if (ctx.catch_block().size > 1 && i < ctx.catch_block().size - 1) {
+                    methodVisitor.visitJumpInsn(Opcodes.GOTO, skip)
+                }
             }
+
             methodVisitor.visitLabel(skip)
 
             ctx.catch_block().forEachIndexed { i, block ->
