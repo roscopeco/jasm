@@ -88,7 +88,6 @@ class MethodAssert internal constructor(actual: MethodContext) :
 
         assertThat(actual.method_descriptor()?.method_arguments()?.method_argument())
             .isNotNull
-            .isNotEmpty
 
         assertThat(TypeVisitor("<testcase>", errorCollector).visitMethod_descriptor(actual.method_descriptor()))
             .`as`("Method parameter types for ${actual.membername().text}")

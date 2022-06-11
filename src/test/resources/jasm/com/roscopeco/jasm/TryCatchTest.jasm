@@ -1,0 +1,97 @@
+public class com/roscopeco/jasm/TryCatchTest implements com/roscopeco/jasm/model/TryCatchTest {
+    /* Manual exception handler */
+    public manualExceptionHandlerTest()java/lang/Exception {
+        exception tryBegin, tryEnd, catchBegin, java/lang/Exception  // Can be anywhere in the method...
+
+      tryBegin:
+        new java/lang/Exception
+        dup
+        ldc "Pass"
+        invokespecial java/lang/Exception.<init>(java/lang/String)V
+        athrow
+      tryEnd:
+
+        new java/lang/Exception
+        dup
+        ldc "Fail"
+        invokespecial java/lang/Exception.<init>(java/lang/String)V
+        areturn
+
+      catchBegin:
+        checkcast java/lang/Exception
+        areturn
+    }
+
+    /* With try/catch syntactic sugar */
+    public basicTryCatchTest()java/lang/String {
+        try {
+            new java/lang/Exception
+            dup
+            invokespecial java/lang/Exception.<init>()V
+            athrow
+        } catch (java/lang/Exception) {
+            ldc "Pass"
+            areturn
+        }
+
+        ldc "Fail"
+        areturn
+    }
+
+    public nestedTryCatchTest()I {
+        ldc 100
+        istore 1
+
+        try {
+            try {
+                new java/lang/Exception
+                dup
+                invokespecial java/lang/Exception.<init>()V
+                athrow
+            } catch (java/lang/Exception) {
+                iload 1
+                ldc 20
+                imul
+                istore 1
+            }
+
+            new java/lang/RuntimeException
+            dup
+            invokespecial java/lang/RuntimeException.<init>()V
+            athrow
+        } catch (java/lang/RuntimeException) {
+            iload 1
+            ldc 50
+            isub
+            istore 1
+        }
+
+        iload 1
+        ireturn
+    }
+
+    public tryMultipleCatchTest(java/lang/Exception)java/lang/String {
+        try {
+            aload 1
+            athrow
+        } catch (java/io/IOException) {
+            ldc "IOE"
+            areturn
+        } catch (java/lang/NullPointerException) {
+            ldc "NPE"
+            areturn
+        } catch (java/lang/Exception) {
+            ldc "EXCEPTION"
+            areturn
+        }
+
+        ldc "Fail"
+        areturn
+    }
+
+public <init>()V {
+        aload 0
+        invokespecial java/lang/Object.<init>()V
+        return
+    }
+}

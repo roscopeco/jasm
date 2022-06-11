@@ -445,6 +445,8 @@ instruction
  | insn_swap
  | insn_tableswitch
  | label
+ | exception_handler
+ | try_catch_block
  ;
 
 insn_aaload
@@ -1091,6 +1093,18 @@ label
  : LABEL
  ;
 
+exception_handler
+ : EXCEPTION NAME COMMA? NAME COMMA? NAME COMMA? ref_type
+ ;
+
+try_catch_block
+ : TRY LBRACE stat_block RBRACE catch_block+
+ ;
+
+catch_block
+ : CATCH LPAREN ref_type RPAREN LBRACE stat_block RBRACE
+ ;
+
 owner
  : QNAME
  | NAME
@@ -1293,6 +1307,10 @@ TABLESWITCH     : 'tableswitch';
 
 NEWINVOKESPECIAL: 'newinvokespecial';
 CONSTDYNAMIC    : 'constdynamic';
+
+TRY             : 'try';
+CATCH           : 'catch';
+EXCEPTION       : 'exception';
 
 TYPE_VOID
  : 'V'
