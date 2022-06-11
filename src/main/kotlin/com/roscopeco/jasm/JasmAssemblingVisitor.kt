@@ -291,13 +291,22 @@ class JasmAssemblingVisitor(
                     TypeVisitor(unitName, errorCollector).visitType(ctx.type())
                 )
 
-        override fun visitInsn_getstatic(ctx: JasmParser.Insn_getstaticContext)
-                = methodVisitor.visitFieldInsn(
-                    Opcodes.GETSTATIC,
-                    ctx.owner().text,
-                    ctx.membername().text,
-                    TypeVisitor(unitName, errorCollector).visitType(ctx.type())
-                )
+        override fun visitInsn_getstatic(ctx: JasmParser.Insn_getstaticContext) {
+            var type = TypeVisitor(unitName, errorCollector).visitType(ctx.type())
+
+            // This can happen if we had mismatched input during the parse, default it here
+            // so we can keep collecting errors...
+            //
+            // https://github.com/roscopeco/jasm/issues/20
+            if (type.isEmpty()) type = "I"
+
+            methodVisitor.visitFieldInsn(
+                Opcodes.GETSTATIC,
+                ctx.owner().text,
+                ctx.membername().text,
+                type
+            )
+        }
 
         override fun visitInsn_goto(ctx: JasmParser.Insn_gotoContext)
                 = methodVisitor.visitJumpInsn(Opcodes.GOTO, getLabel(ctx.NAME().text).label)
@@ -596,6 +605,46 @@ class JasmAssemblingVisitor(
                         i -> pairs.find { p -> p.first == i }?.second ?: default
                 }.collect(Collectors.toList()).toTypedArray()
             )
+        }
+
+        override fun visitException_handler(ctx: JasmParser.Exception_handlerContext) {
+            methodVisitor.visitTryCatchBlock(
+                getLabel(ctx.NAME(0).text).label,
+                getLabel(ctx.NAME(1).text).label,
+                getLabel(ctx.NAME(2).text).label,
+                ctx.ref_type().text
+            )
+        }
+
+        override fun visitTry_catch_block(ctx: JasmParser.Try_catch_blockContext) {
+            val start = Label()
+            val end = Label()
+            val handlers = (0..ctx.catch_block().size).map { Label() }
+            val skip = Label()
+
+            methodVisitor.visitLabel(start)
+            this.visitStat_block(ctx.stat_block())
+            methodVisitor.visitLabel(end)
+            methodVisitor.visitJumpInsn(Opcodes.GOTO, skip)
+            ctx.catch_block().forEachIndexed { i, block ->
+                methodVisitor.visitLabel(handlers[i])
+                this.visitStat_block(block.stat_block())
+
+                if (ctx.catch_block().size > 1 && i < ctx.catch_block().size - 1) {
+                    methodVisitor.visitJumpInsn(Opcodes.GOTO, skip)
+                }
+            }
+
+            methodVisitor.visitLabel(skip)
+
+            ctx.catch_block().forEachIndexed { i, block ->
+                methodVisitor.visitTryCatchBlock(
+                    start,
+                    end,
+                    handlers[i],
+                    block.ref_type().text
+                )
+            }
         }
 
         private fun visitNonDynamicInvoke(

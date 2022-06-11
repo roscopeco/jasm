@@ -1,0 +1,29 @@
+public class com/roscopeco/jasm/MultiCatchFallthroughTest implements com/roscopeco/jasm/model/MultiCatchFallthroughTest {
+    public multiCatchFallthroughTest(java/lang/Exception)java/lang/String {
+        ldc "Fail"
+        astore 2
+
+        try {
+            aload 1
+            athrow
+        } catch (java/io/IOException) {
+            ldc "IOE"
+            astore 2
+        } catch (java/lang/NullPointerException) {
+            ldc "NPE"
+            astore 2
+        } catch (java/lang/Exception) {
+            ldc "EXCEPTION"
+            astore 2
+        }
+
+        aload 2
+        areturn
+    }
+
+public <init>()V {
+        aload 0
+        invokespecial java/lang/Object.<init>()V
+        return
+    }
+}
