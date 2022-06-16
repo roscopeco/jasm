@@ -5,15 +5,6 @@
  */
 package com.roscopeco.jasm;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.lang.invoke.MethodHandles;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.function.Function;
-import java.util.function.Supplier;
-
 import com.roscopeco.jasm.antlr.JasmLexer;
 import com.roscopeco.jasm.antlr.JasmParser;
 import lombok.NonNull;
@@ -25,6 +16,20 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.util.TraceClassVisitor;
 import org.opentest4j.AssertionFailedError;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.UncheckedIOException;
+import java.lang.invoke.MethodHandles;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.URISyntaxException;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -204,5 +209,31 @@ public class TestUtil {
         } catch (IllegalAccessException e) {
             throw new AssertionFailedError("Failed to define class", e);
         }
+    }
+
+    public static byte[] loadDisasmTestClassBytes(final String name) {
+        try {
+            final var filename = "/com/roscopeco/jasm/model/disasm/" + name + ".class";
+            final var url = TestUtil.class.getResource(filename);
+
+            if (url == null) {
+                throw new FileNotFoundException(filename);
+            } else {
+                final var in = new FileInputStream(new File(url.toURI()));
+                final var out = new byte[in.available()];
+                if (in.read(out) == 0) {
+                    throw new IOException("No data");
+                }
+                return out;
+            }
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static ClassReader loadDisasmTestClass(final String name) {
+        return new ClassReader(loadDisasmTestClassBytes(name));
     }
 }

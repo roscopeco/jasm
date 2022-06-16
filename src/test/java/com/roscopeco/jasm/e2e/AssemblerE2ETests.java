@@ -50,7 +50,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.fail;
 
 @SuppressWarnings("java:S5961" /* Some methods need to assert combinatorial explosion of multiple variants */)
-class JasmE2ETests {
+class AssemblerE2ETests {
     @Test
     void shouldAssembleEmptyClassToValidJavaClass() {
         final var clz = assembleAndDefine("com/roscopeco/jasm/EmptyClassInPackage.jasm");
