@@ -20,14 +20,39 @@ class JasmDisassemblingVisitor(private val modifiers: Modifiers) : ClassVisitor(
             Opcodes.ANEWARRAY to "anewarray",
             Opcodes.ARETURN to "areturn",
             Opcodes.ASTORE to "astore",
+            Opcodes.ATHROW to "athrow",
+            Opcodes.BIPUSH to "bipush",
             Opcodes.CHECKCAST to "checkcast",
             Opcodes.DLOAD to "dload",
             Opcodes.DSTORE to "dstore",
+            Opcodes.DUP to "dup",
+            Opcodes.DUP_X1 to "dup_x1",
+            Opcodes.DUP_X2 to "dup_x2",
+            Opcodes.DUP2_X1 to "dup2_x1",
+            Opcodes.DUP2_X2 to "dup2_x2",
             Opcodes.FLOAD to "fload",
             Opcodes.FSTORE to "fstore",
             Opcodes.GETFIELD to "getfield",
             Opcodes.GETSTATIC to "getstatic",
+            Opcodes.GOTO to "goto",
             Opcodes.ICONST_0 to "iconst 0",
+            Opcodes.IFEQ to "ifeq",
+            Opcodes.IFNE to "ifne",
+            Opcodes.IFLT to "iflt",
+            Opcodes.IFGE to "ifge",
+            Opcodes.IFGT to "igt",
+            Opcodes.IFLE to "ifle",
+            Opcodes.IFNULL to "ifnull",
+            Opcodes.IFNONNULL to "ifnonnull",
+            Opcodes.IF_ACMPEQ to "if_acmpeq",
+            Opcodes.IF_ACMPNE to "if_acmpne",
+            Opcodes.IF_ICMPEQ to "if_icmpeq",
+            Opcodes.IF_ICMPNE to "if_icmpne",
+            Opcodes.IF_ICMPLT to "if_icmplt",
+            Opcodes.IF_ICMPGE to "if_icmpge",
+            Opcodes.IF_ICMPGT to "if_icmpgt",
+            Opcodes.IF_ICMPLE to "if_icmple",
+            Opcodes.IINC to "iinc",
             Opcodes.ILOAD to "iload",
             Opcodes.INSTANCEOF to "instanceof",
             Opcodes.INVOKEINTERFACE to "invokeinterface",
@@ -35,14 +60,21 @@ class JasmDisassemblingVisitor(private val modifiers: Modifiers) : ClassVisitor(
             Opcodes.INVOKESTATIC to "invokestatic",
             Opcodes.INVOKEVIRTUAL to "invokevirtual",
             Opcodes.ISTORE to "istore",
+            Opcodes.JSR to "jsr",
             Opcodes.LDC to "ldc",
             Opcodes.LLOAD to "lload",
             Opcodes.LSTORE to "lstore",
+            Opcodes.MULTIANEWARRAY to "multianewarray",
             Opcodes.NEW to "new",
+            Opcodes.NEWARRAY to "newarray",
+            Opcodes.POP to "pop",
+            Opcodes.POP2 to "pop2",
             Opcodes.PUTFIELD to "putfield",
             Opcodes.PUTSTATIC to "putstatic",
             Opcodes.RET to "ret",
             Opcodes.RETURN to "return",
+            Opcodes.SIPUSH to "sipush",
+            Opcodes.SWAP to "swap",
         )
     }
     
@@ -113,14 +145,14 @@ class JasmDisassemblingVisitor(private val modifiers: Modifiers) : ClassVisitor(
     ) : MethodVisitor(Opcodes.ASM9) {
 
         private val labels = mutableMapOf<Label, String>()
-        private var nextLabelNum = 0;
+        private var nextLabelNum = 0
         private val lines = mutableListOf<String>()
 
         fun output(indenter: Indenter): String
                 = methodHeader(indenter) + methodBody(indenter.indent()) + indenter.indented("}")
 
         fun methodHeader(indenter: Indenter): String
-                = indenter.indented("${formattedModifiers(access)}$name${disassembleDescriptor(descriptor)} {\n")
+                = indenter.indented("${formattedModifiers(access)}$name${disassembleMethodDescriptor(descriptor)} {\n")
 
         fun methodBody(indenter: Indenter): String {
             return if (lines.isNotEmpty())
@@ -129,20 +161,26 @@ class JasmDisassemblingVisitor(private val modifiers: Modifiers) : ClassVisitor(
                 ""
         }
 
+        override fun visitTryCatchBlock(start: Label, end: Label, handler: Label, type: String) {
+            lines.add("exception ${getLabelName(start)}, ${getLabelName(end)}, ${getLabelName(handler)}, ${
+                handleBareType(type)
+            }")
+        }
+
         override fun visitInsn(opcode: Int) {
-            lines.add(OPCODE_NAMES[opcode] ?: "// TODO unimplemented opcode $opcode")
+            lines.add(OPCODE_NAMES[opcode]!!)
         }
 
         override fun visitIntInsn(opcode: Int, operand: Int) {
-            todo(opcode)
+            lines.add("${OPCODE_NAMES[opcode]!!} $operand")
         }
 
         override fun visitTypeInsn(opcode: Int, type: String) {
-            lines.add("${OPCODE_NAMES[opcode]} ${handleBareType(type)}")
+            lines.add("${OPCODE_NAMES[opcode]!!} ${handleBareType(type)}")
         }
 
         override fun visitFieldInsn(opcode: Int, owner: String, name: String, descriptor: String) {
-            lines.add("${OPCODE_NAMES[opcode]!!} ${handleBareType(owner)}.$name ${disassembleType(descriptor)}")
+            lines.add("${OPCODE_NAMES[opcode]!!} ${handleBareType(owner)}.$name ${disassembleTypeDescriptor(descriptor)}")
         }
 
         override fun visitMethodInsn(
@@ -152,7 +190,7 @@ class JasmDisassemblingVisitor(private val modifiers: Modifiers) : ClassVisitor(
             descriptor: String,
             isInterface: Boolean
         ) {
-            lines.add("${OPCODE_NAMES[opcode]!!} ${handleBareType(owner)}.$name${disassembleDescriptor(descriptor)}")
+            lines.add("${OPCODE_NAMES[opcode]!!} ${handleBareType(owner)}.$name${disassembleMethodDescriptor(descriptor)}")
         }
 
         override fun visitInvokeDynamicInsn(
@@ -165,19 +203,20 @@ class JasmDisassemblingVisitor(private val modifiers: Modifiers) : ClassVisitor(
         }
 
         override fun visitJumpInsn(opcode: Int, label: Label) {
-            todo(opcode)
+            lines.add("${OPCODE_NAMES[opcode]!!} ${getLabelName(label)}")
         }
 
         override fun visitLabel(label: Label) {
+            lines.add("")
             lines.add("${getLabelName(label)}:")
         }
 
         override fun visitLdcInsn(value: Any) {
-            lines.add("${OPCODE_NAMES[Opcodes.LDC]} ${disassembleConstArg(value)}")
+            lines.add("${OPCODE_NAMES[Opcodes.LDC]!!} ${disassembleConstArg(value)}")
         }
 
         override fun visitIincInsn(varIndex: Int, increment: Int) {
-            todo(Opcodes.IINC)
+            lines.add("${OPCODE_NAMES[Opcodes.IINC]!!} $varIndex, [$increment]")
         }
 
         override fun visitTableSwitchInsn(min: Int, max: Int, dflt: Label, vararg labels: Label?) {
@@ -189,7 +228,7 @@ class JasmDisassemblingVisitor(private val modifiers: Modifiers) : ClassVisitor(
         }
 
         override fun visitMultiANewArrayInsn(descriptor: String, numDimensions: Int) {
-            todo(Opcodes.MULTIANEWARRAY)
+            lines.add("${OPCODE_NAMES[Opcodes.MULTIANEWARRAY]!!} ${disassembleTypeDescriptor(descriptor)}, $numDimensions")
         }
 
         override fun visitVarInsn(opcode: Int, varIndex: Int) {
@@ -215,7 +254,7 @@ class JasmDisassemblingVisitor(private val modifiers: Modifiers) : ClassVisitor(
                 val lastLSquare = bareType.lastIndexOf("[")
                 bareType.substring(0, lastLSquare + 1) + bareType.substring(lastLSquare + 1, bareType.length - 1)
             } else {
-                bareType;
+                bareType
             }
         }
 
@@ -228,12 +267,12 @@ class JasmDisassemblingVisitor(private val modifiers: Modifiers) : ClassVisitor(
             else -> TODO("Const arg type '${arg.javaClass}' not yet supported")
         }
 
-        private fun disassembleDescriptor(descriptor: String): String {
+        private fun disassembleMethodDescriptor(descriptor: String): String {
             val ctx = JvmTypesParser(CommonTokenStream(JvmTypesLexer(CharStreams.fromString(descriptor)))).method_descriptor()
             return "(${ctx.param().joinToString(", ") { disassembleSingleType(it.type()) }})${disassembleSingleType(ctx.return_().type())}"
         }
 
-        private fun disassembleType(type: String): String {
+        private fun disassembleTypeDescriptor(type: String): String {
             val ctx = JvmTypesParser(CommonTokenStream(JvmTypesLexer(CharStreams.fromString(type)))).type()
             return disassembleSingleType(ctx)
         }

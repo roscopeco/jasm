@@ -135,4 +135,30 @@ public class DisassemblerE2ETests {
                 .vreturn()
                 .noMoreCode();
     }
+
+    @Test
+    void shouldDisassembleClassWithTryCatch() {
+        final var test = doParseString(disassemble("ExceptionTest"));
+        assertMember(test.classbody().member(1))
+            .isMethod()
+            .hasName("test")
+            .hasDescriptor("()V")
+            .hasCodeSequence()
+                .exception("label0", "label1", "label1", "java/lang/InterruptedException")
+                .label("label0:")
+                    .anew("java/lang/InterruptedException")
+                    .dup()
+                    .ldcStr("BANG")
+                    .invokeSpecial("java/lang/InterruptedException", "<init>", "(Ljava/lang/String;)V")
+                    .athrow()
+                .label("label1:")
+                    .astore(1)
+                .label("label2:")
+                    .invokeStatic("java/lang/Thread", "currentThread", "()Ljava/lang/Thread;")
+                    .invokeVirtual("java/lang/Thread", "interrupt", "()V")
+                .label("label3:")
+                    .vreturn()
+                .label("label4:")
+                    .noMoreCode();
+    }
 }
