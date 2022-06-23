@@ -9,7 +9,7 @@ import org.antlr.v4.runtime.ParserRuleContext
 import org.objectweb.asm.Opcodes
 
 class Modifiers {
-    private val modifierMap = mapOf(
+    private val forwardMap = mapOf(
         "abstract"      to Opcodes.ACC_ABSTRACT,
         "annotation"    to Opcodes.ACC_ANNOTATION,
         "bridge"        to Opcodes.ACC_BRIDGE,
@@ -32,7 +32,21 @@ class Modifiers {
         "volatile"      to Opcodes.ACC_VOLATILE
     )
 
+    private val reverseClassMap = listOf(  /* Keep in JLS order for nice output */
+        Pair(Opcodes.ACC_PUBLIC, "public"),
+        Pair(Opcodes.ACC_ABSTRACT, "abstract"),
+        Pair(Opcodes.ACC_INTERFACE, "interface"),
+        Pair(Opcodes.ACC_ENUM, "enum"),
+        Pair(Opcodes.ACC_SYNTHETIC, "synthetic"),
+    )
+
     fun mapModifiers(modifiers: List<ParserRuleContext>): Int = modifiers
-            .map { mod -> modifierMap[mod.text]!! }
+            .map { mod -> forwardMap[mod.text]!! }
             .fold(0) { value, modifier -> value or modifier }
+
+    fun disassembleClassModifiers(modifiers: Int): String = reverseClassMap.map {
+            (bit, str) -> if (modifiers and bit == bit) str else ""
+    }
+        .filter { it.isNotEmpty() }
+        .joinToString(separator = " ")
 }
