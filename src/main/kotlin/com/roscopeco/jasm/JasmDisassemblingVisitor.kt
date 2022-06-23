@@ -201,7 +201,7 @@ class JasmDisassemblingVisitor(private val modifiers: Modifiers) : ClassVisitor(
         }
 
         private fun formattedModifiers(modifierBitmap: Int): String {
-            val modsStr = modifiers.disassembleClassModifiers(modifierBitmap)
+            val modsStr = modifiers.disassembleMethodModifiers(modifierBitmap)
 
             return if (modsStr.isNotEmpty())
                 "$modsStr "
