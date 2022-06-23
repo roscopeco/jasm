@@ -28,4 +28,11 @@ public class com/roscopeco/jasm/InvokeTests {
         aload 1
         areturn
     }
+
+    public testArrayReceiver(java/lang/Object) java/lang/Object {
+        aload 1
+        checkcast [java/lang/Object
+        invokevirtual [java/lang/Object.clone()java/lang/Object
+        areturn
+    }
 }

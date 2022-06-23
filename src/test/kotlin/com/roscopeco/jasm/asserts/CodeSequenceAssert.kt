@@ -81,7 +81,7 @@ class CodeSequenceAssert<Caller> internal constructor(actual: Stat_blockContext,
     fun castore() = genericNoOperandCheck("castore", InstructionContext::insn_castore)
 
     fun checkcast(expected: String) = genericStringOperandCheck("checkcast", expected, InstructionContext:: insn_checkcast) {
-            checkcast -> checkcast.QNAME().text
+            checkcast -> (checkcast.LSQUARE()?.joinToString("") { it.text } ?: "") + checkcast.QNAME().text
     }
 
     fun d2f() = genericNoOperandCheck("d2f", InstructionContext::insn_d2f)

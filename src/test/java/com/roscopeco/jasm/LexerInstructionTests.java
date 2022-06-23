@@ -170,11 +170,26 @@ class LexerInstructionTests {
     void shouldLexCheckCast() {
         runInstructionTest("com/roscopeco/jasm/insntest/Checkcast.jasm", lexer -> {
             assertNextToken(lexer)
-                    .hasType(JasmLexer.CHECKCAST);
+                .hasType(JasmLexer.CHECKCAST);
 
             assertNextToken(lexer)
-                    .hasType(JasmLexer.QNAME)
-                    .hasText("java/util/ArrayList");
+                .hasType(JasmLexer.QNAME)
+                .hasText("java/util/ArrayList");
+        });
+    }
+
+    @Test
+    void shouldLexCheckCastArray() {
+        runInstructionTest("com/roscopeco/jasm/insntest/CheckcastArray.jasm", lexer -> {
+            assertNextToken(lexer)
+                .hasType(JasmLexer.CHECKCAST);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.LSQUARE);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.QNAME)
+                .hasText("java/util/ArrayList");
         });
     }
 
@@ -741,31 +756,66 @@ class LexerInstructionTests {
     void shouldLexInvokeInterface() {
         runInstructionTest("com/roscopeco/jasm/insntest/InvokeInterface.jasm", lexer -> {
             assertNextToken(lexer)
-                    .hasType(JasmLexer.INVOKEINTERFACE);
+                .hasType(JasmLexer.INVOKEINTERFACE);
 
             assertNextToken(lexer)
-                    .hasType(JasmLexer.QNAME)
-                    .hasText("java/util/List");
+                .hasType(JasmLexer.QNAME)
+                .hasText("java/util/List");
 
             assertNextToken(lexer)
-                    .hasType(JasmLexer.DOT);
+                .hasType(JasmLexer.DOT);
 
             assertNextToken(lexer)
-                    .hasType(JasmLexer.NAME)
-                    .hasText("get");
+                .hasType(JasmLexer.NAME)
+                .hasText("get");
 
             assertNextToken(lexer)
-                    .hasType(JasmLexer.LPAREN);
+                .hasType(JasmLexer.LPAREN);
 
             assertNextToken(lexer)
-                    .hasType(JasmLexer.TYPE_INT);
+                .hasType(JasmLexer.TYPE_INT);
 
             assertNextToken(lexer)
-                    .hasType(JasmLexer.RPAREN);
+                .hasType(JasmLexer.RPAREN);
 
             assertNextToken(lexer)
-                    .hasType(JasmLexer.QNAME)
-                    .hasText("java/lang/Object");
+                .hasType(JasmLexer.QNAME)
+                .hasText("java/lang/Object");
+        });
+    }
+
+    @Test
+    void shouldLexInvokeInterfaceArray() {
+        runInstructionTest("com/roscopeco/jasm/insntest/InvokeInterfaceArray.jasm", lexer -> {
+            assertNextToken(lexer)
+                .hasType(JasmLexer.INVOKEINTERFACE);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.LSQUARE);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.QNAME)
+                .hasText("java/util/List");
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.DOT);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.NAME)
+                .hasText("get");
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.LPAREN);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.TYPE_INT);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.RPAREN);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.QNAME)
+                .hasText("java/lang/Object");
         });
     }
 
@@ -773,42 +823,88 @@ class LexerInstructionTests {
     void shouldLexInvokeSpecial() {
         runInstructionTest("com/roscopeco/jasm/insntest/InvokeSpecial.jasm", lexer -> {
             assertNextToken(lexer)
-                    .hasType(JasmLexer.INVOKESPECIAL);
+                .hasType(JasmLexer.INVOKESPECIAL);
 
             assertNextToken(lexer)
-                    .hasType(JasmLexer.QNAME)
-                    .hasText("java/lang/Object");
+                .hasType(JasmLexer.QNAME)
+                .hasText("java/lang/Object");
 
             assertNextToken(lexer)
-                    .hasType(JasmLexer.DOT);
+                .hasType(JasmLexer.DOT);
 
             assertNextToken(lexer)
-                    .hasType(JasmLexer.INIT);
+                .hasType(JasmLexer.INIT);
 
             assertNextToken(lexer)
-                    .hasType(JasmLexer.LPAREN);
+                .hasType(JasmLexer.LPAREN);
 
             assertNextToken(lexer)
-                    .hasType(JasmLexer.QNAME)
-                    .hasText("java/lang/String");
+                .hasType(JasmLexer.QNAME)
+                .hasText("java/lang/String");
 
             assertNextToken(lexer)
-                    .hasType(JasmLexer.COMMA);
+                .hasType(JasmLexer.COMMA);
 
             assertNextToken(lexer)
-                    .hasType(JasmLexer.TYPE_INT);
+                .hasType(JasmLexer.TYPE_INT);
 
             assertNextToken(lexer)
-                    .hasType(JasmLexer.COMMA);
+                .hasType(JasmLexer.COMMA);
 
             assertNextToken(lexer)
-                    .hasType(JasmLexer.TYPE_BOOL);
+                .hasType(JasmLexer.TYPE_BOOL);
 
             assertNextToken(lexer)
-                    .hasType(JasmLexer.RPAREN);
+                .hasType(JasmLexer.RPAREN);
 
             assertNextToken(lexer)
-                    .hasType(JasmLexer.TYPE_VOID);
+                .hasType(JasmLexer.TYPE_VOID);
+        });
+    }
+
+    @Test
+    void shouldLexInvokeSpecialArray() {
+        runInstructionTest("com/roscopeco/jasm/insntest/InvokeSpecialArray.jasm", lexer -> {
+            assertNextToken(lexer)
+                .hasType(JasmLexer.INVOKESPECIAL);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.LSQUARE);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.QNAME)
+                .hasText("java/lang/Object");
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.DOT);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.INIT);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.LPAREN);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.QNAME)
+                .hasText("java/lang/String");
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.COMMA);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.TYPE_INT);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.COMMA);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.TYPE_BOOL);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.RPAREN);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.TYPE_VOID);
         });
     }
 
@@ -816,28 +912,60 @@ class LexerInstructionTests {
     void shouldLexInvokeStatic() {
         runInstructionTest("com/roscopeco/jasm/insntest/InvokeStatic.jasm", lexer -> {
             assertNextToken(lexer)
-                    .hasType(JasmLexer.INVOKESTATIC);
+                .hasType(JasmLexer.INVOKESTATIC);
 
             assertNextToken(lexer)
-                    .hasType(JasmLexer.QNAME)
-                    .hasText("java/lang/Thread");
+                .hasType(JasmLexer.QNAME)
+                .hasText("java/lang/Thread");
 
             assertNextToken(lexer)
-                    .hasType(JasmLexer.DOT);
+                .hasType(JasmLexer.DOT);
 
             assertNextToken(lexer)
-                    .hasType(JasmLexer.NAME)
-                    .hasText("currentThread");
+                .hasType(JasmLexer.NAME)
+                .hasText("currentThread");
 
             assertNextToken(lexer)
-                    .hasType(JasmLexer.LPAREN);
+                .hasType(JasmLexer.LPAREN);
 
             assertNextToken(lexer)
-                    .hasType(JasmLexer.RPAREN);
+                .hasType(JasmLexer.RPAREN);
 
             assertNextToken(lexer)
-                    .hasType(JasmLexer.QNAME)
-                    .hasText("java/lang/Thread");
+                .hasType(JasmLexer.QNAME)
+                .hasText("java/lang/Thread");
+        });
+    }
+
+    @Test
+    void shouldLexInvokeStaticArray() {
+        runInstructionTest("com/roscopeco/jasm/insntest/InvokeStaticArray.jasm", lexer -> {
+            assertNextToken(lexer)
+                .hasType(JasmLexer.INVOKESTATIC);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.LSQUARE);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.QNAME)
+                .hasText("java/lang/Thread");
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.DOT);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.NAME)
+                .hasText("currentThread");
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.LPAREN);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.RPAREN);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.QNAME)
+                .hasText("java/lang/Thread");
         });
     }
 
@@ -845,28 +973,60 @@ class LexerInstructionTests {
     void shouldLexInvokeVirtual() {
         runInstructionTest("com/roscopeco/jasm/insntest/InvokeVirtual.jasm", lexer -> {
             assertNextToken(lexer)
-                    .hasType(JasmLexer.INVOKEVIRTUAL);
+                .hasType(JasmLexer.INVOKEVIRTUAL);
 
             assertNextToken(lexer)
-                    .hasType(JasmLexer.QNAME)
-                    .hasText("java/lang/String");
+                .hasType(JasmLexer.QNAME)
+                .hasText("java/lang/String");
 
             assertNextToken(lexer)
-                    .hasType(JasmLexer.DOT);
+                .hasType(JasmLexer.DOT);
 
             assertNextToken(lexer)
-                    .hasType(JasmLexer.NAME)
-                    .hasText("trim");
+                .hasType(JasmLexer.NAME)
+                .hasText("trim");
 
             assertNextToken(lexer)
-                    .hasType(JasmLexer.LPAREN);
+                .hasType(JasmLexer.LPAREN);
 
             assertNextToken(lexer)
-                    .hasType(JasmLexer.RPAREN);
+                .hasType(JasmLexer.RPAREN);
 
             assertNextToken(lexer)
-                    .hasType(JasmLexer.QNAME)
-                    .hasText("java/lang/String");
+                .hasType(JasmLexer.QNAME)
+                .hasText("java/lang/String");
+        });
+    }
+
+    @Test
+    void shouldLexInvokeVirtualArray() {
+        runInstructionTest("com/roscopeco/jasm/insntest/InvokeVirtualArray.jasm", lexer -> {
+            assertNextToken(lexer)
+                .hasType(JasmLexer.INVOKEVIRTUAL);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.LSQUARE);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.QNAME)
+                .hasText("java/lang/String");
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.DOT);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.NAME)
+                .hasText("trim");
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.LPAREN);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.RPAREN);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.QNAME)
+                .hasText("java/lang/String");
         });
     }
 

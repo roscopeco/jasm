@@ -12,7 +12,7 @@ import org.junit.jupiter.api.function.ThrowingConsumer
 
 object LexerParserAssertions {
     @JvmStatic
-    fun assertClass(actual: JasmParser.ClassContext) =ClassAssert(actual)
+    fun assertClass(actual: JasmParser.ClassContext) = ClassAssert(actual)
 
     @JvmStatic
     fun assertToken(actual: Token) = TokenAssert(actual)

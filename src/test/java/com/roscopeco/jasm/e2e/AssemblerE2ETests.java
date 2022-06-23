@@ -42,6 +42,7 @@ import static com.roscopeco.jasm.TestUtil.assemble;
 import static com.roscopeco.jasm.TestUtil.assembleAndDefine;
 import static com.roscopeco.jasm.TestUtil.boolVoidInvoker;
 import static com.roscopeco.jasm.TestUtil.instantiate;
+import static com.roscopeco.jasm.TestUtil.objectObjectInvoker;
 import static com.roscopeco.jasm.TestUtil.intVoidInvoker;
 import static com.roscopeco.jasm.TestUtil.objectArgsInvoker;
 import static com.roscopeco.jasm.TestUtil.objectVoidInvoker;
@@ -201,7 +202,7 @@ class AssemblerE2ETests {
         assertThat(clz.getDeclaredFields()).isEmpty();
 
         assertThat(clz.getDeclaredConstructors()).hasSize(1);
-        assertThat(clz.getDeclaredMethods()).hasSize(3);
+        assertThat(clz.getDeclaredMethods()).hasSize(4);
 
         final var obj = instantiate(clz);
 
@@ -214,6 +215,11 @@ class AssemblerE2ETests {
             .isSameAs(list);
 
         assertThat(list).containsExactly("Hello World");
+
+        final String[] array = new String[42];
+        assertThat(objectObjectInvoker(obj, "testArrayReceiver").apply(array))
+            .isEqualTo(array)
+            .isNotSameAs(array);
     }
 
     @Test
@@ -399,15 +405,21 @@ class AssemblerE2ETests {
         assertThat(clz.getDeclaredClasses()).isEmpty();
         assertThat(clz.getDeclaredFields()).isEmpty();
         assertThat(clz.getDeclaredConstructors()).hasSize(1);
-        assertThat(clz.getDeclaredMethods()).hasSize(1);
+        assertThat(clz.getDeclaredMethods()).hasSize(2);
 
         final var obj = instantiate(clz, CheckcastTest.class);
         final var list = new ArrayList<>();
-        final var nonList = "";
+        final var string = "";
 
         assertThat(obj.castToList(list)).isSameAs(list);
 
-        assertThatThrownBy(() -> obj.castToList(nonList))
+        assertThatThrownBy(() -> obj.castToList(string))
+            .isInstanceOf(ClassCastException.class);
+
+        final var array = new String[0];
+        assertThat(obj.castToStringArray(array)).isSameAs(array);
+
+        assertThatThrownBy(() -> obj.castToStringArray(string))
             .isInstanceOf(ClassCastException.class);
     }
 

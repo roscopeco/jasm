@@ -506,7 +506,7 @@ insn_castore
  ;
 
 insn_checkcast
- : CHECKCAST QNAME
+ : CHECKCAST LSQUARE* QNAME
  ;
 
 insn_d2f
@@ -1106,8 +1106,8 @@ catch_block
  ;
 
 owner
- : QNAME
- | NAME
+ : LSQUARE* QNAME
+ | LSQUARE* NAME
  ;
 
 int_atom    : INT;

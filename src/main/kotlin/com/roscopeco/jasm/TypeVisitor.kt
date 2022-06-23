@@ -42,4 +42,28 @@ class TypeVisitor(private val unitName: String, private val errorCollector: Erro
 
     override fun visitArray_type(ctx: JasmParser.Array_typeContext) =
         ctx.LSQUARE().joinToString(separator = "") { it.text } + super.visitArray_type(ctx)
+
+    override fun visitOwner(ctx: JasmParser.OwnerContext): String {
+        return fixBareType(extractBareType(ctx))
+    }
+
+    override fun visitInsn_checkcast(ctx: JasmParser.Insn_checkcastContext): String {
+        return fixBareType(extractBareType(ctx))
+    }
+
+    private fun extractBareType(ctx: JasmParser.Insn_checkcastContext)
+            = (ctx.LSQUARE()?.joinToString("") { it.text } ?: "") + ctx.QNAME().text
+
+    private fun extractBareType(ctx: JasmParser.OwnerContext)
+            = (ctx.LSQUARE()?.joinToString("") { it.text } ?: "") + ctx.QNAME().text
+
+    private fun fixBareType(bare: String): String {
+        return if (bare.startsWith("[")) {
+            val lastLSquare = bare.lastIndexOf("[")
+            "${bare.substring(0, lastLSquare + 1)}L${bare.substring(lastLSquare + 1, bare.length)};"
+        } else {
+            bare
+        }
+    }
+
 }

@@ -181,7 +181,8 @@ class JasmAssemblingVisitor(
         override fun visitInsn_castore(ctx: JasmParser.Insn_castoreContext) = methodVisitor.visitInsn(Opcodes.CASTORE)
 
         override fun visitInsn_checkcast(ctx: JasmParser.Insn_checkcastContext)
-                = methodVisitor.visitTypeInsn(Opcodes.CHECKCAST, ctx.QNAME().text)
+                = methodVisitor.visitTypeInsn(Opcodes.CHECKCAST,
+                    TypeVisitor(unitName, errorCollector).visitInsn_checkcast(ctx))
 
         override fun visitInsn_d2f(ctx: JasmParser.Insn_d2fContext) = methodVisitor.visitInsn(Opcodes.D2F)
 
@@ -408,7 +409,7 @@ class JasmAssemblingVisitor(
         override fun visitInsn_invokeinterface(ctx: JasmParser.Insn_invokeinterfaceContext)
                 = visitNonDynamicInvoke(
                     Opcodes.INVOKEINTERFACE,
-                    ctx.owner().text,
+                    TypeVisitor(unitName, errorCollector).visitOwner(ctx.owner()),
                     ctx.membername().text,
                     TypeVisitor(unitName, errorCollector).visitMethod_descriptor(ctx.method_descriptor()),
                     true
@@ -417,7 +418,7 @@ class JasmAssemblingVisitor(
         override fun visitInsn_invokespecial(ctx: JasmParser.Insn_invokespecialContext)
                 = visitNonDynamicInvoke(
                     Opcodes.INVOKESPECIAL,
-                    ctx.owner().text,
+                    TypeVisitor(unitName, errorCollector).visitOwner(ctx.owner()),
                     ctx.membername().text,
                     TypeVisitor(unitName, errorCollector).visitMethod_descriptor(ctx.method_descriptor()),
                     false
@@ -426,7 +427,7 @@ class JasmAssemblingVisitor(
         override fun visitInsn_invokestatic(ctx: JasmParser.Insn_invokestaticContext)
                 = visitNonDynamicInvoke(
                     Opcodes.INVOKESTATIC,
-                    ctx.owner().text,
+                    TypeVisitor(unitName, errorCollector).visitOwner(ctx.owner()),
                     ctx.membername().text,
                     TypeVisitor(unitName, errorCollector).visitMethod_descriptor(ctx.method_descriptor()),
                     false
@@ -435,7 +436,7 @@ class JasmAssemblingVisitor(
         override fun visitInsn_invokevirtual(ctx: JasmParser.Insn_invokevirtualContext)
                 = visitNonDynamicInvoke(
                     Opcodes.INVOKEVIRTUAL,
-                    ctx.owner().text,
+                    TypeVisitor(unitName, errorCollector).visitOwner(ctx.owner()),
                     ctx.membername().text,
                     TypeVisitor(unitName, errorCollector).visitMethod_descriptor(ctx.method_descriptor()),
                     false
@@ -678,7 +679,7 @@ class JasmAssemblingVisitor(
         private fun buildBootstrapHandle(ctx: JasmParser.Method_handleContext): Handle {
             return Handle(
                 generateTagForHandle(ctx),
-                ctx.bootstrap_spec().owner().text,
+                TypeVisitor(unitName, errorCollector).visitOwner(ctx.bootstrap_spec().owner()),
                 ctx.bootstrap_spec().membername().text,
                 TypeVisitor(unitName, errorCollector).visitMethod_descriptor(ctx.bootstrap_spec().method_descriptor()),
                 ctx.handle_tag().INVOKEINTERFACE() != null,

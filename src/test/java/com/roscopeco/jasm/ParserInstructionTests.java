@@ -127,6 +127,7 @@ class ParserInstructionTests {
             Arguments.of("Anewarray.jasm", "java/lang/String", (BiFunction<CodeSequenceAssert, String, CodeSequenceAssert>) CodeSequenceAssert::anewarray),
             Arguments.of("Bipush.jasm", 100, (BiFunction<CodeSequenceAssert, Integer, CodeSequenceAssert>) CodeSequenceAssert::bipush),
             Arguments.of("Checkcast.jasm", "java/util/ArrayList", (BiFunction<CodeSequenceAssert, String, CodeSequenceAssert>) CodeSequenceAssert::checkcast),
+            Arguments.of("CheckcastArray.jasm", "[java/util/ArrayList", (BiFunction<CodeSequenceAssert, String, CodeSequenceAssert>) CodeSequenceAssert::checkcast),
             Arguments.of("Dconst.jasm", 0, (BiFunction<CodeSequenceAssert, Integer, CodeSequenceAssert>) CodeSequenceAssert::dconst),
             Arguments.of("Dload.jasm", 0, (BiFunction<CodeSequenceAssert, Integer, CodeSequenceAssert>) CodeSequenceAssert::dload),
             Arguments.of("Dstore.jasm", 0, (BiFunction<CodeSequenceAssert, Integer, CodeSequenceAssert>) CodeSequenceAssert::dstore),
@@ -249,32 +250,64 @@ class ParserInstructionTests {
     @Test
     void shouldParseInvokeInterface() {
         runInstructionTest("com/roscopeco/jasm/insntest/InvokeInterface.jasm", code -> code
-                .invokeInterface("java/util/List", "get", "(I)Ljava/lang/Object;")
-                .noMoreCode()
+            .invokeInterface("java/util/List", "get", "(I)Ljava/lang/Object;")
+            .noMoreCode()
+        );
+    }
+
+    @Test
+    void shouldParseInvokeInterfaceArray() {
+        runInstructionTest("com/roscopeco/jasm/insntest/InvokeInterfaceArray.jasm", code -> code
+            .invokeInterface("[java/util/List", "get", "(I)Ljava/lang/Object;")
+            .noMoreCode()
         );
     }
 
     @Test
     void shouldParseInvokeSpecial() {
         runInstructionTest("com/roscopeco/jasm/insntest/InvokeSpecial.jasm", code -> code
-                .invokeSpecial("java/lang/Object", "<init>", "(Ljava/lang/String;IZ)V")
-                .noMoreCode()
+            .invokeSpecial("java/lang/Object", "<init>", "(Ljava/lang/String;IZ)V")
+            .noMoreCode()
+        );
+    }
+
+    @Test
+    void shouldParseInvokeSpecialArray() {
+        runInstructionTest("com/roscopeco/jasm/insntest/InvokeSpecialArray.jasm", code -> code
+            .invokeSpecial("[java/lang/Object", "<init>", "(Ljava/lang/String;IZ)V")
+            .noMoreCode()
         );
     }
 
     @Test
     void shouldParseInvokeStatic() {
         runInstructionTest("com/roscopeco/jasm/insntest/InvokeStatic.jasm", code -> code
-                .invokeStatic("java/lang/Thread", "currentThread", "()Ljava/lang/Thread;")
-                .noMoreCode()
+            .invokeStatic("java/lang/Thread", "currentThread", "()Ljava/lang/Thread;")
+            .noMoreCode()
+        );
+    }
+
+    @Test
+    void shouldParseInvokeStaticArray() {
+        runInstructionTest("com/roscopeco/jasm/insntest/InvokeStaticArray.jasm", code -> code
+            .invokeStatic("[java/lang/Thread", "currentThread", "()Ljava/lang/Thread;")
+            .noMoreCode()
         );
     }
 
     @Test
     void shouldParseInvokeVirtual() {
         runInstructionTest("com/roscopeco/jasm/insntest/InvokeVirtual.jasm", code -> code
-                .invokeVirtual("java/lang/String", "trim", "()Ljava/lang/String;")
-                .noMoreCode()
+            .invokeVirtual("java/lang/String", "trim", "()Ljava/lang/String;")
+            .noMoreCode()
+        );
+    }
+
+    @Test
+    void shouldParseInvokeVirtualArray() {
+        runInstructionTest("com/roscopeco/jasm/insntest/InvokeVirtualArray.jasm", code -> code
+            .invokeVirtual("[java/lang/String", "trim", "()Ljava/lang/String;")
+            .noMoreCode()
         );
     }
 

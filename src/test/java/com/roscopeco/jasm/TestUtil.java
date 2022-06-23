@@ -64,6 +64,12 @@ public class TestUtil {
         return testCaseParser(testCase).class_();
     }
 
+    public static JasmParser.ClassContext doParseString(final String jasm) {
+        return buildParser("<test>",
+            new CommonTokenStream(buildLexer("<test>", CharStreams.fromString(jasm))))
+                .class_();
+    }
+
     public static JasmLexer buildLexer(@NonNull final String unitName, @NonNull final CharStream input) {
         final var lexer = new JasmLexer(input);
         lexer.removeErrorListeners();
@@ -167,6 +173,20 @@ public class TestUtil {
         };
     }
 
+    public static Function<Object, Object> objectObjectInvoker(
+            final Object receiver,
+            final String name
+    ) {
+        return (Object arg) -> {
+            try {
+                return getAccessibleMethod(receiver, name, Object.class)
+                    .invoke(receiver instanceof Class<?> ? null : receiver, arg);
+            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                throw new AssertionFailedError("Failed to invoke " + name + " on receiver of class " + receiver.getClass(), e);
+            }
+        };
+    }
+
     public static Object instantiate(final Class<?> clz) {
         try {
             final var ctor = clz.getConstructor();
@@ -235,5 +255,15 @@ public class TestUtil {
 
     public static ClassReader loadDisasmTestClass(final String name) {
         return new ClassReader(loadDisasmTestClassBytes(name));
+    }
+
+    public static String disassemble(final String testCase) {
+        return disassemble(new JasmDisassemblingVisitor(), testCase);
+    }
+
+    public static String disassemble(final JasmDisassemblingVisitor disassembler, final String testCase) {
+        final var clz = loadDisasmTestClass(testCase);
+        clz.accept(disassembler, ClassReader.SKIP_FRAMES);
+        return disassembler.output();
     }
 }

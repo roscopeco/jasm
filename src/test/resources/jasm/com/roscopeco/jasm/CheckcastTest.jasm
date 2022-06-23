@@ -10,4 +10,10 @@ public class com/roscopeco/jasm/CheckcastTest implements com/roscopeco/jasm/mode
         checkcast java/util/List
         areturn
     }
+
+    public castToStringArray(java/lang/Object)[java/lang/String {
+        aload 1
+        checkcast [java/lang/String
+        areturn
+    }
 }
