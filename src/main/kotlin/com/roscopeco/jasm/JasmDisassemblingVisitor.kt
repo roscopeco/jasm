@@ -5,13 +5,18 @@ import com.roscopeco.jasm.antlr.JvmTypesParser
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.objectweb.asm.ClassVisitor
+import org.objectweb.asm.FieldVisitor
 import org.objectweb.asm.Handle
 import org.objectweb.asm.Label
 import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Type
 
-class JasmDisassemblingVisitor(private val modifiers: Modifiers, private val unitName: String) : ClassVisitor(Opcodes.ASM9) {
+class JasmDisassemblingVisitor(
+    private val modifiers: Modifiers,
+    private val unitName: String,
+    private val lineNumbers: Boolean
+) : ClassVisitor(Opcodes.ASM9) {
     companion object {
         private val LINE_SEPARATOR = System.lineSeparator()
 
@@ -177,9 +182,13 @@ class JasmDisassemblingVisitor(private val modifiers: Modifiers, private val uni
     
     private var access = 0
     private var name = ""
+    private var originalSourceName = "<unknown>"
     private var methods = mutableListOf<JasmDisassemblingMethodVisitor>()
+    private var fields = mutableListOf<JasmDisassemblingFieldVisitor>()
+    private var debug = ""
 
-    constructor(unitName: String) : this(Modifiers(), unitName)
+    constructor(unitName: String) : this(unitName, false)
+    constructor(unitName: String, lineNumbers: Boolean) : this(Modifiers(), unitName, lineNumbers)
 
     fun output() = output(SpaceIndenter(4))
 
@@ -187,21 +196,29 @@ class JasmDisassemblingVisitor(private val modifiers: Modifiers, private val uni
 
     private fun fileHeader(indenter: Indenter): String
             = indenter.indented("/*${LINE_SEPARATOR}") +
-                    indenter.indented(" * Disassembled from $unitName with JASM${LINE_SEPARATOR}") +
+                    indenter.indented(" * Disassembled from $unitName (originally $originalSourceName) by JASM${LINE_SEPARATOR}") +
                     indenter.indented(" */${LINE_SEPARATOR}")
 
     private fun classHeader(indenter: Indenter): String = indenter.indented("${formattedModifiers(this.access)}class ${this.name}")
 
     private fun classBody(indenter: Indenter): String {
-        return if (methods.isEmpty()) {
+        return if (methods.isEmpty() && fields.isEmpty()) {
             ""
         } else {
             " {\n${classMembers(indenter.indent())}$LINE_SEPARATOR}"
         }
     }
 
-    private fun classMembers(indenter: Indenter): String
-            = methods.joinToString(LINE_SEPARATOR + LINE_SEPARATOR) { it.output(indenter) }
+    private fun classMembers(indenter: Indenter): String {
+        val methods = methods.joinToString(LINE_SEPARATOR + LINE_SEPARATOR) { it.output(indenter) }
+        val fields = fields.joinToString(LINE_SEPARATOR + LINE_SEPARATOR) { it.output(indenter) }
+
+        var out = fields
+        if (out.isNotEmpty() && out.isNotBlank()) {
+            out += LINE_SEPARATOR + LINE_SEPARATOR
+        }
+        return out + methods
+    }
 
     override fun visit(
         version: Int,
@@ -215,6 +232,23 @@ class JasmDisassemblingVisitor(private val modifiers: Modifiers, private val uni
         this.access = access
 
         super.visit(version, access, name, signature, superName, interfaces)
+    }
+
+    override fun visitSource(source: String?, debug: String?) {
+        this.originalSourceName = source ?: "<unknown>"
+        this.debug = debug ?: ""
+    }
+
+    override fun visitField(
+        access: Int,
+        name: String,
+        descriptor: String,
+        signature: String?,
+        value: Any?
+    ): FieldVisitor {
+        val visitor = JasmDisassemblingFieldVisitor(access, name, descriptor, signature, value)
+        fields.add(visitor)
+        return visitor
     }
 
     override fun visitMethod(
@@ -236,6 +270,35 @@ class JasmDisassemblingVisitor(private val modifiers: Modifiers, private val uni
             ""
         else
             "$modsStr "
+    }
+
+    // Manually fix up bare types that may be ref arrays
+    private fun handleBareType(bareType: String): String {
+        return if (bareType.contains("[")) {
+            val lastLSquare = bareType.lastIndexOf("[")
+            bareType.substring(0, lastLSquare + 1) + bareType.substring(lastLSquare + 1, bareType.length - 1)
+        } else {
+            bareType
+        }
+    }
+
+    private fun disassembleTypeDescriptor(type: String): String {
+        val ctx = JvmTypesParser(CommonTokenStream(JvmTypesLexer(CharStreams.fromString(type)))).type()
+        return disassembleSingleType(ctx)
+    }
+
+    private fun disassembleSingleType(ctx: JvmTypesParser.TypeContext): String {
+        return if (ctx.prim_type() != null) {
+            ctx.prim_type().text
+        } else if (ctx.ref_type() != null) {
+            val ary = ctx.ref_type().ARRAY()?.joinToString("") { it.text } ?: ""
+            val name = ctx.ref_type().REF().text
+            "$ary${name.substring(1, name.length - 1)}"
+        } else if (ctx.VOID() != null) {
+            "V"
+        } else {
+            throw JasmException("[BUG]: Unparseable method descriptor ${ctx.text}")
+        }
     }
 
     private interface MethodBlock {
@@ -267,6 +330,38 @@ class JasmDisassemblingVisitor(private val modifiers: Modifiers, private val uni
                     (min..max).zip(labels).joinToString(",$LINE_SEPARATOR") { (key, label) -> blockIndent.indented("$key: $label") } +
                     LINE_SEPARATOR +
                     indenter.indented("}")
+        }
+    }
+
+    private inner class JasmDisassemblingFieldVisitor(
+        val access: Int,
+        val name: String,
+        val descriptor: String,
+        val signature: String?,
+        val value: Any?
+    ) : FieldVisitor(Opcodes.ASM9) {
+        fun output(indenter: Indenter) = fieldComment(indenter) + fieldBody(indenter)
+
+        private fun fieldComment(indenter: Indenter)
+                = indenter.indented("// ${signature ?: "<no signature>"}$LINE_SEPARATOR");
+
+        private fun fieldBody(indenter: Indenter)
+                = indenter.indented("${modifiers.disassembleFieldModifiers(access)} ${name} ${disassembleTypeDescriptor(descriptor)}") +
+                        fieldInitializer()
+
+        private fun fieldInitializer(): String {
+            return if (value == null) {
+                ""
+            } else {
+                return " = " + disassembleFieldInitializerValue(value)
+            }
+        }
+
+        private fun disassembleFieldInitializerValue(value: Any) = when (value) {
+            // TODO escaping!
+            is String -> "\"${value}\""
+            is Number -> value.toString()
+            else -> TODO("Unsupported field initializer ${value.javaClass}")
         }
     }
 
@@ -303,6 +398,12 @@ class JasmDisassemblingVisitor(private val modifiers: Modifiers, private val uni
             blocks.add(Line("exception ${getLabelName(start)}, ${getLabelName(end)}, ${getLabelName(handler)}, ${
                 handleBareType(type)
             }"))
+        }
+
+        override fun visitLineNumber(line: Int, start: Label?) {
+            if (lineNumbers) {
+                blocks.add(Line("// Line ${line}"))
+            }
         }
 
         override fun visitInsn(opcode: Int) {
@@ -386,16 +487,6 @@ class JasmDisassemblingVisitor(private val modifiers: Modifiers, private val uni
                 ""
         }
 
-        // Manual fix up bare types that may be ref arrays
-        private fun handleBareType(bareType: String): String {
-            return if (bareType.contains("[")) {
-                val lastLSquare = bareType.lastIndexOf("[")
-                bareType.substring(0, lastLSquare + 1) + bareType.substring(lastLSquare + 1, bareType.length - 1)
-            } else {
-                bareType
-            }
-        }
-
         private fun getLabelName(label: Label) = labels.getOrPut(label) { "label${nextLabelNum++}" }
 
         private fun disassembleConstArg(arg: Any): String = when (arg) {
@@ -408,25 +499,6 @@ class JasmDisassemblingVisitor(private val modifiers: Modifiers, private val uni
         private fun disassembleMethodDescriptor(descriptor: String): String {
             val ctx = JvmTypesParser(CommonTokenStream(JvmTypesLexer(CharStreams.fromString(descriptor)))).method_descriptor()
             return "(${ctx.param().joinToString(", ") { disassembleSingleType(it.type()) }})${disassembleSingleType(ctx.return_().type())}"
-        }
-
-        private fun disassembleTypeDescriptor(type: String): String {
-            val ctx = JvmTypesParser(CommonTokenStream(JvmTypesLexer(CharStreams.fromString(type)))).type()
-            return disassembleSingleType(ctx)
-        }
-
-        private fun disassembleSingleType(ctx: JvmTypesParser.TypeContext): String {
-            return if (ctx.prim_type() != null) {
-                ctx.prim_type().text
-            } else if (ctx.ref_type() != null) {
-                val ary = ctx.ref_type().ARRAY()?.joinToString("") { it.text } ?: ""
-                val name = ctx.ref_type().REF().text
-                "$ary${name.substring(1, name.length - 1)}"
-            } else if (ctx.VOID() != null) {
-                "V"
-            } else {
-                throw JasmException("[BUG]: Unparseable method descriptor $descriptor")
-            }
         }
     }
 }

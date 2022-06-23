@@ -54,6 +54,17 @@ class Modifiers {
         Pair(Opcodes.ACC_VARARGS, "varargs"),
     )
 
+    private val reverseFieldMap = listOf(  /* Keep in JLS order for nice output */
+        Pair(Opcodes.ACC_PRIVATE, "private"),
+        Pair(Opcodes.ACC_PROTECTED, "protected"),
+        Pair(Opcodes.ACC_PUBLIC, "public"),
+        Pair(Opcodes.ACC_STATIC, "static"),
+        Pair(Opcodes.ACC_FINAL, "final"),
+        Pair(Opcodes.ACC_TRANSIENT, "volatile"),
+        Pair(Opcodes.ACC_TRANSIENT, "transient"),
+        Pair(Opcodes.ACC_SYNTHETIC, "synthetic"),
+    )
+
     fun mapModifiers(modifiers: List<ParserRuleContext>): Int = modifiers
             .map { mod -> forwardMap[mod.text]!! }
             .fold(0) { value, modifier -> value or modifier }
@@ -61,6 +72,8 @@ class Modifiers {
     fun disassembleClassModifiers(modifiers: Int): String = disassembleModifiers(modifiers, reverseClassMap)
 
     fun disassembleMethodModifiers(modifiers: Int): String = disassembleModifiers(modifiers, reverseMethodMap)
+
+    fun disassembleFieldModifiers(modifiers: Int): String = disassembleModifiers(modifiers, reverseFieldMap)
 
     private fun disassembleModifiers(modifiers: Int, reverseMap: List<Pair<Int, String>>)= reverseMap.map {
             (bit, str) -> if (modifiers and bit == bit) str else ""

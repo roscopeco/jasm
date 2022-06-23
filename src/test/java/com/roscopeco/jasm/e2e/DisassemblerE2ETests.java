@@ -1,7 +1,10 @@
 package com.roscopeco.jasm.e2e;
 
 import org.junit.jupiter.api.Test;
+import org.objectweb.asm.Opcodes;
 
+import static com.roscopeco.jasm.TestUtil.assembleString;
+import static com.roscopeco.jasm.TestUtil.defineClass;
 import static com.roscopeco.jasm.TestUtil.disassemble;
 import static com.roscopeco.jasm.TestUtil.doParseString;
 import static com.roscopeco.jasm.asserts.LexerParserAssertions.assertClass;
@@ -11,7 +14,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class DisassemblerE2ETests {
     @Test
     void shouldDisassembleEmptyClass() {
-        final var test = doParseString(disassemble("EmptyClass"));
+        final var source = disassemble("EmptyClass");
+        final var test = doParseString(source);
 
         assertClass(test)
             .isPublic()
@@ -30,11 +34,14 @@ public class DisassemblerE2ETests {
                 .vreturn()
                 .label("label1:")
                 .noMoreCode();
+
+        checkAssembleAndDefineClass(source, "EmptyClass");
     }
 
     @Test
     void shouldDisassembleEmptyClassWithDefaultAccess() {
-        final var test = doParseString(disassemble("EmptyDefaultClass"));
+        final var source = disassemble("EmptyDefaultClass");
+        final var test = doParseString(source);
 
         assertClass(test)
             .isNotPublic()
@@ -53,11 +60,14 @@ public class DisassemblerE2ETests {
                 .vreturn()
                 .label("label1:")
                 .noMoreCode();
+
+        checkAssembleAndDefineClass(source, "EmptyDefaultClass");
     }
 
     @Test
     void shouldDisassembleEmptyInterface() {
-        final var test = doParseString(disassemble("EmptyInterface"));
+        final var source = disassemble("EmptyInterface");
+        final var test = doParseString(source);
 
         assertClass(test)
             .isPublic()
@@ -66,12 +76,14 @@ public class DisassemblerE2ETests {
             .hasName("com/roscopeco/jasm/model/disasm/EmptyInterface");
 
         assertThat(test.classbody()).isNull();
+
+        checkAssembleAndDefineClass(source, "EmptyInterface");
     }
 
     @Test
     void shouldDisassembleEmptyEnum() {
-        System.out.println(disassemble("EmptyEnum"));
-        final var test = doParseString(disassemble("EmptyEnum"));
+        final var source = disassemble("EmptyEnum");
+        final var test = doParseString(source);
 
         assertClass(test)
             .isPublic()
@@ -79,11 +91,14 @@ public class DisassemblerE2ETests {
             .hasName("com/roscopeco/jasm/model/disasm/EmptyEnum");
 
         // Not testing the body here, as it differs between Javac versions (11 and 17 do things differently for example)
+        // Also not testing define due to tightened up rules around enums in modern Java (trivial rename doesn't work)
     }
 
     @Test
     void shouldDisassembleClassWithTryCatch() {
-        final var test = doParseString(disassemble("ExceptionTest"));
+        System.out.println(disassemble("ExceptionTest"));
+        final var source = disassemble("ExceptionTest");
+        final var test = doParseString(source);
         assertMember(test.classbody().member(1))
             .isMethod()
             .hasName("test")
@@ -105,11 +120,14 @@ public class DisassemblerE2ETests {
                     .vreturn()
                 .label("label4:")
                     .noMoreCode();
+
+        checkAssembleAndDefineClass(source, "ExceptionTest");
     }
 
     @Test
     void shouldDisassembleClassWithLookupSwitch() {
-        final var test = doParseString(disassemble("LookupSwitchTest"));
+        final var source = disassemble("LookupSwitchTest");
+        final var test = doParseString(source);
 
         assertMember(test.classbody().member(1))
             .isMethod()
@@ -125,11 +143,14 @@ public class DisassemblerE2ETests {
                     .withCase(2000000, "label4")
                 // Not interested in the rest
             ;
+
+        checkAssembleAndDefineClass(source, "LookupSwitchTest");
     }
 
     @Test
     void shouldDisassembleClassWithTableSwitch() {
-        final var test = doParseString(disassemble("TableSwitchTest"));
+        final var source = disassemble("TableSwitchTest");
+        final var test = doParseString(source);
 
         assertMember(test.classbody().member(1))
             .isMethod()
@@ -147,5 +168,24 @@ public class DisassemblerE2ETests {
                     .withCase(5, "label4")
                 // Not interested in the rest
         ;
+
+        checkAssembleAndDefineClass(source, "TableSwitchTest");
+    }
+
+    @Test
+    void shouldDisassembleClassWithFields() {
+        final var source = disassemble("ClassWithFields");
+        final var test = doParseString(source);
+
+        assertThat(test.classbody().member()).hasSize(10);
+
+        checkAssembleAndDefineClass(source, "ClassWithFields");
+    }
+
+    private void checkAssembleAndDefineClass(final String source, final String name) {
+        final var clz = defineClass(assembleString(
+            source.replace("com/roscopeco/jasm/model/disasm/" + name, "com/roscopeco/jasm/" + name + "Test0000"), Opcodes.V11));
+
+        assertThat(clz.getName()).isEqualTo("com.roscopeco.jasm." + name + "Test0000");
     }
 }

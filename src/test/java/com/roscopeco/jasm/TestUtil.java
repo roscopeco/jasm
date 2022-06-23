@@ -17,6 +17,7 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.util.TraceClassVisitor;
 import org.opentest4j.AssertionFailedError;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -204,6 +205,20 @@ public class TestUtil {
     public static byte[] assemble(final String testCase, final int formatVersion) {
         final var bytes
             = new JasmAssembler(testCase, formatVersion, () -> inputStreamForTestCase(testCase)).assemble();
+
+        if (Boolean.parseBoolean(System.getProperty("jasmTestDumpClass"))) {
+            final var classReader = new ClassReader(bytes);
+            final var tcv = new TraceClassVisitor(new PrintWriter(System.out));
+
+            classReader.accept(tcv, 0);
+        }
+
+        return bytes;
+    }
+
+    public static byte[] assembleString(final String code, final int formatVersion) {
+        final var bytes
+            = new JasmAssembler("<test>", formatVersion, () -> new ByteArrayInputStream(code.getBytes())).assemble();
 
         if (Boolean.parseBoolean(System.getProperty("jasmTestDumpClass"))) {
             final var classReader = new ClassReader(bytes);
