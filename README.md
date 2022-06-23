@@ -2,8 +2,9 @@
 
 ### What?
 
-JASM is an assembler for JVM bytecode. Because how many times have you needed
-_that_ already today?
+JASM is an assembler/disassembler for JVM bytecode. It provides a nice syntax
+for writing JVM classes in a bytecode-focused assembly language, and can also
+disassemble any Java `.class` file to JASM source code.
 
 JASM has a [Gradle plugin](https://github.com/roscopeco/jasm-gradle-plugin) and 
 a (WIP) [Plugin for IntelliJ](https://github.com/roscopeco/jasm-intellij-plugin).
