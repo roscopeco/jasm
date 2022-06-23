@@ -162,4 +162,46 @@ public class DisassemblerE2ETests {
                 .label("label4:")
                     .noMoreCode();
     }
+
+    @Test
+    void shouldDisassembleClassWithLookupSwitch() {
+        final var test = doParseString(disassemble("LookupSwitchTest"));
+
+        assertMember(test.classbody().member(1))
+            .isMethod()
+            .hasName("test")
+            .hasDescriptor("(I)V")
+            .hasCodeSequence()
+                .label("label0:")
+                .iload(1)
+                .lookupswitch()
+                    .withDefault("label1")
+                    .withCase(1, "label2")
+                    .withCase(10000, "label3")
+                    .withCase(2000000, "label4")
+                // Not interested in the rest
+            ;
+    }
+
+    @Test
+    void shouldDisassembleClassWithTableSwitch() {
+        final var test = doParseString(disassemble("TableSwitchTest"));
+
+        assertMember(test.classbody().member(1))
+            .isMethod()
+            .hasName("test")
+            .hasDescriptor("(I)V")
+            .hasCodeSequence()
+                .label("label0:")
+                .iload(1)
+                .tableswitch()
+                    .withDefault("label1")
+                    .withCase(1, "label2")
+                    .withCase(2, "label3")
+                    .withCase(3, "label1")
+                    .withCase(4, "label1")
+                    .withCase(5, "label4")
+                // Not interested in the rest
+        ;
+    }
 }

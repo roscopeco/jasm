@@ -63,6 +63,7 @@ class JasmDisassemblingVisitor(private val modifiers: Modifiers, private val uni
             Opcodes.JSR to "jsr",
             Opcodes.LDC to "ldc",
             Opcodes.LLOAD to "lload",
+            Opcodes.LOOKUPSWITCH to "lookupswitch",
             Opcodes.LSTORE to "lstore",
             Opcodes.MULTIANEWARRAY to "multianewarray",
             Opcodes.NEW to "new",
@@ -75,6 +76,7 @@ class JasmDisassemblingVisitor(private val modifiers: Modifiers, private val uni
             Opcodes.RETURN to "return",
             Opcodes.SIPUSH to "sipush",
             Opcodes.SWAP to "swap",
+            Opcodes.TABLESWITCH to "tableswitch"
         )
     }
     
@@ -141,6 +143,38 @@ class JasmDisassemblingVisitor(private val modifiers: Modifiers, private val uni
             "$modsStr "
     }
 
+    private interface MethodBlock {
+        fun generate(indenter: Indenter): String
+    }
+
+    private class Line(val line: String) : MethodBlock {
+        override fun generate(indenter: Indenter): String {
+            return indenter.indented(line)
+        }
+    }
+
+    private class LookupSwitch(val default: String, val keys: IntArray, val labels: List<String>) : MethodBlock {
+        override fun generate(indenter: Indenter): String {
+            val blockIndent = indenter.indent()
+
+            return indenter.indented("${OPCODE_NAMES[Opcodes.LOOKUPSWITCH]!!} $default {$LINE_SEPARATOR") +
+                    keys.zip(labels).joinToString(",$LINE_SEPARATOR") { (key, label) -> blockIndent.indented("$key: $label") } +
+                    LINE_SEPARATOR +
+                    indenter.indented("}")
+        }
+    }
+
+    private class TableSwitch(val default: String, val min: Int, val max: Int, val labels: List<String>) : MethodBlock {
+        override fun generate(indenter: Indenter): String {
+            val blockIndent = indenter.indent()
+
+            return indenter.indented("${OPCODE_NAMES[Opcodes.TABLESWITCH]!!} $default {$LINE_SEPARATOR") +
+                    (min..max).zip(labels).joinToString(",$LINE_SEPARATOR") { (key, label) -> blockIndent.indented("$key: $label") } +
+                    LINE_SEPARATOR +
+                    indenter.indented("}")
+        }
+    }
+
     private inner class JasmDisassemblingMethodVisitor(
         val access: Int,
         val name: String,
@@ -151,7 +185,7 @@ class JasmDisassemblingVisitor(private val modifiers: Modifiers, private val uni
 
         private val labels = mutableMapOf<Label, String>()
         private var nextLabelNum = 0
-        private val lines = mutableListOf<String>()
+        private val blocks = mutableListOf<MethodBlock>()
 
         fun output(indenter: Indenter): String
                 = methodComment(indenter) +  methodHeader(indenter) + methodBody(indenter.indent()) + indenter.indented("}")
@@ -164,32 +198,32 @@ class JasmDisassemblingVisitor(private val modifiers: Modifiers, private val uni
                 = indenter.indented("${formattedModifiers(access)}$name${disassembleMethodDescriptor(descriptor)} {\n")
 
         fun methodBody(indenter: Indenter): String {
-            return if (lines.isNotEmpty())
-                lines.joinToString(LINE_SEPARATOR) { indenter.indented(it) } + LINE_SEPARATOR
+            return if (blocks.isNotEmpty())
+                blocks.joinToString(LINE_SEPARATOR) { it.generate(indenter) } + LINE_SEPARATOR
             else
                 ""
         }
 
         override fun visitTryCatchBlock(start: Label, end: Label, handler: Label, type: String) {
-            lines.add("exception ${getLabelName(start)}, ${getLabelName(end)}, ${getLabelName(handler)}, ${
+            blocks.add(Line("exception ${getLabelName(start)}, ${getLabelName(end)}, ${getLabelName(handler)}, ${
                 handleBareType(type)
-            }")
+            }"))
         }
 
         override fun visitInsn(opcode: Int) {
-            lines.add(OPCODE_NAMES[opcode]!!)
+            blocks.add(Line(OPCODE_NAMES[opcode]!!))
         }
 
         override fun visitIntInsn(opcode: Int, operand: Int) {
-            lines.add("${OPCODE_NAMES[opcode]!!} $operand")
+            blocks.add(Line("${OPCODE_NAMES[opcode]!!} $operand"))
         }
 
         override fun visitTypeInsn(opcode: Int, type: String) {
-            lines.add("${OPCODE_NAMES[opcode]!!} ${handleBareType(type)}")
+            blocks.add(Line("${OPCODE_NAMES[opcode]!!} ${handleBareType(type)}"))
         }
 
         override fun visitFieldInsn(opcode: Int, owner: String, name: String, descriptor: String) {
-            lines.add("${OPCODE_NAMES[opcode]!!} ${handleBareType(owner)}.$name ${disassembleTypeDescriptor(descriptor)}")
+            blocks.add(Line("${OPCODE_NAMES[opcode]!!} ${handleBareType(owner)}.$name ${disassembleTypeDescriptor(descriptor)}"))
         }
 
         override fun visitMethodInsn(
@@ -199,7 +233,7 @@ class JasmDisassemblingVisitor(private val modifiers: Modifiers, private val uni
             descriptor: String,
             isInterface: Boolean
         ) {
-            lines.add("${OPCODE_NAMES[opcode]!!} ${handleBareType(owner)}.$name${disassembleMethodDescriptor(descriptor)}")
+            blocks.add(Line("${OPCODE_NAMES[opcode]!!} ${handleBareType(owner)}.$name${disassembleMethodDescriptor(descriptor)}"))
         }
 
         override fun visitInvokeDynamicInsn(
@@ -212,40 +246,40 @@ class JasmDisassemblingVisitor(private val modifiers: Modifiers, private val uni
         }
 
         override fun visitJumpInsn(opcode: Int, label: Label) {
-            lines.add("${OPCODE_NAMES[opcode]!!} ${getLabelName(label)}")
+            blocks.add(Line("${OPCODE_NAMES[opcode]!!} ${getLabelName(label)}"))
         }
 
         override fun visitLabel(label: Label) {
-            lines.add("")
-            lines.add("${getLabelName(label)}:")
+            blocks.add(Line(""))
+            blocks.add(Line("${getLabelName(label)}:"))
         }
 
         override fun visitLdcInsn(value: Any) {
-            lines.add("${OPCODE_NAMES[Opcodes.LDC]!!} ${disassembleConstArg(value)}")
+            blocks.add(Line("${OPCODE_NAMES[Opcodes.LDC]!!} ${disassembleConstArg(value)}"))
         }
 
         override fun visitIincInsn(varIndex: Int, increment: Int) {
-            lines.add("${OPCODE_NAMES[Opcodes.IINC]!!} $varIndex, [$increment]")
+            blocks.add(Line("${OPCODE_NAMES[Opcodes.IINC]!!} $varIndex, [$increment]"))
         }
 
-        override fun visitTableSwitchInsn(min: Int, max: Int, dflt: Label, vararg labels: Label?) {
-            todo(Opcodes.TABLESWITCH)
+        override fun visitTableSwitchInsn(min: Int, max: Int, dflt: Label, vararg labels: Label) {
+            blocks.add(TableSwitch(getLabelName(dflt), min, max, labels.map { getLabelName(it) }))
         }
 
-        override fun visitLookupSwitchInsn(dflt: Label, keys: IntArray?, labels: Array<out Label>?) {
-            todo(Opcodes.LOOKUPSWITCH)
+        override fun visitLookupSwitchInsn(dflt: Label, keys: IntArray, labels: Array<out Label>) {
+            blocks.add(LookupSwitch(getLabelName(dflt), keys, labels.map { getLabelName(it) }))
         }
 
         override fun visitMultiANewArrayInsn(descriptor: String, numDimensions: Int) {
-            lines.add("${OPCODE_NAMES[Opcodes.MULTIANEWARRAY]!!} ${disassembleTypeDescriptor(descriptor)}, $numDimensions")
+            blocks.add(Line("${OPCODE_NAMES[Opcodes.MULTIANEWARRAY]!!} ${disassembleTypeDescriptor(descriptor)}, $numDimensions"))
         }
 
         override fun visitVarInsn(opcode: Int, varIndex: Int) {
-            lines.add("${OPCODE_NAMES[opcode]} $varIndex")
+            blocks.add(Line("${OPCODE_NAMES[opcode]} $varIndex"))
         }
 
         private fun todo(opcode: Int) {
-            lines.add("// TODO unimplemented opcode $opcode")
+            blocks.add(Line("// TODO unimplemented opcode $opcode"))
         }
 
         private fun formattedModifiers(modifierBitmap: Int): String {
