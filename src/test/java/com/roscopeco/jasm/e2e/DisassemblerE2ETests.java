@@ -70,7 +70,8 @@ public class DisassemblerE2ETests {
 
     @Test
     void shouldDisassembleEmptyEnum() {
-        // This is probably quite brittle, they could change the way enums work under the hood and this would start failing...
+        // This is quite brittle, they could change the way enums work under the hood and this would start failing...
+        System.out.println(disassemble("EmptyEnum"));
         final var test = doParseString(disassemble("EmptyEnum"));
 
         assertClass(test)

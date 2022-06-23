@@ -11,7 +11,7 @@ import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Type
 
-class JasmDisassemblingVisitor(private val modifiers: Modifiers) : ClassVisitor(Opcodes.ASM9) {
+class JasmDisassemblingVisitor(private val modifiers: Modifiers, private val unitName: String) : ClassVisitor(Opcodes.ASM9) {
     companion object {
         private val LINE_SEPARATOR = System.lineSeparator()
 
@@ -82,12 +82,17 @@ class JasmDisassemblingVisitor(private val modifiers: Modifiers) : ClassVisitor(
     private var name = ""
     private var methods = mutableListOf<JasmDisassemblingMethodVisitor>()
 
-    constructor() : this(Modifiers())
+    constructor(unitName: String) : this(Modifiers(), unitName)
 
     fun output() = output(SpaceIndenter(4))
 
-    fun output(indenter: Indenter): String = classHeader(indenter) + classBody(indenter) + LINE_SEPARATOR
-    
+    fun output(indenter: Indenter): String = fileHeader(indenter) + classHeader(indenter) + classBody(indenter) + LINE_SEPARATOR
+
+    fun fileHeader(indenter: Indenter): String
+            = indenter.indented("/*${LINE_SEPARATOR}") +
+                    indenter.indented(" * Disassembled from ${unitName} with JASM${LINE_SEPARATOR}") +
+                    indenter.indented(" */${LINE_SEPARATOR}")
+
     fun classHeader(indenter: Indenter): String = indenter.indented("${formattedModifiers(this.access)}class ${this.name}")
 
     fun classBody(indenter: Indenter): String {
@@ -149,7 +154,11 @@ class JasmDisassemblingVisitor(private val modifiers: Modifiers) : ClassVisitor(
         private val lines = mutableListOf<String>()
 
         fun output(indenter: Indenter): String
-                = methodHeader(indenter) + methodBody(indenter.indent()) + indenter.indented("}")
+                = methodComment(indenter) +  methodHeader(indenter) + methodBody(indenter.indent()) + indenter.indented("}")
+
+        fun methodComment(indenter: Indenter): String
+                = indenter.indented("// ${signature ?: "<no signature>"}$LINE_SEPARATOR") +
+                    indenter.indented("// ${exceptions?.joinToString(", ") ?: "<no exceptions>"}$LINE_SEPARATOR")
 
         fun methodHeader(indenter: Indenter): String
                 = indenter.indented("${formattedModifiers(access)}$name${disassembleMethodDescriptor(descriptor)} {\n")

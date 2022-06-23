@@ -258,7 +258,7 @@ public class TestUtil {
     }
 
     public static String disassemble(final String testCase) {
-        return disassemble(new JasmDisassemblingVisitor(), testCase);
+        return disassemble(new JasmDisassemblingVisitor(testCase), testCase);
     }
 
     public static String disassemble(final JasmDisassemblingVisitor disassembler, final String testCase) {
