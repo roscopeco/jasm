@@ -5,17 +5,9 @@
  */
 package com.roscopeco.jasm;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.lang.invoke.MethodHandles;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.function.Function;
-import java.util.function.Supplier;
-
 import com.roscopeco.jasm.antlr.JasmLexer;
 import com.roscopeco.jasm.antlr.JasmParser;
+import com.roscopeco.jasm.errors.StandardErrorCollector;
 import lombok.NonNull;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
@@ -25,6 +17,21 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.util.TraceClassVisitor;
 import org.opentest4j.AssertionFailedError;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.UncheckedIOException;
+import java.lang.invoke.MethodHandles;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.URISyntaxException;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -57,6 +64,12 @@ public class TestUtil {
 
     public static JasmParser.ClassContext doParse(final String testCase) {
         return testCaseParser(testCase).class_();
+    }
+
+    public static JasmParser.ClassContext doParseString(final String jasm) {
+        return buildParser("<test>",
+            new CommonTokenStream(buildLexer("<test>", CharStreams.fromString(jasm))))
+                .class_();
     }
 
     public static JasmLexer buildLexer(@NonNull final String unitName, @NonNull final CharStream input) {
@@ -162,6 +175,20 @@ public class TestUtil {
         };
     }
 
+    public static Function<Object, Object> objectObjectInvoker(
+            final Object receiver,
+            final String name
+    ) {
+        return (Object arg) -> {
+            try {
+                return getAccessibleMethod(receiver, name, Object.class)
+                    .invoke(receiver instanceof Class<?> ? null : receiver, arg);
+            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                throw new AssertionFailedError("Failed to invoke " + name + " on receiver of class " + receiver.getClass(), e);
+            }
+        };
+    }
+
     public static Object instantiate(final Class<?> clz) {
         try {
             final var ctor = clz.getConstructor();
@@ -190,6 +217,20 @@ public class TestUtil {
         return bytes;
     }
 
+    public static byte[] assembleString(final String code, final int formatVersion) {
+        final var bytes
+            = new JasmAssembler("<test>", formatVersion, () -> new ByteArrayInputStream(code.getBytes())).assemble();
+
+        if (Boolean.parseBoolean(System.getProperty("jasmTestDumpClass"))) {
+            final var classReader = new ClassReader(bytes);
+            final var tcv = new TraceClassVisitor(new PrintWriter(System.out));
+
+            classReader.accept(tcv, 0);
+        }
+
+        return bytes;
+    }
+
     public static Class<?> assembleAndDefine(final String testCase) {
         return defineClass(assemble(testCase, Opcodes.V11));
     }
@@ -204,5 +245,46 @@ public class TestUtil {
         } catch (IllegalAccessException e) {
             throw new AssertionFailedError("Failed to define class", e);
         }
+    }
+
+    public static byte[] loadDisasmTestClassBytes(final String name) {
+        try {
+            final var filename = "/com/roscopeco/jasm/model/disasm/" + name + ".class";
+            final var url = TestUtil.class.getResource(filename);
+
+            if (url == null) {
+                throw new FileNotFoundException(filename);
+            } else {
+                final var in = new FileInputStream(new File(url.toURI()));
+                final var out = new byte[in.available()];
+                if (in.read(out) == 0) {
+                    throw new IOException("No data");
+                }
+                return out;
+            }
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static ClassReader loadDisasmTestClass(final String name) {
+        return new ClassReader(loadDisasmTestClassBytes(name));
+    }
+
+    public static String disassemble(final String testCase) {
+        return disassemble(new JasmDisassemblingVisitor(testCase, new StandardErrorCollector()), testCase);
+    }
+
+    public static String disassemble(final JasmDisassemblingVisitor disassembler, final String testCase) {
+        final var clz = loadDisasmTestClass(testCase);
+        clz.accept(disassembler, ClassReader.SKIP_FRAMES);
+
+        if (Boolean.parseBoolean(System.getProperty("jasmTestDumpClass"))) {
+            System.out.println(disassembler.output());
+        }
+
+        return disassembler.output();
     }
 }

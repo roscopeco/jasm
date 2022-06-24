@@ -28,4 +28,21 @@ public class com/roscopeco/jasm/InvokeTests {
         aload 1
         areturn
     }
+
+    public testArrayReceiver(java/lang/Object) java/lang/Object {
+        aload 1
+        checkcast [java/lang/Object
+        invokevirtual [java/lang/Object.clone()java/lang/Object
+        areturn
+    }
+
+    public testStaticOnInterface() java/util/Map {
+        ldc "World"
+        bipush 97
+        invokestatic java/lang/Character.valueOf(C)java/lang/Character
+
+        // asterisk here forces an InterfaceMethodref to be generated, needed for e.g. statics on interfaces.
+        invokestatic* java/util/Map.of(java/lang/Object, java/lang/Object)java/util/Map
+        areturn
+    }
 }

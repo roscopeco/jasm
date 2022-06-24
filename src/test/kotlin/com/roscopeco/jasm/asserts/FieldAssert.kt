@@ -7,6 +7,8 @@ package com.roscopeco.jasm.asserts
 
 import com.roscopeco.jasm.antlr.JasmParser.FieldContext
 import org.assertj.core.api.AbstractAssert
+import org.assertj.core.api.AssertionsForInterfaceTypes
+import org.assertj.core.api.ListAssert
 
 class FieldAssert internal constructor(actual: FieldContext) :
     AbstractAssert<FieldAssert, FieldContext>(actual, FieldAssert::class.java) {
@@ -88,6 +90,18 @@ class FieldAssert internal constructor(actual: FieldContext) :
                         + actual.type().text
             )
         }
+
+        return this
+    }
+
+    fun hasModifiers(vararg modifiers: String) = modifierAssert { it.containsAll(modifiers.toList()) }
+
+    private fun modifierAssert(assert: (ListAssert<String>) -> Unit): FieldAssert {
+        isNotNull
+
+        assert.invoke(
+            AssertionsForInterfaceTypes.assertThat(actual.field_modifier().map { it.text })
+            .`as`("Modifier list for ${actual.membername().text}"))
 
         return this
     }

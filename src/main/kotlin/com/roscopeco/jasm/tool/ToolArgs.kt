@@ -13,6 +13,12 @@ class ToolArgs {
     @Parameter(names = ["-o", "--output"], description = "Output base directory for class files")
     var outputDirectory: String = "."
 
+    @Parameter(names = ["-d", "--disassemble"], description = "Disassemble Java class files")
+    var disassmbly: Boolean = false
+
+    @Parameter(names = ["-l", "--line-numbers"], description = "Emit line number comments in disassembly")
+    var emitLineNumbers: Boolean = false
+
     @Parameter(names = ["-target", "--target"], description = "Generate class files suitable for the specified class format versionx")
     var target: Int = Opcodes.V11;
 

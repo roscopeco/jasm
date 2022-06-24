@@ -2,8 +2,9 @@
 
 ### What?
 
-JASM is an assembler for JVM bytecode. Because how many times have you needed
-_that_ already today?
+JASM is an assembler/disassembler for JVM bytecode. It provides a nice syntax
+for writing JVM classes in a bytecode-focused assembly language, and can also
+disassemble any Java `.class` file to JASM source code.
 
 JASM has a [Gradle plugin](https://github.com/roscopeco/jasm-gradle-plugin) and 
 a (WIP) [Plugin for IntelliJ](https://github.com/roscopeco/jasm-intellij-plugin).
@@ -137,9 +138,18 @@ To simply assemble a file `src/com/example/MyClass.jasm` to the `classes` direct
 
 `bin/jasm -i src -o classes com/example/MyClass.jasm`
 
+Or to disassemble a `.class` file `src/com/example/MyClass.class` to the `src` directory:
+
+`bin/jasm -d -i classes -o src com/example/MyClass.class`
+
 Notice that you set the source and destination directories, and just pass the relative
-path to the files within them - this is how the assembler creates the class files in the
-appropriate place the JVM expects to find them.
+path to the files within them - this is how the assembler creates the output files in the
+appropriate place (in a `com/example` directory under the destination directory in
+the example above).
+
+When disassembling, you can optionally specify the `-l` flag, which will cause JASM to 
+output comments in the disassembly with the original line number (if this information is
+present in the `.class` file).
 
 #### Building the tool with Gradle
 
