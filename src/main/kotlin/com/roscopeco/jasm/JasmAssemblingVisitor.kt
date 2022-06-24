@@ -430,7 +430,7 @@ class JasmAssemblingVisitor(
                     TypeVisitor(unitName, errorCollector).visitOwner(ctx.owner()),
                     ctx.membername().text,
                     TypeVisitor(unitName, errorCollector).visitMethod_descriptor(ctx.method_descriptor()),
-                    false
+                    ctx.STAR() != null
                 )
 
         override fun visitInsn_invokevirtual(ctx: JasmParser.Insn_invokevirtualContext)
@@ -439,7 +439,7 @@ class JasmAssemblingVisitor(
                     TypeVisitor(unitName, errorCollector).visitOwner(ctx.owner()),
                     ctx.membername().text,
                     TypeVisitor(unitName, errorCollector).visitMethod_descriptor(ctx.method_descriptor()),
-                    false
+                    ctx.STAR() != null
                 )
 
         override fun visitInsn_ior(ctx: JasmParser.Insn_iorContext) = methodVisitor.visitInsn(Opcodes.IOR)

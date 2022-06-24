@@ -841,8 +841,8 @@ bootstrap_spec
 handle_tag
  : INVOKEINTERFACE
  | INVOKESPECIAL
- | INVOKESTATIC
- | INVOKEVIRTUAL
+ | INVOKESTATIC STAR?
+ | INVOKEVIRTUAL STAR?
  | NEWINVOKESPECIAL
  | GETFIELD
  | GETSTATIC
@@ -874,11 +874,11 @@ insn_invokespecial
  ;
 
 insn_invokestatic
- : INVOKESTATIC owner DOT membername method_descriptor
+ : INVOKESTATIC STAR? owner DOT membername method_descriptor
  ;
 
 insn_invokevirtual
- : INVOKEVIRTUAL owner DOT membername method_descriptor
+ : INVOKEVIRTUAL STAR? owner DOT membername method_descriptor
  ;
 
 insn_ior
@@ -1128,6 +1128,7 @@ COLON   : ':';
 COMMA   : ',';
 EQUALS  : '=';
 DQUOTE  : '"';
+STAR    : '*';
 
 CLASS       : 'class';
 EXTENDS     : 'extends';

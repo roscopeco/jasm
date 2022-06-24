@@ -1,0 +1,5 @@
+class com/roscopeco/jasm/insntest/InvokeStaticStar {
+    insnTest()V {
+        invokestatic* java/lang/Thread.currentThread()java/lang/Thread
+    }
+}

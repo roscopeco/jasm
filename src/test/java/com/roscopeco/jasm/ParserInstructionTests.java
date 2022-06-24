@@ -282,7 +282,7 @@ class ParserInstructionTests {
     @Test
     void shouldParseInvokeStatic() {
         runInstructionTest("com/roscopeco/jasm/insntest/InvokeStatic.jasm", code -> code
-            .invokeStatic("java/lang/Thread", "currentThread", "()Ljava/lang/Thread;")
+            .invokeStatic("java/lang/Thread", "currentThread", "()Ljava/lang/Thread;", false)
             .noMoreCode()
         );
     }
@@ -290,7 +290,15 @@ class ParserInstructionTests {
     @Test
     void shouldParseInvokeStaticArray() {
         runInstructionTest("com/roscopeco/jasm/insntest/InvokeStaticArray.jasm", code -> code
-            .invokeStatic("[java/lang/Thread", "currentThread", "()Ljava/lang/Thread;")
+            .invokeStatic("[java/lang/Thread", "currentThread", "()Ljava/lang/Thread;", false)
+            .noMoreCode()
+        );
+    }
+
+    @Test
+    void shouldParseInvokeStaticStar() {
+        runInstructionTest("com/roscopeco/jasm/insntest/InvokeStaticStar.jasm", code -> code
+            .invokeStatic("java/lang/Thread", "currentThread", "()Ljava/lang/Thread;", true)
             .noMoreCode()
         );
     }
@@ -298,7 +306,7 @@ class ParserInstructionTests {
     @Test
     void shouldParseInvokeVirtual() {
         runInstructionTest("com/roscopeco/jasm/insntest/InvokeVirtual.jasm", code -> code
-            .invokeVirtual("java/lang/String", "trim", "()Ljava/lang/String;")
+            .invokeVirtual("java/lang/String", "trim", "()Ljava/lang/String;", false)
             .noMoreCode()
         );
     }
@@ -306,7 +314,15 @@ class ParserInstructionTests {
     @Test
     void shouldParseInvokeVirtualArray() {
         runInstructionTest("com/roscopeco/jasm/insntest/InvokeVirtualArray.jasm", code -> code
-            .invokeVirtual("[java/lang/String", "trim", "()Ljava/lang/String;")
+            .invokeVirtual("[java/lang/String", "trim", "()Ljava/lang/String;", false)
+            .noMoreCode()
+        );
+    }
+
+    @Test
+    void shouldParseInvokeVirtualStar() {
+        runInstructionTest("com/roscopeco/jasm/insntest/InvokeVirtualStar.jasm", code -> code
+            .invokeVirtual("java/lang/String", "trim", "()Ljava/lang/String;", true)
             .noMoreCode()
         );
     }

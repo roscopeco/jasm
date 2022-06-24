@@ -37,6 +37,7 @@ import org.objectweb.asm.Opcodes;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static com.roscopeco.jasm.TestUtil.assemble;
 import static com.roscopeco.jasm.TestUtil.assembleAndDefine;
@@ -202,7 +203,7 @@ class AssemblerE2ETests {
         assertThat(clz.getDeclaredFields()).isEmpty();
 
         assertThat(clz.getDeclaredConstructors()).hasSize(1);
-        assertThat(clz.getDeclaredMethods()).hasSize(4);
+        assertThat(clz.getDeclaredMethods()).hasSize(5);
 
         final var obj = instantiate(clz);
 
@@ -220,6 +221,11 @@ class AssemblerE2ETests {
         assertThat(objectObjectInvoker(obj, "testArrayReceiver").apply(array))
             .isEqualTo(array)
             .isNotSameAs(array);
+
+        assertThat((Map<?,?>)objectVoidInvoker(obj, "testStaticOnInterface").get())
+            .isNotNull()
+            .extracting(m -> m.get("World"))
+            .isEqualTo('a');
     }
 
     @Test

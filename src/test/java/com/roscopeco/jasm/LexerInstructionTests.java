@@ -970,6 +970,38 @@ class LexerInstructionTests {
     }
 
     @Test
+    void shouldLexInvokeStaticStar() {
+        runInstructionTest("com/roscopeco/jasm/insntest/InvokeStaticStar.jasm", lexer -> {
+            assertNextToken(lexer)
+                .hasType(JasmLexer.INVOKESTATIC);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.STAR);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.QNAME)
+                .hasText("java/lang/Thread");
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.DOT);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.NAME)
+                .hasText("currentThread");
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.LPAREN);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.RPAREN);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.QNAME)
+                .hasText("java/lang/Thread");
+        });
+    }
+
+    @Test
     void shouldLexInvokeVirtual() {
         runInstructionTest("com/roscopeco/jasm/insntest/InvokeVirtual.jasm", lexer -> {
             assertNextToken(lexer)
@@ -1006,6 +1038,38 @@ class LexerInstructionTests {
 
             assertNextToken(lexer)
                 .hasType(JasmLexer.LSQUARE);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.QNAME)
+                .hasText("java/lang/String");
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.DOT);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.NAME)
+                .hasText("trim");
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.LPAREN);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.RPAREN);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.QNAME)
+                .hasText("java/lang/String");
+        });
+    }
+
+    @Test
+    void shouldLexInvokeVirtualStar() {
+        runInstructionTest("com/roscopeco/jasm/insntest/InvokeVirtualStar.jasm", lexer -> {
+            assertNextToken(lexer)
+                .hasType(JasmLexer.INVOKEVIRTUAL);
+
+            assertNextToken(lexer)
+                .hasType(JasmLexer.STAR);
 
             assertNextToken(lexer)
                 .hasType(JasmLexer.QNAME)
