@@ -22,7 +22,7 @@ public class TasksTest {
         final var tasks = Tasks.createTasks(createTestArgs(), f -> true);
 
         assertThat(tasks)
-            .extracting(AssembleTask::getSrc)
+            .extracting(FileTransformTask::getSrc)
             .extracting(File::getPath)
             .containsExactly(
                 Path.of("input", "dir", "one.jasm").toString(),
@@ -31,7 +31,7 @@ public class TasksTest {
             );
 
         assertThat(tasks)
-            .extracting(AssembleTask::getDest)
+            .extracting(FileTransformTask::getDest)
             .extracting(File::getPath)
             .containsExactly(
                 Path.of("output", "dir", "one.class").toString(),
@@ -39,7 +39,7 @@ public class TasksTest {
                 Path.of("output", "dir", "has/path/three.class").toString()
             );
 
-        assertThat(tasks)
+        assertThat(tasks.stream().filter(t -> t instanceof AssembleTask).map(AssembleTask.class::cast))
             .extracting(AssembleTask::getTargetVersion)
             .allMatch(ver -> ver == 50);
     }

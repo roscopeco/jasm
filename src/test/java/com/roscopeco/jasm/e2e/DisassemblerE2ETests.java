@@ -96,7 +96,6 @@ public class DisassemblerE2ETests {
 
     @Test
     void shouldDisassembleClassWithTryCatch() {
-        System.out.println(disassemble("ExceptionTest"));
         final var source = disassemble("ExceptionTest");
         final var test = doParseString(source);
         assertMember(test.classbody().member(1))
