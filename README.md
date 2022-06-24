@@ -138,7 +138,7 @@ To simply assemble a file `src/com/example/MyClass.jasm` to the `classes` direct
 
 `bin/jasm -i src -o classes com/example/MyClass.jasm`
 
-Or to disassemble a `.class` file `src/com/example/MyClass.class` to the `src` directory:
+Or to disassemble a `.class` file `classes/com/example/MyClass.class` to the `src` directory:
 
 `bin/jasm -d -i classes -o src com/example/MyClass.class`
 
