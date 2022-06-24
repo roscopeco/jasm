@@ -456,5 +456,6 @@ valid JASM:
                 java/lang/Class,
             )java/lang/Object
             [com/roscopeco/jasm/model/TestBootstrap]
+        }
 ```
 
