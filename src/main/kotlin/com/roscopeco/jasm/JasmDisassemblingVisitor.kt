@@ -2,9 +2,13 @@ package com.roscopeco.jasm
 
 import com.roscopeco.jasm.antlr.JvmTypesLexer
 import com.roscopeco.jasm.antlr.JvmTypesParser
+import com.roscopeco.jasm.errors.DisassemblyContext
+import com.roscopeco.jasm.errors.DisassemblyError
+import com.roscopeco.jasm.errors.ErrorCollector
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.objectweb.asm.ClassVisitor
+import org.objectweb.asm.ConstantDynamic
 import org.objectweb.asm.FieldVisitor
 import org.objectweb.asm.Handle
 import org.objectweb.asm.Label
@@ -15,7 +19,8 @@ import org.objectweb.asm.Type
 class JasmDisassemblingVisitor(
     private val modifiers: Modifiers,
     private val unitName: String,
-    private val lineNumbers: Boolean
+    private val lineNumbers: Boolean,
+    private val errorCollector: ErrorCollector
 ) : ClassVisitor(Opcodes.ASM9) {
     companion object {
         private val LINE_SEPARATOR = System.lineSeparator()
@@ -178,6 +183,34 @@ class JasmDisassemblingVisitor(
             Opcodes.SWAP to "swap",
             Opcodes.TABLESWITCH to "tableswitch"
         )
+
+        private val HANDLE_TAGS = listOf(
+            "<DISASMBUG>",
+            "getfield",
+            "getstatic",
+            "putfield",
+            "putstatic",
+            "invokevirtual",
+            "invokestatic",
+            "invokespecial",
+            "newinvokespecial",
+            "invokeinterface"
+        )
+
+        private val NEWARRAY_TYPES = listOf(
+            "<DISASMBUG>",
+            "<DISASMBUG>",
+            "<DISASMBUG>",
+            "<DISASMBUG>",
+            "Z",
+            "C",
+            "F",
+            "D",
+            "B",
+            "S",
+            "I",
+            "J"
+        )
     }
     
     private var access = 0
@@ -187,8 +220,8 @@ class JasmDisassemblingVisitor(
     private var fields = mutableListOf<JasmDisassemblingFieldVisitor>()
     private var debug = ""
 
-    constructor(unitName: String) : this(unitName, false)
-    constructor(unitName: String, lineNumbers: Boolean) : this(Modifiers(), unitName, lineNumbers)
+    constructor(unitName: String, errorCollector: ErrorCollector) : this(unitName, false, errorCollector)
+    constructor(unitName: String, lineNumbers: Boolean, errorCollector: ErrorCollector) : this(Modifiers(), unitName, lineNumbers, errorCollector)
 
     fun output() = output(SpaceIndenter(4))
 
@@ -282,6 +315,47 @@ class JasmDisassemblingVisitor(
         }
     }
 
+    private fun disassembleConstArg(arg: Any?, indenter: Indenter): String = when (arg) {
+        null -> "null" // This should probably never happen!
+        is String -> "\"${arg.replace("\"", "\"\"")}\""
+        is Type -> if (arg.sort == Type.METHOD) disassembleMethodDescriptor(arg.descriptor) else handleBareType(arg.internalName)
+        is Handle -> disassembleMethodHandle(arg)
+        is ConstantDynamic -> disassembleConstDynamic(arg, indenter)
+        else -> {
+            errorCollector.addError(DisassemblyError(unitName, DisassemblyContext.ConstArg, "Unexpected const arg type ${arg.javaClass}"))
+            "null"  // TODO this isn't useful...
+        }
+    }
+
+    private fun disassembleConstDynamic(arg: ConstantDynamic, indenter: Indenter): String {
+        val block1 = indenter.indent()
+        val bootstrapArguments = (0 until arg.bootstrapMethodArgumentCount).map { arg.getBootstrapMethodArgument(it) }.toTypedArray()
+
+        return indenter.indented("constdynamic ${arg.name} ${disassembleTypeDescriptor(arg.descriptor)} {$LINE_SEPARATOR") +
+               block1.indented(disassembleMethodHandle(arg.bootstrapMethod)) + LINE_SEPARATOR +
+               block1.indented(disassembleBootstrapArguments(block1, bootstrapArguments)) +
+               indenter.indented("}$LINE_SEPARATOR")
+    }
+
+    private fun disassembleMethodHandle(handle: Handle): String {
+        return "${HANDLE_TAGS[handle.tag]} ${handleBareType(handle.owner)}.${handle.name}${disassembleMethodDescriptor(handle.desc)}"
+    }
+
+    private fun disassembleBootstrapArguments(indenter: Indenter, arguments: Array<out Any?>): String {
+        return if (arguments.isNotEmpty()) {
+            indenter.indented("[${
+                arguments.joinToString(", ") { disassembleConstArg(it, indenter) }
+            }]$LINE_SEPARATOR")
+        } else {
+            ""
+        }
+    }
+
+    private fun disassembleMethodDescriptor(descriptor: String): String {
+        val ctx = JvmTypesParser(CommonTokenStream(JvmTypesLexer(CharStreams.fromString(descriptor)))).method_descriptor()
+        return "(${ctx.param().joinToString(", ") { disassembleSingleType(it.type()) }})${disassembleSingleType(ctx.return_().type())}"
+    }
+
     private fun disassembleTypeDescriptor(type: String): String {
         val ctx = JvmTypesParser(CommonTokenStream(JvmTypesLexer(CharStreams.fromString(type)))).type()
         return disassembleSingleType(ctx)
@@ -297,7 +371,9 @@ class JasmDisassemblingVisitor(
         } else if (ctx.VOID() != null) {
             "V"
         } else {
-            throw JasmException("[BUG]: Unparseable method descriptor ${ctx.text}")
+            errorCollector.addError(DisassemblyError(unitName, DisassemblyContext.Descriptor,
+                "Probable bug: Unparseable type in descriptor ${ctx.text}; Replaced with void"))
+            "V"
         }
     }
 
@@ -305,13 +381,13 @@ class JasmDisassemblingVisitor(
         fun generate(indenter: Indenter): String
     }
 
-    private class Line(val line: String) : MethodBlock {
+    private inner class Line(val line: String) : MethodBlock {
         override fun generate(indenter: Indenter): String {
             return indenter.indented(line)
         }
     }
 
-    private class LookupSwitch(val default: String, val keys: IntArray, val labels: List<String>) : MethodBlock {
+    private inner class LookupSwitch(val default: String, val keys: IntArray, val labels: List<String>) : MethodBlock {
         override fun generate(indenter: Indenter): String {
             val blockIndent = indenter.indent()
 
@@ -322,7 +398,7 @@ class JasmDisassemblingVisitor(
         }
     }
 
-    private class TableSwitch(val default: String, val min: Int, val max: Int, val labels: List<String>) : MethodBlock {
+    private inner class TableSwitch(val default: String, val min: Int, val max: Int, val labels: List<String>) : MethodBlock {
         override fun generate(indenter: Indenter): String {
             val blockIndent = indenter.indent()
 
@@ -331,6 +407,27 @@ class JasmDisassemblingVisitor(
                     LINE_SEPARATOR +
                     indenter.indented("}")
         }
+    }
+
+    private inner class InvokeDynamic(
+        val name: String,
+        val descriptor: String,
+        val bootstrapMethodHandle: Handle,
+        val bootstrapMethodArguments: Array<out Any?>
+    ) : MethodBlock {
+        override fun generate(indenter: Indenter): String {
+            val blockIndent = indenter.indent()
+
+            return indenter.indented("${OPCODE_NAMES[Opcodes.INVOKEDYNAMIC]!!} $name${disassembleMethodDescriptor(descriptor)} {$LINE_SEPARATOR") +
+                    blockIndent.indented("${disassembleMethodHandle(bootstrapMethodHandle)}$LINE_SEPARATOR") +
+                    disassembleBootstrapArguments(blockIndent, bootstrapMethodArguments) +
+                    indenter.indented("}$LINE_SEPARATOR")
+        }
+    }
+
+    private inner class Ldc(val value: Any): MethodBlock {
+        override fun generate(indenter: Indenter): String
+                = indenter.indented("${OPCODE_NAMES[Opcodes.LDC]!!} ${disassembleConstArg(value, indenter)}")
     }
 
     private inner class JasmDisassemblingFieldVisitor(
@@ -343,10 +440,10 @@ class JasmDisassemblingVisitor(
         fun output(indenter: Indenter) = fieldComment(indenter) + fieldBody(indenter)
 
         private fun fieldComment(indenter: Indenter)
-                = indenter.indented("// ${signature ?: "<no signature>"}$LINE_SEPARATOR");
+                = indenter.indented("// ${signature ?: "<no signature>"}$LINE_SEPARATOR")
 
         private fun fieldBody(indenter: Indenter)
-                = indenter.indented("${modifiers.disassembleFieldModifiers(access)} ${name} ${disassembleTypeDescriptor(descriptor)}") +
+                = indenter.indented("${modifiers.disassembleFieldModifiers(access)} $name ${disassembleTypeDescriptor(descriptor)}") +
                         fieldInitializer()
 
         private fun fieldInitializer(): String {
@@ -358,8 +455,7 @@ class JasmDisassemblingVisitor(
         }
 
         private fun disassembleFieldInitializerValue(value: Any) = when (value) {
-            // TODO escaping!
-            is String -> "\"${value}\""
+            is String -> "\"${value.replace("\"", "\"\"")}\""
             is Number -> value.toString()
             else -> TODO("Unsupported field initializer ${value.javaClass}")
         }
@@ -402,7 +498,7 @@ class JasmDisassemblingVisitor(
 
         override fun visitLineNumber(line: Int, start: Label?) {
             if (lineNumbers) {
-                blocks.add(Line("// Line ${line}"))
+                blocks.add(Line("// Line $line"))
             }
         }
 
@@ -411,7 +507,12 @@ class JasmDisassemblingVisitor(
         }
 
         override fun visitIntInsn(opcode: Int, operand: Int) {
-            blocks.add(Line("${OPCODE_NAMES[opcode]!!} $operand"))
+            if (opcode == Opcodes.NEWARRAY) {
+                // Handle this specially
+                blocks.add(Line("${OPCODE_NAMES[opcode]!!} ${NEWARRAY_TYPES[operand]}"))
+            } else {
+                blocks.add(Line("${OPCODE_NAMES[opcode]!!} $operand"))
+            }
         }
 
         override fun visitTypeInsn(opcode: Int, type: String) {
@@ -429,7 +530,27 @@ class JasmDisassemblingVisitor(
             descriptor: String,
             isInterface: Boolean
         ) {
-            blocks.add(Line("${OPCODE_NAMES[opcode]!!} ${handleBareType(owner)}.$name${disassembleMethodDescriptor(descriptor)}"))
+            if (opcode == Opcodes.INVOKEVIRTUAL || opcode == Opcodes.INVOKESTATIC) {
+                blocks.add(
+                    Line(
+                        "${OPCODE_NAMES[opcode]!!}${if (isInterface) "*" else ""} ${handleBareType(owner)}.$name${
+                            disassembleMethodDescriptor(
+                                descriptor
+                            )
+                        }"
+                    )
+                )
+            } else {
+                blocks.add(
+                    Line(
+                        "${OPCODE_NAMES[opcode]!!} ${handleBareType(owner)}.$name${
+                            disassembleMethodDescriptor(
+                                descriptor
+                            )
+                        }"
+                    )
+                )
+            }
         }
 
         override fun visitInvokeDynamicInsn(
@@ -438,7 +559,7 @@ class JasmDisassemblingVisitor(
             bootstrapMethodHandle: Handle,
             vararg bootstrapMethodArguments: Any?
         ) {
-            todo(Opcodes.INVOKEDYNAMIC)
+            blocks.add(InvokeDynamic(name, descriptor, bootstrapMethodHandle, bootstrapMethodArguments))
         }
 
         override fun visitJumpInsn(opcode: Int, label: Label) {
@@ -451,7 +572,7 @@ class JasmDisassemblingVisitor(
         }
 
         override fun visitLdcInsn(value: Any) {
-            blocks.add(Line("${OPCODE_NAMES[Opcodes.LDC]!!} ${disassembleConstArg(value)}"))
+            blocks.add(Ldc(value))
         }
 
         override fun visitIincInsn(varIndex: Int, increment: Int) {
@@ -474,10 +595,6 @@ class JasmDisassemblingVisitor(
             blocks.add(Line("${OPCODE_NAMES[opcode]} $varIndex"))
         }
 
-        private fun todo(opcode: Int) {
-            blocks.add(Line("// TODO unimplemented opcode $opcode"))
-        }
-
         private fun formattedModifiers(modifierBitmap: Int): String {
             val modsStr = modifiers.disassembleMethodModifiers(modifierBitmap)
 
@@ -488,17 +605,5 @@ class JasmDisassemblingVisitor(
         }
 
         private fun getLabelName(label: Label) = labels.getOrPut(label) { "label${nextLabelNum++}" }
-
-        private fun disassembleConstArg(arg: Any): String = when (arg) {
-            // TODO escapes etc!
-            is String -> "\"${arg}\""
-            is Type -> arg.internalName
-            else -> TODO("Const arg type '${arg.javaClass}' not yet supported")
-        }
-
-        private fun disassembleMethodDescriptor(descriptor: String): String {
-            val ctx = JvmTypesParser(CommonTokenStream(JvmTypesLexer(CharStreams.fromString(descriptor)))).method_descriptor()
-            return "(${ctx.param().joinToString(", ") { disassembleSingleType(it.type()) }})${disassembleSingleType(ctx.return_().type())}"
-        }
     }
 }

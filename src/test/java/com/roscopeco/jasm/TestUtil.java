@@ -7,6 +7,7 @@ package com.roscopeco.jasm;
 
 import com.roscopeco.jasm.antlr.JasmLexer;
 import com.roscopeco.jasm.antlr.JasmParser;
+import com.roscopeco.jasm.errors.StandardErrorCollector;
 import lombok.NonNull;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
@@ -273,12 +274,17 @@ public class TestUtil {
     }
 
     public static String disassemble(final String testCase) {
-        return disassemble(new JasmDisassemblingVisitor(testCase), testCase);
+        return disassemble(new JasmDisassemblingVisitor(testCase, new StandardErrorCollector()), testCase);
     }
 
     public static String disassemble(final JasmDisassemblingVisitor disassembler, final String testCase) {
         final var clz = loadDisasmTestClass(testCase);
         clz.accept(disassembler, ClassReader.SKIP_FRAMES);
+
+        if (Boolean.parseBoolean(System.getProperty("jasmTestDumpClass"))) {
+            System.out.println(disassembler.output());
+        }
+
         return disassembler.output();
     }
 }

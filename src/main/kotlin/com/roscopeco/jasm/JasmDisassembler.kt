@@ -5,6 +5,7 @@
  */
 package com.roscopeco.jasm
 
+import com.roscopeco.jasm.errors.StandardErrorCollector
 import org.objectweb.asm.ClassReader
 import java.io.IOException
 import java.io.InputStream
@@ -21,6 +22,7 @@ import java.util.function.Supplier
  */
 class JasmDisassembler(
     private val unitName: String,
+    private val lineNumbers: Boolean,
     private val source: Supplier<InputStream>,
 ) {
 
@@ -32,11 +34,18 @@ class JasmDisassembler(
     fun disassemble(): String {
         try {
             source.get().use { input ->
+                val errorCollector = StandardErrorCollector()
+
                 val classReader = ClassReader(input)
 
-                val visitor = JasmDisassemblingVisitor(unitName, true)
+                val visitor = JasmDisassemblingVisitor(unitName, lineNumbers, errorCollector)
                 classReader.accept(visitor, ClassReader.SKIP_FRAMES)
-                return visitor.output()
+
+                if (errorCollector.hasErrors()) {
+                    throw AssemblyException(errorCollector.getErrors())
+                } else {
+                    return visitor.output()
+                }
             }
         } catch (e: IOException) {
             throw UncheckedIOException(e)

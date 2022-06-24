@@ -907,7 +907,7 @@ class CodeSequenceAssert<Caller> internal constructor(actual: Stat_blockContext,
             { t: T -> ownerExtractor.invoke(t).text },
             { t: T -> membernameExtractor.invoke(t).text },
             { t: T -> TypeVisitor("<testcase>", errorCollector).visitType(typeExtractor.invoke(t)) },
-            { t: T -> false }
+            { false }
         )
     }
 

@@ -19,6 +19,7 @@ object Tasks {
                     DisassembleTask(
                         it.second,
                         Paths.get(args.outputDirectory, fixJasmExtension(it.first)).toFile(),
+                        args.emitLineNumbers
                     )
                 } else {
                     AssembleTask(

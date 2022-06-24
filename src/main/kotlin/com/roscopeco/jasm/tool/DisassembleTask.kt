@@ -5,8 +5,8 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 
-class DisassembleTask(src: File, dest: File) : FileTransformTask<AssemblyResult>(src, dest) {
-    private val assembler = JasmDisassembler(unitName()) { FileInputStream(src) }
+class DisassembleTask(src: File, dest: File, private val emitLineNumbers: Boolean) : FileTransformTask<AssemblyResult>(src, dest) {
+    private val assembler = JasmDisassembler(unitName(), emitLineNumbers) { FileInputStream(src) }
 
     private fun unitName(): String = src.name
     

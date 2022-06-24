@@ -3,6 +3,8 @@ package com.roscopeco.jasm.e2e;
 import org.junit.jupiter.api.Test;
 import org.objectweb.asm.Opcodes;
 
+import java.lang.reflect.InvocationTargetException;
+
 import static com.roscopeco.jasm.TestUtil.assembleString;
 import static com.roscopeco.jasm.TestUtil.defineClass;
 import static com.roscopeco.jasm.TestUtil.disassemble;
@@ -113,8 +115,8 @@ public class DisassemblerE2ETests {
                 .label("label1:")
                     .astore(1)
                 .label("label2:")
-                    .invokeStatic("java/lang/Thread", "currentThread", "()Ljava/lang/Thread;")
-                    .invokeVirtual("java/lang/Thread", "interrupt", "()V")
+                    .invokeStatic("java/lang/Thread", "currentThread", "()Ljava/lang/Thread;", false)
+                    .invokeVirtual("java/lang/Thread", "interrupt", "()V", false)
                 .label("label3:")
                     .vreturn()
                 .label("label4:")
@@ -181,10 +183,25 @@ public class DisassemblerE2ETests {
         checkAssembleAndDefineClass(source, "ClassWithFields");
     }
 
-    private void checkAssembleAndDefineClass(final String source, final String name) {
+    @Test
+    void shouldDisassembleInvokeDynamic() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        final var source = disassemble("InvokeDynamicTest");
+        final var test = doParseString(source);
+
+        assertThat(test.classbody().member()).hasSize(2);
+
+        final var clz = checkAssembleAndDefineClass(source, "InvokeDynamicTest");
+        final var result = clz.getMethod("test").invoke(null);
+
+        assertThat(result).isEqualTo("Hello World");
+    }
+
+    private Class<?> checkAssembleAndDefineClass(final String source, final String name) {
         final var clz = defineClass(assembleString(
             source.replace("com/roscopeco/jasm/model/disasm/" + name, "com/roscopeco/jasm/" + name + "Test0000"), Opcodes.V11));
 
         assertThat(clz.getName()).isEqualTo("com.roscopeco.jasm." + name + "Test0000");
+
+        return clz;
     }
 }
