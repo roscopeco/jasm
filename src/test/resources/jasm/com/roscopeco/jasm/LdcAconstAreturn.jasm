@@ -25,6 +25,16 @@ class com/roscopeco/jasm/LdcAconstAreturn implements com/roscopeco/jasm/model/Ld
         freturn
     }
 
+    public testLdcLong()J {
+        ldc 100L
+        lreturn
+    }
+
+    public testLdcDouble()D {
+        ldc 100.0d
+        dreturn
+    }
+
     public testLdcBool()Z {
         ldc true
         ireturn

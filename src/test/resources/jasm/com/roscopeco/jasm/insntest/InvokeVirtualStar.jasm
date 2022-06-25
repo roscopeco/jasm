@@ -1,0 +1,5 @@
+class com/roscopeco/jasm/insntest/InvokeVirtualStar {
+    insnTest()V {
+        invokevirtual* java/lang/String.trim()java/lang/String
+    }
+}

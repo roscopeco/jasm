@@ -107,10 +107,30 @@ class JasmAssemblingVisitor(
         constant.substring(1, constant.length - 1).replace("\"\"", "\"")
 
     private fun generateFieldInitializer(ctx: JasmParser.Field_initializerContext?) = when {
-        ctx?.int_atom() != null     -> ctx.int_atom().text.toInt()
-        ctx?.float_atom() != null   -> ctx.float_atom().text.toFloat()
+        ctx?.int_atom() != null     -> generateInteger(ctx.int_atom())
+        ctx?.float_atom() != null   -> generateFloatingPoint(ctx.float_atom())
         ctx?.string_atom() != null  -> unescapeConstantString(ctx.string_atom().text)
         else                        -> null
+    }
+
+    private fun generateInteger(atom: JasmParser.Int_atomContext): Any = when {
+        atom.INT() != null          -> atom.INT().text.toInt()
+        atom.LONG() != null         -> atom.LONG().text.substring(0, atom.LONG().text.length - 1).toLong()
+        else                        -> {
+            /* should never happen! */
+            CodeError(unitName, atom, "Invalid integer: ${atom.text}")
+            0
+        }
+    }
+
+    private fun generateFloatingPoint(atom: JasmParser.Float_atomContext) = when {
+        atom.FLOAT() != null        -> atom.FLOAT().text.toFloat()
+        atom.DOUBLE() != null       -> atom.DOUBLE().text.substring(0, atom.DOUBLE().text.length - 1).toDouble()
+        else                        -> {
+            /* should never happen! */
+            CodeError(unitName, atom, "Invalid floating point: ${atom.text}")
+            0.0f
+        }
     }
 
     override fun visitMethod(ctx: JasmParser.MethodContext) {
@@ -181,7 +201,8 @@ class JasmAssemblingVisitor(
         override fun visitInsn_castore(ctx: JasmParser.Insn_castoreContext) = methodVisitor.visitInsn(Opcodes.CASTORE)
 
         override fun visitInsn_checkcast(ctx: JasmParser.Insn_checkcastContext)
-                = methodVisitor.visitTypeInsn(Opcodes.CHECKCAST, ctx.QNAME().text)
+                = methodVisitor.visitTypeInsn(Opcodes.CHECKCAST,
+                    TypeVisitor(unitName, errorCollector).visitInsn_checkcast(ctx))
 
         override fun visitInsn_d2f(ctx: JasmParser.Insn_d2fContext) = methodVisitor.visitInsn(Opcodes.D2F)
 
@@ -408,7 +429,7 @@ class JasmAssemblingVisitor(
         override fun visitInsn_invokeinterface(ctx: JasmParser.Insn_invokeinterfaceContext)
                 = visitNonDynamicInvoke(
                     Opcodes.INVOKEINTERFACE,
-                    ctx.owner().text,
+                    TypeVisitor(unitName, errorCollector).visitOwner(ctx.owner()),
                     ctx.membername().text,
                     TypeVisitor(unitName, errorCollector).visitMethod_descriptor(ctx.method_descriptor()),
                     true
@@ -417,7 +438,7 @@ class JasmAssemblingVisitor(
         override fun visitInsn_invokespecial(ctx: JasmParser.Insn_invokespecialContext)
                 = visitNonDynamicInvoke(
                     Opcodes.INVOKESPECIAL,
-                    ctx.owner().text,
+                    TypeVisitor(unitName, errorCollector).visitOwner(ctx.owner()),
                     ctx.membername().text,
                     TypeVisitor(unitName, errorCollector).visitMethod_descriptor(ctx.method_descriptor()),
                     false
@@ -426,19 +447,19 @@ class JasmAssemblingVisitor(
         override fun visitInsn_invokestatic(ctx: JasmParser.Insn_invokestaticContext)
                 = visitNonDynamicInvoke(
                     Opcodes.INVOKESTATIC,
-                    ctx.owner().text,
+                    TypeVisitor(unitName, errorCollector).visitOwner(ctx.owner()),
                     ctx.membername().text,
                     TypeVisitor(unitName, errorCollector).visitMethod_descriptor(ctx.method_descriptor()),
-                    false
+                    ctx.STAR() != null
                 )
 
         override fun visitInsn_invokevirtual(ctx: JasmParser.Insn_invokevirtualContext)
                 = visitNonDynamicInvoke(
                     Opcodes.INVOKEVIRTUAL,
-                    ctx.owner().text,
+                    TypeVisitor(unitName, errorCollector).visitOwner(ctx.owner()),
                     ctx.membername().text,
                     TypeVisitor(unitName, errorCollector).visitMethod_descriptor(ctx.method_descriptor()),
-                    false
+                    ctx.STAR() != null
                 )
 
         override fun visitInsn_ior(ctx: JasmParser.Insn_iorContext) = methodVisitor.visitInsn(Opcodes.IOR)
@@ -678,7 +699,7 @@ class JasmAssemblingVisitor(
         private fun buildBootstrapHandle(ctx: JasmParser.Method_handleContext): Handle {
             return Handle(
                 generateTagForHandle(ctx),
-                ctx.bootstrap_spec().owner().text,
+                TypeVisitor(unitName, errorCollector).visitOwner(ctx.bootstrap_spec().owner()),
                 ctx.bootstrap_spec().membername().text,
                 TypeVisitor(unitName, errorCollector).visitMethod_descriptor(ctx.bootstrap_spec().method_descriptor()),
                 ctx.handle_tag().INVOKEINTERFACE() != null,
@@ -707,8 +728,8 @@ class JasmAssemblingVisitor(
 
         private fun generateSingleConstArg(idx: Int, ctx: JasmParser.Const_argContext): Any {
             return when {
-                ctx.int_atom() != null          -> Integer.parseInt(ctx.int_atom().text)
-                ctx.float_atom() != null        -> java.lang.Float.parseFloat(ctx.float_atom().text)
+                ctx.int_atom() != null          -> generateInteger(ctx.int_atom())
+                ctx.float_atom() != null        -> generateFloatingPoint(ctx.float_atom())
                 ctx.string_atom() != null       -> unescapeConstantString(ctx.string_atom().text)
                 ctx.bool_atom() != null         -> if (java.lang.Boolean.parseBoolean(ctx.bool_atom().text)) 1 else 0
                 ctx.QNAME() != null             -> Type.getType("L" + ctx.QNAME().text + ";")

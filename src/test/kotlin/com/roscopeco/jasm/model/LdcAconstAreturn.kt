@@ -8,6 +8,8 @@ interface LdcAconstAreturn {
     fun testLdcString(): String
     fun testLdcInt(): Int
     fun testLdcFloat(): Float
+    fun testLdcLong(): Long
+    fun testLdcDouble(): Double
     fun testLdcBool(): Boolean
     fun testLdcClass(): Class<*>
     fun testLdcMethodType(): MethodType

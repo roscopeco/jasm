@@ -2,8 +2,9 @@
 
 ### What?
 
-JASM is an assembler for JVM bytecode. Because how many times have you needed
-_that_ already today?
+JASM is an assembler/disassembler for JVM bytecode. It provides a nice syntax
+for writing JVM classes in a bytecode-focused assembly language, and can also
+disassemble any Java `.class` file to JASM source code.
 
 JASM has a [Gradle plugin](https://github.com/roscopeco/jasm-gradle-plugin) and 
 a (WIP) [Plugin for IntelliJ](https://github.com/roscopeco/jasm-intellij-plugin).
@@ -24,89 +25,7 @@ public class com/example/HelloWorld {
 }
 ```
 
-All your favourite instructions (in fact, _all_ the JVM instructions) are supported:
-
-```java
-public class com/example/MyClass
-extends com/example/Superclass
-implements com/example/SomeInterface {
-    public <init>()V {
-        aload 0
-        invokespecial com/example/Superclass.<init>()V
-        return
-    }
-
-    public dontAddCanary(java/util/List)V {
-        goto skipAdd
-
-        aload 1
-        ldc "CANARY"
-        invokeinterface java/util/List.add(java/lang/Object)Z 
-        
-    skipAdd:
-        return
-    }
-}
-```
-
-And you can use advanced JVM features like `invokedynamic` and dynamic constants that aren't 
-directly available in the Java language:
-
-```java
-public doBasicInvokeDynamicTest()java/lang/String {
-    invokedynamic get()java/util/function/Supplier {
-        invokestatic java/lang/invoke/LambdaMetafactory.metafactory(
-            java/lang/invoke/MethodHandles$Lookup,
-            java/lang/String,
-            java/lang/invoke/MethodType,
-            java/lang/invoke/MethodType,
-            java/lang/invoke/MethodHandle,
-            java/lang/invoke/MethodType,
-        )java/lang/invoke/CallSite
-        [
-            ()java/lang/Object,
-            invokestatic com/roscopeco/jasm/model/TestBootstrap.lambdaGetImpl()java/lang/String,
-            ()java/lang/String
-        ]
-    }
-    
-    invokeinterface java/util/function/Supplier.get()java/lang/Object
-    checkcast java/lang/String
-    areturn
-}
-```
-
-There's a smidge of syntactic sugar around types in case you just can't 
-get used to the JVM internal names (for primitives), so you can do e.g. :
-
-```java
-public myGreatMethod(int, long, java/util/List) java/util/List {
-    
-    // cool assembly stuff...
-        
-}
-```
-
-In addiiton to lots of examples in [the tests](src/test/resources/jasm) showing the syntax for
-the different instructions and with examples of how they're used, there is also some more in-depth
-documentation and a few "standard recipes" in [the cookbook](docs/cookbook.md).
-
-### Why not just use Jasmin?
-
-The venerable [Jasmin](https://github.com/davidar/jasmin) project has been around for years,
-and has the advantage of being mature, stable, and well supported everywhere (for example, 
-Github does syntax highlighting for it). So why not just use that?
-
-Of course it's totally personal choice which you use, but there are a few reasons to choose
-JASM over Jasmin:
-
-* JASM supports all the modern features of the latest JVMs, such as
-  * `invokedynamic` and dynamic constants
-  * `record` classes etc
-* JASM has some nice "quality of life" features, such as automatically computing stack map frames / maxlocals for you
-* JASM is built on modern tooling, whereas Jasmin's code is showing its age a bit
-  * This makes it easy, for example, to build [Gradle](https://github.com/roscopeco/jasm-gradle-plugin) and [IntelliJ](https://github.com/roscopeco/jasm-intellij-plugin) integration for JASM
-* JASM has (IMHO) a cleaner syntax than Jasmin
+See the [Examples](docs/examples.md) for more examples of JASM code.
 
 ### How?
 
@@ -137,9 +56,18 @@ To simply assemble a file `src/com/example/MyClass.jasm` to the `classes` direct
 
 `bin/jasm -i src -o classes com/example/MyClass.jasm`
 
+Or to disassemble a `.class` file `classes/com/example/MyClass.class` to the `src` directory:
+
+`bin/jasm -d -i classes -o src com/example/MyClass.class`
+
 Notice that you set the source and destination directories, and just pass the relative
-path to the files within them - this is how the assembler creates the class files in the
-appropriate place the JVM expects to find them.
+path to the files within them - this is how the assembler creates the output files in the
+appropriate place (in a `com/example` directory under the destination directory in
+the example above).
+
+When disassembling, you can optionally specify the `-l` flag, which will cause JASM to 
+output comments in the disassembly with the original line number (if this information is
+present in the `.class` file).
 
 #### Building the tool with Gradle
 
@@ -155,7 +83,7 @@ E.g. (for Gradle):
 
 ```kotlin
 dependencies {
-  implementation("com.roscopeco.jasm:jasm:0.5.0")
+  implementation("com.roscopeco.jasm:jasm:0.6.0")
 }
 ```
 
@@ -164,9 +92,6 @@ dependencies {
 Well, **why not**?
 
 I wrote this for fun, which I had both in writing it and playing with it. 
-
-I release it without any real expectation that it will be _useful_, but with 
-the sincere hope that you too might find it fun.
 
 If you really need some use-cases to justify the electrons squandered in
 pursuit of this project, how about these (some lifted from Jasmin's README):
@@ -191,6 +116,25 @@ pursuit of this project, how about these (some lifted from Jasmin's README):
 
 * Teachers - Perhaps you're teaching a compiler course, maybe you could use this
   to introduce students to JVM bytecode, or even as an IL for the compilers.
+
+#### Why not just use Jasmin?
+
+The venerable [Jasmin](https://github.com/davidar/jasmin) project has been around for years,
+and has the advantage of being mature, stable, and well supported everywhere (for example,
+Github does syntax highlighting for it). So why not just use that?
+
+Of course it's totally personal choice which you use, but there are a few reasons to choose
+JASM over Jasmin:
+
+* JASM supports all the modern features of the latest JVMs, such as
+  * `invokedynamic` and dynamic constants
+  * `record` classes etc
+* JASM has some nice "quality of life" features, such as automatically computing stack map frames / maxlocals for you
+* JASM is built on modern tooling, whereas Jasmin's code is showing its age a bit
+  * This makes it easy, for example, to build [Gradle](https://github.com/roscopeco/jasm-gradle-plugin) and [IntelliJ](https://github.com/roscopeco/jasm-intellij-plugin) integration for JASM
+* JASM comes with a full-featured built-in disassembler
+* JASM has (IMHO) a cleaner syntax than Jasmin
+
 
 ### Who?
 

@@ -21,6 +21,7 @@ import com.roscopeco.jasm.antlr.JasmParser.Insn_invokestaticContext
 import com.roscopeco.jasm.antlr.JasmParser.Insn_invokevirtualContext
 import com.roscopeco.jasm.antlr.JasmParser.Const_argContext
 import org.antlr.v4.runtime.tree.TerminalNode
+import org.assertj.core.extractor.Extractors
 
 class CodeSequenceAssert<Caller> internal constructor(actual: Stat_blockContext, private val caller: Caller) :
     AbstractAssert<CodeSequenceAssert<Caller>, Stat_blockContext>(actual, CodeSequenceAssert::class.java) {
@@ -81,7 +82,7 @@ class CodeSequenceAssert<Caller> internal constructor(actual: Stat_blockContext,
     fun castore() = genericNoOperandCheck("castore", InstructionContext::insn_castore)
 
     fun checkcast(expected: String) = genericStringOperandCheck("checkcast", expected, InstructionContext:: insn_checkcast) {
-            checkcast -> checkcast.QNAME().text
+            checkcast -> (checkcast.LSQUARE()?.joinToString("") { it.text } ?: "") + checkcast.QNAME().text
     }
 
     fun d2f() = genericNoOperandCheck("d2f", InstructionContext::insn_d2f)
@@ -378,11 +379,12 @@ class CodeSequenceAssert<Caller> internal constructor(actual: Stat_blockContext,
             owner,
             name,
             descriptor,
+            true,
             InstructionContext::insn_invokeinterface,
             Insn_invokeinterfaceContext::owner,
             Insn_invokeinterfaceContext::membername,
             Insn_invokeinterfaceContext::method_descriptor
-        )
+        ) { true }
 
     fun invokeSpecial(
         owner: String,
@@ -393,41 +395,46 @@ class CodeSequenceAssert<Caller> internal constructor(actual: Stat_blockContext,
             owner,
             name,
             descriptor,
+            false,
             InstructionContext::insn_invokespecial,
             Insn_invokespecialContext::owner,
             Insn_invokespecialContext::membername,
-            Insn_invokespecialContext::method_descriptor
-        )
+            Insn_invokespecialContext::method_descriptor,
+        ) { false }
 
     fun invokeStatic(
         owner: String,
         name: String,
-        descriptor: String
+        descriptor: String,
+        isInterface: Boolean
     ) = genericNonDynamicInvokeCheck(
             "invokestatic",
             owner,
             name,
             descriptor,
+            isInterface,
             InstructionContext::insn_invokestatic,
             Insn_invokestaticContext::owner,
             Insn_invokestaticContext::membername,
-            Insn_invokestaticContext::method_descriptor
-        )
+            Insn_invokestaticContext::method_descriptor,
+        ) { t -> t.STAR() != null }
 
     fun invokeVirtual(
         owner: String,
         name: String,
-        descriptor: String
+        descriptor: String,
+        isInterface: Boolean
     ) = genericNonDynamicInvokeCheck(
             "invokevirtual",
             owner,
             name,
             descriptor,
+            isInterface,
             InstructionContext::insn_invokevirtual,
             Insn_invokevirtualContext::owner,
             Insn_invokevirtualContext::membername,
-            Insn_invokevirtualContext::method_descriptor
-        )
+            Insn_invokevirtualContext::method_descriptor,
+        ) { t -> t.STAR() != null }
 
     fun ior() = genericNoOperandCheck("ior", InstructionContext::insn_ior)
 
@@ -858,20 +865,24 @@ class CodeSequenceAssert<Caller> internal constructor(actual: Stat_blockContext,
         owner: String,
         name: String,
         descriptor: String,
+        isInterface: Boolean,
         invokeExtractor: (InstructionContext) -> T,
         ownerExtractor: (T) -> OwnerContext,
         membernameExtractor: (T) -> MembernameContext,
-        descriptorExtractor: (T) -> Method_descriptorContext
+        descriptorExtractor: (T) -> Method_descriptorContext,
+        interfaceExtractor: (T) -> Boolean
     ): CodeSequenceAssert<Caller> {
         return genericOwnerNameTypeCheckCheck(
             invokeType,
             owner,
             name,
             descriptor,
+            isInterface,
             invokeExtractor,
             { t: T -> ownerExtractor.invoke(t).text },
             { t: T -> membernameExtractor.invoke(t).text },
-            { t: T -> TypeVisitor("<testcase>", errorCollector).visitMethod_descriptor(descriptorExtractor.invoke(t)) }
+            { t: T -> TypeVisitor("<testcase>", errorCollector).visitMethod_descriptor(descriptorExtractor.invoke(t)) },
+            interfaceExtractor
         )
     }
 
@@ -884,17 +895,19 @@ class CodeSequenceAssert<Caller> internal constructor(actual: Stat_blockContext,
         accessExtractor: (InstructionContext) -> T,
         ownerExtractor: (T) -> OwnerContext,
         membernameExtractor: (T) -> MembernameContext,
-        typeExtractor: (T) -> JasmParser.TypeContext
+        typeExtractor: (T) -> JasmParser.TypeContext,
     ): CodeSequenceAssert<Caller> {
         return genericOwnerNameTypeCheckCheck(
             accessType,
             owner,
             name,
             descriptor,
+            false,
             accessExtractor,
             { t: T -> ownerExtractor.invoke(t).text },
             { t: T -> membernameExtractor.invoke(t).text },
-            { t: T -> TypeVisitor("<testcase>", errorCollector).visitType(typeExtractor.invoke(t)) }
+            { t: T -> TypeVisitor("<testcase>", errorCollector).visitType(typeExtractor.invoke(t)) },
+            { false }
         )
     }
 
@@ -903,10 +916,12 @@ class CodeSequenceAssert<Caller> internal constructor(actual: Stat_blockContext,
         owner: String,
         name: String,
         descriptor: String,
+        isInterface: Boolean,
         invokeExtractor: (InstructionContext) -> T,
         ownerExtractor: (T) -> String,
         membernameExtractor: (T) -> String,
-        descriptorExtractor: (T) -> String
+        descriptorExtractor: (T) -> String,
+        interfaceIndicatorExtractor: (T) -> Boolean
     ): CodeSequenceAssert<Caller> {
 
         val failMessageSupplier = { insn: InstructionContext ->
@@ -930,9 +945,11 @@ class CodeSequenceAssert<Caller> internal constructor(actual: Stat_blockContext,
         }
 
         val insn = invokeExtractor.invoke(stat.instruction())
+
         val extractedOwner = ownerExtractor.invoke(insn)
         val extractedName = membernameExtractor.invoke(insn)
         val extractedDesc = descriptorExtractor.invoke(insn)
+        val extractedInterfaceIndicator = interfaceIndicatorExtractor.invoke(insn)
 
         if (owner != extractedOwner) {
             failWithMessage(
@@ -947,6 +964,11 @@ class CodeSequenceAssert<Caller> internal constructor(actual: Stat_blockContext,
         if (descriptor != extractedDesc) {
             failWithMessage(
                 "${failMessageSupplier.invoke(stat.instruction())}\n  <descriptor mismatch'$descriptor' vs '${extractedDesc}'>"
+            )
+        }
+        if (isInterface != extractedInterfaceIndicator) {
+            failWithMessage(
+                "${failMessageSupplier.invoke(stat.instruction())}\n  <interface indicator mismatch '$extractedInterfaceIndicator' vs '${isInterface}'>"
             )
         }
 

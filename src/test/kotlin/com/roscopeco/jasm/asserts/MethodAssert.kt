@@ -10,6 +10,8 @@ import com.roscopeco.jasm.TypeVisitor
 import com.roscopeco.jasm.antlr.JasmParser.MethodContext
 import org.assertj.core.api.AbstractAssert
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.AssertionsForInterfaceTypes
+import org.assertj.core.api.ListAssert
 
 class MethodAssert internal constructor(actual: MethodContext) :
     AbstractAssert<MethodAssert, MethodContext>(actual, MethodAssert::class.java) {
@@ -96,6 +98,24 @@ class MethodAssert internal constructor(actual: MethodContext) :
         return this
     }
 
-
     fun hasCodeSequence() = CodeSequenceAssert(actual.stat_block(), this)
+
+    fun isPublic() = modifierAssert { it.contains("public") }
+
+    fun isPrivate() = modifierAssert { it.contains("private") }
+
+    fun isNotPublic() = modifierAssert { it.doesNotContain("public") }
+
+    fun isAbstract() = modifierAssert { it.contains("abstract") }
+
+    fun isStatic() = modifierAssert { it.contains("static") }
+
+    private fun modifierAssert(assert: (ListAssert<String>) -> Unit): MethodAssert {
+        isNotNull
+
+        assert.invoke(AssertionsForInterfaceTypes.assertThat(actual.method_modifier().map { it.text })
+            .`as`("Modifier list for ${actual.membername().text}"))
+
+        return this
+    }
 }
