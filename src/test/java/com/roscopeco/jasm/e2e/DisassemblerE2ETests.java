@@ -1,5 +1,8 @@
 package com.roscopeco.jasm.e2e;
 
+import com.roscopeco.jasm.model.Interface1;
+import com.roscopeco.jasm.model.Interface2;
+import com.roscopeco.jasm.model.Superclass;
 import org.junit.jupiter.api.Test;
 import org.objectweb.asm.Opcodes;
 
@@ -185,6 +188,7 @@ public class DisassemblerE2ETests {
 
     @Test
     void shouldDisassembleInvokeDynamic() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        System.out.println(disassemble("InvokeDynamicTest"));
         final var source = disassemble("InvokeDynamicTest");
         final var test = doParseString(source);
 
@@ -198,7 +202,6 @@ public class DisassemblerE2ETests {
 
     @Test
     void shouldDisassembleLdcTests() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        System.out.println(disassemble("LdcTests"));
         final var source = disassemble("LdcTests");
         final var test = doParseString(source);
 
@@ -221,6 +224,21 @@ public class DisassemblerE2ETests {
         result = clz.getMethod("returnDouble").invoke(null);
         assertThat(result).isEqualTo(10.2d);
     }
+
+    @Test
+    void shouldDisassembleExtendsImplements() {
+        final var source = disassemble("ExtendsImplementsTest");
+        final var test = doParseString(source);
+
+        assertThat(test.classbody().member()).hasSize(1);
+
+        final var clz = checkAssembleAndDefineClass(source, "ExtendsImplementsTest");
+
+        assertThat(clz.getSuperclass()).isEqualTo(Superclass.class);
+        assertThat(clz.getInterfaces())
+            .containsExactlyInAnyOrder(Interface1.class, Interface2.class);
+    }
+
     private Class<?> checkAssembleAndDefineClass(final String source, final String name) {
         final var clz = defineClass(assembleString(
             source.replace("com/roscopeco/jasm/model/disasm/" + name, "com/roscopeco/jasm/" + name + "Test0000"), Opcodes.V11));
