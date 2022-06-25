@@ -219,6 +219,10 @@ class JasmDisassemblingVisitor(
     private var methods = mutableListOf<JasmDisassemblingMethodVisitor>()
     private var fields = mutableListOf<JasmDisassemblingFieldVisitor>()
     private var debug = ""
+    private var originalVersion = 0
+    private var signature = "<no signature>"
+    private var supername = ""
+    private var interfaces = mutableListOf<String>()
 
     constructor(unitName: String, errorCollector: ErrorCollector) : this(unitName, false, errorCollector)
     constructor(unitName: String, lineNumbers: Boolean, errorCollector: ErrorCollector) : this(Modifiers(), unitName, lineNumbers, errorCollector)
@@ -230,9 +234,28 @@ class JasmDisassemblingVisitor(
     private fun fileHeader(indenter: Indenter): String
             = indenter.indented("/*${LINE_SEPARATOR}") +
                     indenter.indented(" * Disassembled from $unitName (originally $originalSourceName) by JASM${LINE_SEPARATOR}") +
+                    indenter.indented(" *") + LINE_SEPARATOR +
+                    indenter.indented(" * Original class version: $originalVersion") + LINE_SEPARATOR +
+                    indenter.indented(" * Signature: $signature") + LINE_SEPARATOR +
                     indenter.indented(" */${LINE_SEPARATOR}")
 
-    private fun classHeader(indenter: Indenter): String = indenter.indented("${formattedModifiers(this.access)}class ${this.name}")
+    private fun classHeader(indenter: Indenter): String = indenter.indented("${formattedModifiers(this.access)}class ${this.name}${extends()}${implements()}")
+
+    private fun extends(): String {
+        if (this.supername.isEmpty() || this.supername.isBlank() || this.supername == "java/lang/Object") {
+            return ""
+        } else {
+            return " extends ${this.supername}"
+        }
+    }
+
+    private fun implements(): String {
+        if (this.interfaces.isEmpty()) {
+            return ""
+        } else {
+            return " implements ${this.interfaces.joinToString(", ")}"
+        }
+    }
 
     private fun classBody(indenter: Indenter): String {
         return if (methods.isEmpty() && fields.isEmpty()) {
@@ -261,10 +284,12 @@ class JasmDisassemblingVisitor(
         superName: String?,
         interfaces: Array<out String>?
     ) {
+        this.originalVersion = version
         this.name = name!!
         this.access = access
-
-        super.visit(version, access, name, signature, superName, interfaces)
+        this.signature = signature ?: "<no signature>"
+        this.supername = superName ?: ""
+        this.interfaces.addAll(interfaces ?: emptyArray())
     }
 
     override fun visitSource(source: String?, debug: String?) {
