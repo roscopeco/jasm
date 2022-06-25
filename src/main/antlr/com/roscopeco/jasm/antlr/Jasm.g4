@@ -1110,8 +1110,8 @@ owner
  | LSQUARE* NAME
  ;
 
-int_atom    : INT;
-float_atom  : FLOAT;
+int_atom    : INT | LONG;
+float_atom  : FLOAT | DOUBLE;
 bool_atom   : (TRUE | FALSE);
 string_atom : STRING;
 
@@ -1373,8 +1373,17 @@ QNAME
  : [a-zA-Z_$] [a-zA-Z_$0-9/]*
  ;
 
+LONG
+ : MINUS? [0-9]+ [Ll]
+ ;
+
 INT
  : MINUS? [0-9]+
+ ;
+
+DOUBLE
+ : MINUS? [0-9]+ '.' [0-9]* [Dd]
+ | MINUS? '.' [0-9]+ [Dd]
  ;
 
 FLOAT

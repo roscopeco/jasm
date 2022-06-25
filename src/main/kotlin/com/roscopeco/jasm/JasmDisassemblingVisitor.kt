@@ -318,12 +318,29 @@ class JasmDisassemblingVisitor(
     private fun disassembleConstArg(arg: Any?, indenter: Indenter): String = when (arg) {
         null -> "null" // This should probably never happen!
         is String -> "\"${arg.replace("\"", "\"\"")}\""
+        is Number -> disassembleNumber(arg)
         is Type -> if (arg.sort == Type.METHOD) disassembleMethodDescriptor(arg.descriptor) else handleBareType(arg.internalName)
         is Handle -> disassembleMethodHandle(arg)
         is ConstantDynamic -> disassembleConstDynamic(arg, indenter)
         else -> {
             errorCollector.addError(DisassemblyError(unitName, DisassemblyContext.ConstArg, "Unexpected const arg type ${arg.javaClass}"))
             "null"  // TODO this isn't useful...
+        }
+    }
+
+    private fun disassembleNumber(arg: Number): String {
+        return if (arg is java.lang.Integer) {
+            arg.toString()
+        } else if (arg is java.lang.Long) {
+            "${arg}L"
+        } else if (arg is java.lang.Float) {
+            arg.toString()
+        } else if (arg is java.lang.Double) {
+            "${arg}d"
+        } else {
+            errorCollector.addError(DisassemblyError(unitName, DisassemblyContext.ConstArg,
+                "Unsupported number type ${arg.javaClass} [$arg]"))
+            "0"
         }
     }
 
@@ -456,7 +473,7 @@ class JasmDisassemblingVisitor(
 
         private fun disassembleFieldInitializerValue(value: Any) = when (value) {
             is String -> "\"${value.replace("\"", "\"\"")}\""
-            is Number -> value.toString()
+            is Number -> disassembleNumber(value)
             else -> TODO("Unsupported field initializer ${value.javaClass}")
         }
     }

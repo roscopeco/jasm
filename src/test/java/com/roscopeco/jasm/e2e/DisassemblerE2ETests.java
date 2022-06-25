@@ -196,6 +196,31 @@ public class DisassemblerE2ETests {
         assertThat(result).isEqualTo("Hello World");
     }
 
+    @Test
+    void shouldDisassembleLdcTests() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        System.out.println(disassemble("LdcTests"));
+        final var source = disassemble("LdcTests");
+        final var test = doParseString(source);
+
+        assertThat(test.classbody().member()).hasSize(6);
+
+        final var clz = checkAssembleAndDefineClass(source, "LdcTests");
+
+        var result = clz.getMethod("returnString").invoke(null);
+        assertThat(result).isEqualTo("Testing");
+
+        result = clz.getMethod("returnInt").invoke(null);
+        assertThat(result).isEqualTo(100000);
+
+        result = clz.getMethod("returnLong").invoke(null);
+        assertThat(result).isEqualTo(100L);
+
+        result = clz.getMethod("returnFloat").invoke(null);
+        assertThat(result).isEqualTo(9.5f);
+
+        result = clz.getMethod("returnDouble").invoke(null);
+        assertThat(result).isEqualTo(10.2d);
+    }
     private Class<?> checkAssembleAndDefineClass(final String source, final String name) {
         final var clz = defineClass(assembleString(
             source.replace("com/roscopeco/jasm/model/disasm/" + name, "com/roscopeco/jasm/" + name + "Test0000"), Opcodes.V11));

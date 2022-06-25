@@ -107,10 +107,30 @@ class JasmAssemblingVisitor(
         constant.substring(1, constant.length - 1).replace("\"\"", "\"")
 
     private fun generateFieldInitializer(ctx: JasmParser.Field_initializerContext?) = when {
-        ctx?.int_atom() != null     -> ctx.int_atom().text.toInt()
-        ctx?.float_atom() != null   -> ctx.float_atom().text.toFloat()
+        ctx?.int_atom() != null     -> generateInteger(ctx.int_atom())
+        ctx?.float_atom() != null   -> generateFloatingPoint(ctx.float_atom())
         ctx?.string_atom() != null  -> unescapeConstantString(ctx.string_atom().text)
         else                        -> null
+    }
+
+    private fun generateInteger(atom: JasmParser.Int_atomContext): Any = when {
+        atom.INT() != null          -> atom.INT().text.toInt()
+        atom.LONG() != null         -> atom.LONG().text.substring(0, atom.LONG().text.length - 1).toLong()
+        else                        -> {
+            /* should never happen! */
+            CodeError(unitName, atom, "Invalid integer: ${atom.text}")
+            0
+        }
+    }
+
+    private fun generateFloatingPoint(atom: JasmParser.Float_atomContext) = when {
+        atom.FLOAT() != null        -> atom.FLOAT().text.toFloat()
+        atom.DOUBLE() != null       -> atom.DOUBLE().text.substring(0, atom.DOUBLE().text.length - 1).toDouble()
+        else                        -> {
+            /* should never happen! */
+            CodeError(unitName, atom, "Invalid floating point: ${atom.text}")
+            0.0f
+        }
     }
 
     override fun visitMethod(ctx: JasmParser.MethodContext) {
@@ -708,8 +728,8 @@ class JasmAssemblingVisitor(
 
         private fun generateSingleConstArg(idx: Int, ctx: JasmParser.Const_argContext): Any {
             return when {
-                ctx.int_atom() != null          -> Integer.parseInt(ctx.int_atom().text)
-                ctx.float_atom() != null        -> java.lang.Float.parseFloat(ctx.float_atom().text)
+                ctx.int_atom() != null          -> generateInteger(ctx.int_atom())
+                ctx.float_atom() != null        -> generateFloatingPoint(ctx.float_atom())
                 ctx.string_atom() != null       -> unescapeConstantString(ctx.string_atom().text)
                 ctx.bool_atom() != null         -> if (java.lang.Boolean.parseBoolean(ctx.bool_atom().text)) 1 else 0
                 ctx.QNAME() != null             -> Type.getType("L" + ctx.QNAME().text + ";")

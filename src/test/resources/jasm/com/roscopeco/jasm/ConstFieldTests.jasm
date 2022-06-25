@@ -2,6 +2,8 @@ public class com/roscopeco/jasm/ConstFieldTests implements com/roscopeco/jasm/mo
     private static final CONST_STR java/lang/String = "Constant String"
     private static final CONST_INT I = 10
     private static final CONST_FLOAT F = 42.0
+    private static final CONST_LONG J = 100L
+    private static final CONST_DOUBLE D = 100.0d
 
     public getConstString()java/lang/String {
         aload 0
@@ -19,6 +21,17 @@ public class com/roscopeco/jasm/ConstFieldTests implements com/roscopeco/jasm/mo
         aload 0
         getstatic com/roscopeco/jasm/ConstFieldTests.CONST_FLOAT F
         freturn
+    }
+    public getConstLong()J {
+        aload 0
+        getstatic com/roscopeco/jasm/ConstFieldTests.CONST_LONG J
+        lreturn
+    }
+
+    public getConstDouble()D {
+        aload 0
+        getstatic com/roscopeco/jasm/ConstFieldTests.CONST_DOUBLE D
+        dreturn
     }
 
     public <init>()V {
