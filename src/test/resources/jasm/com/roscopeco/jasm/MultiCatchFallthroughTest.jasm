@@ -21,7 +21,7 @@ public class com/roscopeco/jasm/MultiCatchFallthroughTest implements com/roscope
         areturn
     }
 
-public <init>()V {
+    public <init>()V {
         aload 0
         invokespecial java/lang/Object.<init>()V
         return
