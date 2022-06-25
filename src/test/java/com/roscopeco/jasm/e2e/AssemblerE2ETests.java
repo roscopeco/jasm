@@ -154,7 +154,7 @@ class AssemblerE2ETests {
         assertThat(clz.getDeclaredFields()).isEmpty();
 
         assertThat(clz.getDeclaredConstructors()).hasSize(1);
-        assertThat(clz.getDeclaredMethods()).hasSize(9);
+        assertThat(clz.getDeclaredMethods()).hasSize(11);
 
         final var obj = instantiate(clz, LdcAconstAreturn.class);
 
@@ -169,6 +169,12 @@ class AssemblerE2ETests {
 
         // Tests LDC(float), FRETURN
         assertThat(obj.testLdcFloat()).isEqualTo(5.5f);
+
+        // Tests LDC(long), LRETURN
+        assertThat(obj.testLdcLong()).isEqualTo(100L);
+
+        // Tests LDC(double), DRETURN
+        assertThat(obj.testLdcDouble()).isEqualTo(100.0d);
 
         // Tests LDC(bool), IRETURN
         assertThat(obj.testLdcBool()).isTrue();
@@ -693,15 +699,17 @@ class AssemblerE2ETests {
         assertThat(clz.getName()).isEqualTo("com.roscopeco.jasm.ConstFieldTests");
 
         assertThat(clz.getDeclaredClasses()).isEmpty();
-        assertThat(clz.getDeclaredFields()).hasSize(3);
+        assertThat(clz.getDeclaredFields()).hasSize(5);
         assertThat(clz.getDeclaredConstructors()).hasSize(1);
-        assertThat(clz.getDeclaredMethods()).hasSize(3);
+        assertThat(clz.getDeclaredMethods()).hasSize(5);
 
         final var obj = instantiate(clz, ConstFieldTests.class);
 
         assertThat(obj.getConstString()).isEqualTo("Constant String");
         assertThat(obj.getConstInt()).isEqualTo(10);
         assertThat(obj.getConstFloat()).isEqualTo(42.0f);
+        assertThat(obj.getConstLong()).isEqualTo(100L);
+        assertThat(obj.getConstDouble()).isEqualTo(100d);
     }
 
     @Test
