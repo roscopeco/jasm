@@ -27,10 +27,6 @@ public class com/example/HelloWorld {
 
 See the [Examples](docs/examples.md) for more examples of JASM code.
 
-In addiiton to lots of examples in [the tests](src/test/resources/jasm) showing the syntax for
-the different instructions and with examples of how they're used, there is also some more in-depth
-documentation and a few "standard recipes" in [the cookbook](docs/cookbook.md).
-
 ### How?
 
 #### Requirements
