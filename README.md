@@ -83,7 +83,7 @@ E.g. (for Gradle):
 
 ```kotlin
 dependencies {
-  implementation("com.roscopeco.jasm:jasm:0.5.0")
+  implementation("com.roscopeco.jasm:jasm:0.6.0")
 }
 ```
 
