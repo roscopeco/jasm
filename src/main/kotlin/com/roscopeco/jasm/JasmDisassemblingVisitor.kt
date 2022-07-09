@@ -239,13 +239,15 @@ class JasmDisassemblingVisitor(
                     indenter.indented(" * Signature: $signature") + LINE_SEPARATOR +
                     indenter.indented(" */${LINE_SEPARATOR}")
 
-    private fun classHeader(indenter: Indenter): String = indenter.indented("${formattedModifiers(this.access)}class ${this.name}${extends()}${implements()}")
+    private fun classHeader(indenter: Indenter): String = indenter.indented("${formattedModifiers(this.access)}class ${
+        LiteralNames.escape(this.name)
+    }${extends()}${implements()}")
 
     private fun extends(): String {
         if (this.supername.isEmpty() || this.supername.isBlank() || this.supername == "java/lang/Object") {
             return ""
         } else {
-            return " extends ${this.supername}"
+            return " extends ${LiteralNames.escape(this.supername)}"
         }
     }
 
@@ -253,7 +255,7 @@ class JasmDisassemblingVisitor(
         if (this.interfaces.isEmpty()) {
             return ""
         } else {
-            return " implements ${this.interfaces.joinToString(", ")}"
+            return " implements ${this.interfaces.joinToString(", ") { LiteralNames.escape(it) } }"
         }
     }
 
@@ -332,12 +334,12 @@ class JasmDisassemblingVisitor(
 
     // Manually fix up bare types that may be ref arrays
     private fun handleBareType(bareType: String): String {
-        return if (bareType.contains("[")) {
+        return LiteralNames.escape(if (bareType.contains("[")) {
             val lastLSquare = bareType.lastIndexOf("[")
             bareType.substring(0, lastLSquare + 1) + bareType.substring(lastLSquare + 1, bareType.length - 1)
         } else {
             bareType
-        }
+        })
     }
 
     private fun disassembleConstArg(arg: Any?, indenter: Indenter): String = when (arg) {
@@ -373,7 +375,7 @@ class JasmDisassemblingVisitor(
         val block1 = indenter.indent()
         val bootstrapArguments = (0 until arg.bootstrapMethodArgumentCount).map { arg.getBootstrapMethodArgument(it) }.toTypedArray()
 
-        return indenter.indented("constdynamic ${arg.name} ${disassembleTypeDescriptor(arg.descriptor)} {$LINE_SEPARATOR") +
+        return indenter.indented("constdynamic ${LiteralNames.escape(arg.name)} ${disassembleTypeDescriptor(arg.descriptor)} {$LINE_SEPARATOR") +
                block1.indented(disassembleMethodHandle(arg.bootstrapMethod)) + LINE_SEPARATOR +
                block1.indented(disassembleBootstrapArguments(block1, bootstrapArguments)) +
                indenter.indented("}$LINE_SEPARATOR")
@@ -409,7 +411,7 @@ class JasmDisassemblingVisitor(
         } else if (ctx.ref_type() != null) {
             val ary = ctx.ref_type().ARRAY()?.joinToString("") { it.text } ?: ""
             val name = ctx.ref_type().REF().text
-            "$ary${name.substring(1, name.length - 1)}"
+            "$ary${LiteralNames.escape(name.substring(1, name.length - 1))}"
         } else if (ctx.VOID() != null) {
             "V"
         } else {
@@ -460,7 +462,7 @@ class JasmDisassemblingVisitor(
         override fun generate(indenter: Indenter): String {
             val blockIndent = indenter.indent()
 
-            return indenter.indented("${OPCODE_NAMES[Opcodes.INVOKEDYNAMIC]!!} $name${disassembleMethodDescriptor(descriptor)} {$LINE_SEPARATOR") +
+            return indenter.indented("${OPCODE_NAMES[Opcodes.INVOKEDYNAMIC]!!} ${LiteralNames.escapeMethodName(name)}${disassembleMethodDescriptor(descriptor)} {$LINE_SEPARATOR") +
                     blockIndent.indented("${disassembleMethodHandle(bootstrapMethodHandle)}$LINE_SEPARATOR") +
                     disassembleBootstrapArguments(blockIndent, bootstrapMethodArguments) +
                     indenter.indented("}$LINE_SEPARATOR")
@@ -485,7 +487,7 @@ class JasmDisassemblingVisitor(
                 = indenter.indented("// ${signature ?: "<no signature>"}$LINE_SEPARATOR")
 
         private fun fieldBody(indenter: Indenter)
-                = indenter.indented("${modifiers.disassembleFieldModifiers(access)} $name ${disassembleTypeDescriptor(descriptor)}") +
+                = indenter.indented("${modifiers.disassembleFieldModifiers(access)} ${LiteralNames.escape(name)} ${disassembleTypeDescriptor(descriptor)}") +
                         fieldInitializer()
 
         private fun fieldInitializer(): String {
@@ -523,7 +525,7 @@ class JasmDisassemblingVisitor(
                     indenter.indented("// ${exceptions?.joinToString(", ") ?: "<no exceptions>"}$LINE_SEPARATOR")
 
         fun methodHeader(indenter: Indenter): String
-                = indenter.indented("${formattedModifiers(access)}$name${disassembleMethodDescriptor(descriptor)} {\n")
+                = indenter.indented("${formattedModifiers(access)}${LiteralNames.escapeMethodName(name)}${disassembleMethodDescriptor(descriptor)} {\n")
 
         fun methodBody(indenter: Indenter): String {
             return if (blocks.isNotEmpty())
@@ -562,7 +564,7 @@ class JasmDisassemblingVisitor(
         }
 
         override fun visitFieldInsn(opcode: Int, owner: String, name: String, descriptor: String) {
-            blocks.add(Line("${OPCODE_NAMES[opcode]!!} ${handleBareType(owner)}.$name ${disassembleTypeDescriptor(descriptor)}"))
+            blocks.add(Line("${OPCODE_NAMES[opcode]!!} ${handleBareType(owner)}.${LiteralNames.escape(name)} ${disassembleTypeDescriptor(descriptor)}"))
         }
 
         override fun visitMethodInsn(
@@ -575,7 +577,9 @@ class JasmDisassemblingVisitor(
             if (opcode == Opcodes.INVOKEVIRTUAL || opcode == Opcodes.INVOKESTATIC) {
                 blocks.add(
                     Line(
-                        "${OPCODE_NAMES[opcode]!!}${if (isInterface) "*" else ""} ${handleBareType(owner)}.$name${
+                        "${OPCODE_NAMES[opcode]!!}${if (isInterface) "*" else ""} ${handleBareType(owner)}.${
+                            LiteralNames.escapeMethodName(name)
+                        }${
                             disassembleMethodDescriptor(
                                 descriptor
                             )
@@ -585,7 +589,7 @@ class JasmDisassemblingVisitor(
             } else {
                 blocks.add(
                     Line(
-                        "${OPCODE_NAMES[opcode]!!} ${handleBareType(owner)}.$name${
+                        "${OPCODE_NAMES[opcode]!!} ${handleBareType(owner)}.${LiteralNames.escapeMethodName(name)}${
                             disassembleMethodDescriptor(
                                 descriptor
                             )
