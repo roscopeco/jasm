@@ -38,10 +38,10 @@ class TypeVisitor(private val unitName: String, private val errorCollector: Erro
         }
     }
 
-    override fun visitRef_type(ctx: JasmParser.Ref_typeContext) = "L" + ctx.text + ";"
+    override fun visitRef_type(ctx: JasmParser.Ref_typeContext) = "L" + LiteralNames.unescape(ctx.text) + ";"
 
     override fun visitArray_type(ctx: JasmParser.Array_typeContext) =
-        ctx.LSQUARE().joinToString(separator = "") { it.text } + super.visitArray_type(ctx)
+        ctx.LSQUARE().joinToString(separator = "") { LiteralNames.unescape(it.text) } + super.visitArray_type(ctx)
 
     override fun visitOwner(ctx: JasmParser.OwnerContext): String {
         return fixBareType(extractBareType(ctx))
@@ -51,11 +51,25 @@ class TypeVisitor(private val unitName: String, private val errorCollector: Erro
         return fixBareType(extractBareType(ctx))
     }
 
+    override fun visitInsn_instanceof(ctx: JasmParser.Insn_instanceofContext): String {
+        return fixBareType(extractBareType(ctx))
+    }
+
+    override fun visitMembername(ctx: JasmParser.MembernameContext): String {
+        return LiteralNames.unescape(ctx.text)
+    }
+
     private fun extractBareType(ctx: JasmParser.Insn_checkcastContext)
-            = (ctx.LSQUARE()?.joinToString("") { it.text } ?: "") + ctx.QNAME().text
+            = (ctx.LSQUARE()?.joinToString("") { it.text } ?: "") + LiteralNames.unescape(
+                ctx.QNAME()?.text ?: ctx.NAME()?.text ?: ctx.LITERAL_NAME()?.text ?: "<Error: No name>")
+
+    private fun extractBareType(ctx: JasmParser.Insn_instanceofContext)
+            = (ctx.LSQUARE()?.joinToString("") { it.text } ?: "") + LiteralNames.unescape(
+                ctx.QNAME()?.text ?: ctx.NAME()?.text ?: ctx.LITERAL_NAME()?.text ?: "<Error: No name>")
 
     private fun extractBareType(ctx: JasmParser.OwnerContext)
-            = (ctx.LSQUARE()?.joinToString("") { it.text } ?: "") + ctx.QNAME().text
+            = (ctx.LSQUARE()?.joinToString("") { it.text } ?: "") + LiteralNames.unescape(
+                ctx.QNAME()?.text ?: ctx.NAME()?.text ?: ctx.LITERAL_NAME()?.text ?: "<Error: No name>")
 
     private fun fixBareType(bare: String): String {
         return if (bare.startsWith("[")) {

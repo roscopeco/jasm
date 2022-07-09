@@ -5,12 +5,11 @@
  */
 package com.roscopeco.jasm.asserts
 
+import com.roscopeco.jasm.LiteralNames
 import com.roscopeco.jasm.antlr.JasmParser.ClassContext
 import org.assertj.core.api.AbstractAssert
-import org.antlr.v4.runtime.tree.TerminalNode
 
 import org.assertj.core.api.AssertionsForInterfaceTypes.assertThat
-import org.assertj.core.api.ListAssert
 
 class ClassAssert internal constructor(actual: ClassContext) :
     AbstractAssert<ClassAssert, ClassContext>(actual, ClassAssert::class.java) {
@@ -18,7 +17,7 @@ class ClassAssert internal constructor(actual: ClassContext) :
     fun hasName(name: String): ClassAssert {
         isNotNull
         
-        if (name != actual.classname().text) {
+        if (name != LiteralNames.unescape(actual.classname().text)) {
             failWithMessage("Expected class to have name '" + name + "' but was '" + actual.classname().text + "'")
         }
         

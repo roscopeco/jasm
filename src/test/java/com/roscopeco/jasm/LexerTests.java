@@ -964,4 +964,63 @@ class LexerTests {
 
         /* no need to go further */
     }
+
+    @Test
+    void shouldLexClassWithGetForNumericField() {
+        // https://github.com/roscopeco/jasm/issues/35
+        final var lexer = testCaseLexer("com/roscopeco/jasm/LiteralNames.jasm");
+        assertNextToken(lexer)
+            .hasType(JasmLexer.PUBLIC);
+
+        assertNextToken(lexer)
+            .hasType(JasmLexer.CLASS);
+
+        assertNextToken(lexer)
+            .hasType(JasmLexer.LITERAL_NAME)
+            .hasText("`com/roscopeco/jasm/Literal Names`");
+
+        assertNextToken(lexer)
+            .hasType(JasmLexer.IMPLEMENTS);
+
+        assertNextToken(lexer)
+            .hasType(JasmLexer.QNAME)
+            .hasText("com/roscopeco/jasm/model/LiteralNames");
+
+        assertNextToken(lexer)
+            .hasType(JasmLexer.LBRACE);
+
+        assertNextToken(lexer)
+            .hasType(JasmLexer.PRIVATE);
+
+        assertNextToken(lexer)
+            .hasType(JasmLexer.STATIC);
+
+        assertNextToken(lexer)
+            .hasType(JasmLexer.LITERAL_NAME)
+            .hasText("`0`");
+
+        assertNextToken(lexer)
+            .hasType(JasmLexer.QNAME)
+            .hasText("java/lang/String");
+
+        assertNextToken(lexer)
+            .hasType(JasmLexer.EQUALS);
+
+        assertNextToken(lexer)
+            .hasType(JasmLexer.STRING)
+            .hasText("\"test\"");
+
+        assertNextToken(lexer)
+            .hasType(JasmLexer.PRIVATE);
+
+        assertNextToken(lexer)
+            .hasType(JasmLexer.LITERAL_NAME)
+            .hasText("`1`");
+
+        assertNextToken(lexer)
+            .hasType(JasmLexer.QNAME)
+            .hasText("java/lang/String");
+
+        // No need to go further - we're parsing literal names fine
+    }
 }

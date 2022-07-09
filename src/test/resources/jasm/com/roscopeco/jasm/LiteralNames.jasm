@@ -1,0 +1,40 @@
+public class `com/roscopeco/jasm/Literal Names` implements com/roscopeco/jasm/model/LiteralNames {
+    private static `0` java/lang/String = "test"
+    private `1` java/lang/String
+
+    public test1()java/lang/String {
+        getstatic `com/roscopeco/jasm/Literal Names`.`0` java/lang/String
+        areturn
+    }
+
+    public test2()java/lang/String {
+        aload 0
+        getfield `com/roscopeco/jasm/Literal Names`.`1` java/lang/String
+        areturn
+    }
+
+    public `final native`()I {
+        goto `my label`
+        ldc 24
+        ireturn
+
+        `my label`:
+        ldc 42
+        ireturn
+    }
+
+    public test3()I {
+        aload 0
+        invokevirtual `com/roscopeco/jasm/Literal Names`.`final native`()I
+        ireturn
+    }
+
+    public <init>(java/lang/String)V {
+        aload 0
+        dup
+        invokespecial java/lang/Object.<init>()V
+        aload 1
+        putfield `com/roscopeco/jasm/Literal Names`.`1` java/lang/String
+        return
+    }
+}

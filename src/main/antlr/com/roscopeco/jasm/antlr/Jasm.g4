@@ -11,6 +11,7 @@ class
 classname
  : QNAME
  | NAME
+ | LITERAL_NAME
  ;
 
 extends
@@ -60,6 +61,7 @@ method_argument
 
 membername
  : NAME
+ | LITERAL_NAME
  | INIT
  | CLINIT
  | AALOAD
@@ -507,6 +509,8 @@ insn_castore
 
 insn_checkcast
  : CHECKCAST LSQUARE* QNAME
+ | CHECKCAST LSQUARE* NAME
+ | CHECKCAST LSQUARE* LITERAL_NAME
  ;
 
 insn_d2f
@@ -679,6 +683,7 @@ insn_getstatic
 
 insn_goto
  : GOTO NAME
+ | GOTO LITERAL_NAME
  ;
 
 insn_i2b
@@ -815,7 +820,9 @@ insn_ineg
  ;
 
 insn_instanceof
- : INSTANCEOF QNAME
+ : INSTANCEOF LSQUARE* QNAME
+ | INSTANCEOF LSQUARE* NAME
+ | INSTANCEOF LSQUARE* LITERAL_NAME
  ;
 
 insn_invokedynamic
@@ -1091,6 +1098,7 @@ insn_tableswitch
 
 label
  : LABEL
+ | LITERAL_NAME COLON
  ;
 
 exception_handler
@@ -1108,6 +1116,7 @@ catch_block
 owner
  : LSQUARE* QNAME
  | LSQUARE* NAME
+ | LSQUARE* LITERAL_NAME
  ;
 
 int_atom    : INT | LONG;
@@ -1129,6 +1138,7 @@ COMMA   : ',';
 EQUALS  : '=';
 DQUOTE  : '"';
 STAR    : '*';
+BACKTICK: '`';
 
 CLASS       : 'class';
 EXTENDS     : 'extends';
@@ -1371,6 +1381,10 @@ NAME
 
 QNAME
  : [a-zA-Z_$] [a-zA-Z_$0-9/]*
+ ;
+
+LITERAL_NAME
+ : BACKTICK (~[`\r\n] | '``')* BACKTICK
  ;
 
 LONG
