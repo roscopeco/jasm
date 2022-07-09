@@ -459,3 +459,57 @@ valid JASM:
         }
 ```
 
+#### Literal Names
+
+The JVM is very flexible when it comes to what characters can appear in the names of things.
+There are no restrictions on having spaces in names, naming methods after keywords in any languages,
+numbers, punctuation (except semicolon) and so on.
+
+JASM supports this with _Literal Names_, which are enclosed within backticks. 
+
+With this syntax, you can use any keywords, whitespace and all other characters supported by the 
+JVM in class names, descriptors and anywhere else you might need to.
+
+```java
+public class `com/roscopeco/jasm/Literal Names` implements com/roscopeco/jasm/model/LiteralNames {
+    private static `0` java/lang/String = "test"
+    private `1` java/lang/String
+
+    public test1()java/lang/String {
+        getstatic `com/roscopeco/jasm/Literal Names`.`0` java/lang/String
+        areturn
+    }
+
+    public test2()java/lang/String {
+        aload 0
+        getfield `com/roscopeco/jasm/Literal Names`.`1` java/lang/String
+        areturn
+    }
+
+    public `final native`()I {
+        goto `my label`
+        ldc 24
+        ireturn
+
+        `my label`:
+        ldc 42
+        ireturn
+    }
+
+    public test3()I {
+        aload 0
+        invokevirtual `com/roscopeco/jasm/Literal Names`.`final native`()I
+        ireturn
+    }
+
+    public <init>(java/lang/String)V {
+        aload 0
+        dup
+        invokespecial java/lang/Object.<init>()V
+        aload 1
+        putfield `com/roscopeco/jasm/Literal Names`.`1` java/lang/String
+        return
+    }
+}
+```
+
