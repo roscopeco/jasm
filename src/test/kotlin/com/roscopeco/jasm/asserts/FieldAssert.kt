@@ -5,6 +5,7 @@
  */
 package com.roscopeco.jasm.asserts
 
+import com.roscopeco.jasm.LiteralNames
 import com.roscopeco.jasm.antlr.JasmParser.FieldContext
 import org.assertj.core.api.AbstractAssert
 import org.assertj.core.api.AssertionsForInterfaceTypes
@@ -16,7 +17,7 @@ class FieldAssert internal constructor(actual: FieldContext) :
     fun hasName(expected: String): FieldAssert {
         isNotNull
 
-        if (expected != actual.membername().text) {
+        if (expected != LiteralNames.unescape(actual.membername().text)) {
             failWithMessage(
                 "Expected field to have name '"
                         + expected
@@ -55,7 +56,7 @@ class FieldAssert internal constructor(actual: FieldContext) :
                         + actual.type().text
             )
         }
-        if (typeName != actual.type().text) {
+        if (typeName != LiteralNames.unescape(actual.type().text)) {
             failWithMessage(
                 "Expected field "
                         + actual.membername().text

@@ -22,6 +22,7 @@ import com.roscopeco.jasm.model.IfNullNonNullTest;
 import com.roscopeco.jasm.model.InvokedynamicTest;
 import com.roscopeco.jasm.model.JsrRetTest;
 import com.roscopeco.jasm.model.LdcAconstAreturn;
+import com.roscopeco.jasm.model.LiteralNames;
 import com.roscopeco.jasm.model.LoadsAndStoresTest;
 import com.roscopeco.jasm.model.LongMathTests;
 import com.roscopeco.jasm.model.MultiCatchFallthroughTest;
@@ -35,6 +36,7 @@ import org.junit.jupiter.api.Test;
 import org.objectweb.asm.Opcodes;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -922,5 +924,30 @@ class AssemblerE2ETests {
         assertThat(obj.multiCatchFallthroughTest(new IOException())).isEqualTo("IOE");
         assertThat(obj.multiCatchFallthroughTest(new NullPointerException())).isEqualTo("NPE");
         assertThat(obj.multiCatchFallthroughTest(new Exception())).isEqualTo("EXCEPTION");
+    }
+
+    @Test
+    void shouldAssembleClassWithLiteralNamesCorrectly()
+        throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+        final var clz = assembleAndDefine("com/roscopeco/jasm/LiteralNames.jasm");
+
+        assertThat(clz.getName()).isEqualTo("com.roscopeco.jasm.Literal Names");
+
+        assertThat(clz.getDeclaredClasses()).isEmpty();
+        assertThat(clz.getDeclaredFields()).hasSize(2);
+        assertThat(clz.getDeclaredConstructors()).hasSize(1);
+        assertThat(clz.getDeclaredMethods()).hasSize(4);
+
+        final var obj = (LiteralNames)clz.getDeclaredConstructor(String.class).newInstance("Testing123");
+
+        assertThat(obj.test1()).isEqualTo("test");
+        assertThat(obj.test2()).isEqualTo("Testing123");
+
+        final var literalNameMethod = clz.getDeclaredMethod("final native");
+        final var result = literalNameMethod.invoke(obj);
+
+        assertThat(result).isEqualTo(42);
+
+        assertThat(obj.test3()).isEqualTo(42);
     }
 }
