@@ -32,6 +32,8 @@ import com.roscopeco.jasm.model.RefArrayTests;
 import com.roscopeco.jasm.model.Superclass;
 import com.roscopeco.jasm.model.SwitchTests;
 import com.roscopeco.jasm.model.TryCatchTest;
+import com.roscopeco.jasm.model.annotations.TestAnnotation;
+import com.roscopeco.jasm.model.annotations.TestEnum;
 import org.junit.jupiter.api.Test;
 import org.objectweb.asm.Opcodes;
 
@@ -949,5 +951,39 @@ class AssemblerE2ETests {
         assertThat(result).isEqualTo(42);
 
         assertThat(obj.test3()).isEqualTo(42);
+    }
+
+    @Test
+    void shouldAssembleAnnotatedClassesCorrectly() throws NoSuchFieldException, NoSuchMethodException {
+        final var clz = assembleAndDefine("com/roscopeco/jasm/AnnotationTest.jasm");
+
+        final var classDeprecated = clz.getAnnotation(Deprecated.class);
+
+        assertThat(classDeprecated).isNotNull();
+        assertThat(classDeprecated.since()).isEqualTo("42");
+
+        final var test = clz.getAnnotation(TestAnnotation.class);
+
+        assertThat(test).isNotNull();
+        assertThat(test.classArg()).isEqualTo(List.class);
+        assertThat(test.stringArg()).isEqualTo("Yolo");
+        assertThat(test.arrayArg()).hasSameElementsAs(List.of("one", "two"));
+        assertThat(test.enumArg()).isEqualTo(TestEnum.THREE);
+
+        final var field = clz.getDeclaredField("myField");
+        assertThat(field).isNotNull();
+
+        final var fieldDeprecated = field.getAnnotation(Deprecated.class);
+
+        assertThat(fieldDeprecated).isNotNull();
+        assertThat(fieldDeprecated.since()).isEqualTo("1001");
+
+        final var method = clz.getDeclaredMethod("test");
+        assertThat(method).isNotNull();
+
+        final var methodDeprecated = method.getAnnotation(Deprecated.class);
+
+        assertThat(methodDeprecated).isNotNull();
+        assertThat(methodDeprecated.since()).isEqualTo("2002");
     }
 }

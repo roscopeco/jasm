@@ -1021,6 +1021,129 @@ class LexerTests {
             .hasType(JasmLexer.QNAME)
             .hasText("java/lang/String");
 
-        // No need to go further - we're parsing literal names fine
+        // No need to go further - we're lexing literal names fine
+    }
+
+    @Test
+    void shouldLexClassWithSimpleAnnotation() {
+        final var lexer = testCaseLexer("SimpleAnnotatedClass.jasm");
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.AT);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.QNAME)
+                .hasText("com/roscopeco/jasm/model/annotations/TestAnnotation");
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.CLASS);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.NAME)
+                .hasText("SimpleAnnotatedClass");
+    }
+
+    @Test
+    void shouldLexClassWithComplexAnnotation() {
+        final var lexer = testCaseLexer("ComplexAnnotatedClass.jasm");
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.AT);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.QNAME)
+                .hasText("com/roscopeco/jasm/model/annotations/TestAnnotation");
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.LPAREN);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.NAME)
+                .hasText("stringArg");
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.EQUALS);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.STRING)
+                .hasText("\"Yolo\"");
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.COMMA);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.NAME)
+                .hasText("classArg");
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.EQUALS);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.QNAME)
+                .hasText("java/util/List");
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.COMMA);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.NAME)
+                .hasText("arrayArg");
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.EQUALS);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.LBRACE);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.STRING)
+                .hasText("\"one\"");
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.COMMA);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.STRING)
+                .hasText("\"two\"");
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.RBRACE);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.COMMA);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.NAME)
+                .hasText("enumArg");
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.EQUALS);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.LSQUARE);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.QNAME)
+                .hasText("com/roscopeco/jasm/model/annotations/TestEnum");
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.DOT);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.NAME)
+                .hasText("THREE");
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.RSQUARE);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.RPAREN);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.CLASS);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.NAME)
+                .hasText("ComplexAnnotatedClass");
     }
 }

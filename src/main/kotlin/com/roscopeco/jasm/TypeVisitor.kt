@@ -40,6 +40,8 @@ class TypeVisitor(private val unitName: String, private val errorCollector: Erro
 
     override fun visitRef_type(ctx: JasmParser.Ref_typeContext) = "L" + LiteralNames.unescape(ctx.text) + ";"
 
+    override fun visitClassname(ctx: JasmParser.ClassnameContext) = "L" + LiteralNames.unescape(ctx.text) + ";"
+
     override fun visitArray_type(ctx: JasmParser.Array_typeContext) =
         ctx.LSQUARE().joinToString(separator = "") { LiteralNames.unescape(it.text) } + super.visitArray_type(ctx)
 
