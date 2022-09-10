@@ -6,13 +6,14 @@
 package com.roscopeco.jasm.asserts
 
 import com.roscopeco.jasm.LiteralNames
+import com.roscopeco.jasm.antlr.JasmParser.AnnotationContext
 import com.roscopeco.jasm.antlr.JasmParser.ClassContext
 import org.assertj.core.api.AbstractAssert
 
 import org.assertj.core.api.AssertionsForInterfaceTypes.assertThat
 
 class ClassAssert internal constructor(actual: ClassContext) :
-    AbstractAssert<ClassAssert, ClassContext>(actual, ClassAssert::class.java) {
+    AnnotatableItemAssert<ClassAssert, ClassContext>(actual, ClassAssert::class.java, { actual.annotation() }) {
 
     fun hasName(name: String): ClassAssert {
         isNotNull

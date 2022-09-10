@@ -9,6 +9,7 @@ import com.roscopeco.jasm.antlr.JasmBaseVisitor
 import com.roscopeco.jasm.antlr.JasmParser
 import com.roscopeco.jasm.errors.CodeError
 import com.roscopeco.jasm.errors.ErrorCollector
+import org.objectweb.asm.AnnotationVisitor
 import org.objectweb.asm.ClassVisitor
 import org.objectweb.asm.ConstantDynamic
 import org.objectweb.asm.Handle
@@ -75,6 +76,12 @@ class JasmAssemblingVisitor(
         visitor.visitEnd()
     }
 
+    override fun visitAnnotation(ctx: JasmParser.AnnotationContext) {
+        val annotationVisitor = visitor.visitAnnotation(typeVisitor.visitClassname(ctx.classname()), true)
+        return JasmAnnotationVisitor(annotationVisitor).visitAnnotation(ctx)
+    }
+
+
     override fun visitField(ctx: JasmParser.FieldContext) {
         if ((ctx.field_initializer() != null) && (modifiers.mapModifiers(ctx.field_modifier()) and Opcodes.ACC_STATIC) == 0) {
             errorCollector.addError(
@@ -104,8 +111,18 @@ class JasmAssemblingVisitor(
             generateFieldInitializer(ctx.field_initializer())
         )
 
-        super.visitField(ctx)
+        // Manually driving this rather than having a specific field visitor, maybe later...
+        if (ctx.annotation() != null) {
+            ctx.annotation().forEach {
+                val annotationVisitor = fv.visitAnnotation(typeVisitor.visitClassname(it.classname()), true)
+                JasmAnnotationVisitor(annotationVisitor).visitAnnotation(it)
+                annotationVisitor.visitEnd()
+            }
+        }
+
         fv.visitEnd()
+
+        // Do **not** call super here, we manually handled the field completely
     }
 
     private fun unescapeConstantString(constant: String) =
@@ -138,8 +155,79 @@ class JasmAssemblingVisitor(
         }
     }
 
+    private fun generateAnnotationArg(name: String, ctx: JasmParser.Annotation_argContext, visitor: AnnotationVisitor) {
+        when {
+            ctx.int_atom() != null          -> visitor.visit(name, generateInteger(ctx.int_atom()))
+            ctx.float_atom() != null        -> visitor.visit(name, generateFloatingPoint(ctx.float_atom()))
+            ctx.string_atom() != null       -> visitor.visit(name, unescapeConstantString(ctx.string_atom().text))
+            ctx.bool_atom() != null         -> if (java.lang.Boolean.parseBoolean(ctx.bool_atom().text)) {
+                visitor.visit(name, 1)
+            } else {
+                visitor.visit(name, 0)
+            }
+            ctx.annotation_array_literal() != null -> generateAnnotationArrayLiteral(name, ctx, visitor)
+            ctx.enum_value_literal() != null -> generateAnnotationEnumLiteral(name, ctx, visitor)
+            ctx.NAME() != null              -> visitor.visit(name, Type.getType("L" + ctx.NAME().text + ";"))
+            ctx.LITERAL_NAME() != null      -> visitor.visit(name, Type.getType("L" + LiteralNames.unescape(ctx.LITERAL_NAME().text) + ";"))
+            ctx.QNAME() != null             -> visitor.visit(name, Type.getType("L" + ctx.QNAME().text + ";"))
+            else -> {
+                errorCollector.addError(CodeError(unitName, ctx, "Unsupported annotation arg: " + ctx.text))
+            }
+        }
+    }
+
+    private fun generateAnnotationArrayLiteral(name: String, ctx: JasmParser.Annotation_argContext, visitor: AnnotationVisitor) {
+        val arrayVisitor = visitor.visitArray(name)
+        ctx.annotation_array_literal().annotation_arg().map {
+            generateAnnotationArg("ignored", it, arrayVisitor)
+        }.toTypedArray()
+        arrayVisitor.visitEnd()
+    }
+
+    private fun generateAnnotationEnumLiteral(name: String, ctx: JasmParser.Annotation_argContext, visitor: AnnotationVisitor) {
+        val owner = ctx.enum_value_literal().classname()
+        val ownerDescriptor = when {
+            owner.NAME() != null            -> Type.getType("L" + owner.NAME().text + ";")
+            owner.LITERAL_NAME() != null    -> Type.getType("L" + LiteralNames.unescape(owner.LITERAL_NAME().text) + ";")
+            owner.QNAME() != null           -> Type.getType("L" + owner.QNAME().text + ";")
+            else                            -> {
+                errorCollector.addError(CodeError(unitName, ctx, "[BUG] Unsupported enum owner: " + ctx.text))
+                Type.getType(Object::class.java)
+            }
+        }
+        val valueCtx = ctx.enum_value_literal().enum_literal_value()
+        val value = when {
+            valueCtx.NAME() != null         -> valueCtx.NAME().text
+            valueCtx.LITERAL_NAME() != null -> LiteralNames.unescape(valueCtx.LITERAL_NAME().text)
+            else                            -> {
+                errorCollector.addError(CodeError(unitName, ctx, "[BUG] Unsupported enum value: " + ctx.text))
+                "<error>"
+            }
+        }
+
+        visitor.visitEnum(name, ownerDescriptor.descriptor, value)
+    }
+
     override fun visitMethod(ctx: JasmParser.MethodContext) {
         return JasmMethodVisitor(ctx).visitMethod(ctx)
+    }
+
+    private inner class JasmAnnotationVisitor(val visitor: AnnotationVisitor) : JasmBaseVisitor<Unit>() {
+
+        override fun visitAnnotation(ctx: JasmParser.AnnotationContext?) {
+            return super.visitAnnotation(ctx)
+        }
+        override fun visitAnnotation_param(ctx: JasmParser.Annotation_paramContext) {
+            val name = when {
+                ctx.NAME() != null          -> ctx.NAME().text
+                ctx.LITERAL_NAME() != null  -> LiteralNames.unescape(ctx.LITERAL_NAME().text)
+                else                        -> "<Invalid annotation name>"
+            }
+
+            generateAnnotationArg(name, ctx.annotation_arg(), visitor)
+
+            return super.visitAnnotation_param(ctx)
+        }
     }
 
     private inner class JasmMethodVisitor(ctx: JasmParser.MethodContext) : JasmBaseVisitor<Unit>() {
@@ -153,6 +241,12 @@ class JasmAssemblingVisitor(
             null,
             null
         )
+
+        override fun visitAnnotation(ctx: JasmParser.AnnotationContext) {
+            val annotationVisitor = methodVisitor.visitAnnotation(typeVisitor.visitClassname(ctx.classname()), true)
+            JasmAnnotationVisitor(annotationVisitor).visitAnnotation(ctx)
+            annotationVisitor.visitEnd()
+        }
 
         override fun visitMethod(ctx: JasmParser.MethodContext) {
              super.visitMethod(ctx)
@@ -764,6 +858,8 @@ class JasmAssemblingVisitor(
                 ctx.float_atom() != null        -> generateFloatingPoint(ctx.float_atom())
                 ctx.string_atom() != null       -> unescapeConstantString(ctx.string_atom().text)
                 ctx.bool_atom() != null         -> if (java.lang.Boolean.parseBoolean(ctx.bool_atom().text)) 1 else 0
+                ctx.NAME() != null              -> Type.getType("L" + ctx.NAME().text + ";")
+                ctx.LITERAL_NAME() != null      -> Type.getType("L" + ctx.LITERAL_NAME().text + ";")
                 ctx.QNAME() != null             -> Type.getType("L" + ctx.QNAME().text + ";")
                 ctx.method_handle() != null     -> buildBootstrapHandle(ctx.method_handle())
                 ctx.method_descriptor() != null -> Type.getMethodType(typeVisitor.visitMethod_descriptor(ctx.method_descriptor()))

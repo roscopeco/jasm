@@ -1,0 +1,11 @@
+@java/lang/Deprecated(since = "42")
+@com/roscopeco/jasm/model/annotations/TestAnnotation(stringArg = "Yolo", classArg = java/util/List, arrayArg = { "one", "two" }, enumArg = [com/roscopeco/jasm/model/annotations/TestEnum.THREE])
+class com/roscopeco/jasm/AnnotationTest {
+    @java/lang/Deprecated(since = "1001")
+    public myField I
+
+    @java/lang/Deprecated(since = "2002")
+    public test()V {
+        return
+    }
+}

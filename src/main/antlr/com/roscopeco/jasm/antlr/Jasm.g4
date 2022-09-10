@@ -5,7 +5,41 @@ grammar Jasm;
 }
 
 class
- : type_modifier* CLASS classname extends? implements? (LBRACE classbody RBRACE)?
+ : annotation* type_modifier* CLASS classname extends? implements? (LBRACE classbody RBRACE)?
+ ;
+
+annotation
+ : AT classname (LPAREN annotation_param? (COMMA annotation_param)* RPAREN)?
+ ;
+
+annotation_param
+ : NAME EQUALS annotation_arg
+ | LITERAL_NAME EQUALS annotation_arg
+ ;
+
+annotation_arg
+ : int_atom
+ | float_atom
+ | string_atom
+ | bool_atom
+ | enum_value_literal
+ | annotation_array_literal
+ | NAME
+ | LITERAL_NAME
+ | QNAME
+ ;
+
+enum_value_literal
+ : LSQUARE classname DOT enum_literal_value RSQUARE
+ ;
+
+enum_literal_value
+ : NAME
+ | LITERAL_NAME
+ ;
+
+annotation_array_literal
+ : LBRACE annotation_arg? (COMMA annotation_arg)* RBRACE
  ;
 
 classname
@@ -32,7 +66,7 @@ member
  ;
 
 field
- : field_modifier* membername type (EQUALS field_initializer)?
+ : annotation* field_modifier* membername type (EQUALS field_initializer)?
  ;
 
 field_initializer
@@ -42,7 +76,7 @@ field_initializer
  ;
 
 method
- : method_modifier* membername method_descriptor (LBRACE stat_block RBRACE)?
+ : annotation* method_modifier* membername method_descriptor (LBRACE stat_block RBRACE)?
  ;
 
 method_descriptor
@@ -862,6 +896,8 @@ const_arg
  | float_atom
  | string_atom
  | bool_atom
+ | NAME
+ | LITERAL_NAME
  | QNAME
  | method_descriptor
  | method_handle
@@ -1124,6 +1160,7 @@ float_atom  : FLOAT | DOUBLE;
 bool_atom   : (TRUE | FALSE);
 string_atom : STRING;
 
+AT      : '@';
 LPAREN  : '(';
 RPAREN  : ')';
 LBRACE  : '{';

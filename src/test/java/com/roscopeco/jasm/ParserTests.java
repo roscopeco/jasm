@@ -9,6 +9,7 @@ import lombok.NonNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.objectweb.asm.Type;
 
 import static com.roscopeco.jasm.TestUtil.doParse;
 import static com.roscopeco.jasm.asserts.LexerParserAssertions.assertClass;
@@ -366,5 +367,26 @@ class ParserTests {
                 .aload(1)
                 .putField("com/roscopeco/jasm/Literal Names", "1", "Ljava/lang/String;")
                 .vreturn();
+    }
+
+    @Test
+    void shouldParseSimpleAnnotatedClass() {
+        final var test = doParse("SimpleAnnotatedClass.jasm");
+
+        assertClass(test)
+            .hasName("SimpleAnnotatedClass")
+            .hasAnnotationNamed("com/roscopeco/jasm/model/annotations/TestAnnotation");
+    }
+
+    @Test
+    void shouldParseComplexAnnotatedClass() {
+        final var test = doParse("ComplexAnnotatedClass.jasm");
+
+        assertClass(test)
+            .hasName("ComplexAnnotatedClass")
+            .hasAnnotationNamed("com/roscopeco/jasm/model/annotations/TestAnnotation")
+                .hasNamedParamWithValue("stringArg", "Yolo")
+                .hasNamedParamWithValue("classArg", java.util.List.class)
+                .hasNamedParamWithValue("arrayArg", new String[] { "one", "two" });
     }
 }

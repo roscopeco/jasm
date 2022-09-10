@@ -128,6 +128,19 @@ public manualExceptionHandlerTest()java/lang/Exception {
     areturn
 }
 ```
+
+### Annotations
+
+```java
+@java/lang/Deprecated
+@com/roscopeco/jasm/model/annotations/TestAnnotation(stringArg = "Yolo", classArg = java/util/List, arrayArg = { "one", "two" }, enumArg = [com/roscopeco/jasm/model/annotations/TestEnum.THREE])
+class ComplexAnnotatedClass {
+    // ...
+}
+```
+
+N.B. Enum args **must** be enclosed in square brackets, while curly brackets are used for arrays.
+
 ### Invokedynamic
 
 ```java

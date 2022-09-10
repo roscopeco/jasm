@@ -1,0 +1,2 @@
+@com/roscopeco/jasm/model/annotations/TestAnnotation(stringArg = "Yolo", classArg = java/util/List, arrayArg = { "one", "two" }, enumArg = [com/roscopeco/jasm/model/annotations/TestEnum.THREE])
+class ComplexAnnotatedClass
