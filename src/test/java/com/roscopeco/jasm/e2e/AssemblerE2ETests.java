@@ -13,12 +13,12 @@ import com.roscopeco.jasm.model.DoubleMathTests;
 import com.roscopeco.jasm.model.FloatMathTests;
 import com.roscopeco.jasm.model.GetPutFieldTests;
 import com.roscopeco.jasm.model.IfIcmpTests;
+import com.roscopeco.jasm.model.IfNullNonNullTest;
 import com.roscopeco.jasm.model.IfTests;
 import com.roscopeco.jasm.model.InstanceOfTest;
 import com.roscopeco.jasm.model.IntMathTests;
 import com.roscopeco.jasm.model.Interface1;
 import com.roscopeco.jasm.model.Interface2;
-import com.roscopeco.jasm.model.IfNullNonNullTest;
 import com.roscopeco.jasm.model.InvokedynamicTest;
 import com.roscopeco.jasm.model.JsrRetTest;
 import com.roscopeco.jasm.model.LdcAconstAreturn;
@@ -26,9 +26,9 @@ import com.roscopeco.jasm.model.LiteralNames;
 import com.roscopeco.jasm.model.LoadsAndStoresTest;
 import com.roscopeco.jasm.model.LongMathTests;
 import com.roscopeco.jasm.model.MultiCatchFallthroughTest;
-import com.roscopeco.jasm.model.StackOpsTest;
 import com.roscopeco.jasm.model.PrimArrayTests;
 import com.roscopeco.jasm.model.RefArrayTests;
+import com.roscopeco.jasm.model.StackOpsTest;
 import com.roscopeco.jasm.model.Superclass;
 import com.roscopeco.jasm.model.SwitchTests;
 import com.roscopeco.jasm.model.TryCatchTest;
@@ -47,9 +47,9 @@ import static com.roscopeco.jasm.TestUtil.assemble;
 import static com.roscopeco.jasm.TestUtil.assembleAndDefine;
 import static com.roscopeco.jasm.TestUtil.boolVoidInvoker;
 import static com.roscopeco.jasm.TestUtil.instantiate;
-import static com.roscopeco.jasm.TestUtil.objectObjectInvoker;
 import static com.roscopeco.jasm.TestUtil.intVoidInvoker;
 import static com.roscopeco.jasm.TestUtil.objectArgsInvoker;
+import static com.roscopeco.jasm.TestUtil.objectObjectInvoker;
 import static com.roscopeco.jasm.TestUtil.objectVoidInvoker;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -985,5 +985,49 @@ class AssemblerE2ETests {
 
         assertThat(methodDeprecated).isNotNull();
         assertThat(methodDeprecated.since()).isEqualTo("2002");
+    }
+
+    @Test
+    void shouldAssembleParameterAnnotationsCorrectly() throws NoSuchMethodException, NoSuchFieldException {
+        final var clz = assembleAndDefine("com/roscopeco/jasm/MethodFieldAnnotations.jasm");
+
+        final var method = clz.getDeclaredMethod("test", int.class, String.class);
+        assertThat(method).isNotNull();
+        assertThat(method.getAnnotations()).hasSize(1);
+
+        final var methodDeprecated = method.getAnnotation(Deprecated.class);
+
+        assertThat(methodDeprecated).isNotNull();
+        assertThat(methodDeprecated.since()).isEqualTo("2002");
+
+        final var annotations = method.getParameterAnnotations();
+
+        assertThat(annotations[0]).hasSize(1);
+        var annotation = annotations[0][0];
+        assertThat(annotation.annotationType()).isEqualTo(TestAnnotation.class);
+        var testAnnotation = (TestAnnotation)annotation;
+        assertThat(testAnnotation.classArg()).isEqualTo(Object.class); /* default */
+
+        assertThat(annotations[1]).hasSize(2);
+        annotation = annotations[1][0];
+        assertThat(annotation.annotationType()).isEqualTo(Deprecated.class);
+        final var deprecatedAnnotation = (Deprecated)annotation;
+        assertThat(deprecatedAnnotation.since()).isEqualTo("3003");
+
+        annotation = annotations[1][1];
+        assertThat(annotation.annotationType()).isEqualTo(TestAnnotation.class);
+        testAnnotation = (TestAnnotation)annotation;
+        assertThat(testAnnotation.classArg()).isEqualTo(List.class); /* Explicitly specified */
+
+        final var otherField = clz.getDeclaredField("otherField");
+        assertThat(otherField).isNotNull();
+
+        final var fieldAnnotation = otherField.getAnnotation(TestAnnotation.class);
+        assertThat(fieldAnnotation).isNotNull();
+
+        final var fieldAnnotationParam = fieldAnnotation.annotationParameter();
+
+        assertThat(fieldAnnotationParam).isNotNull();
+        assertThat(fieldAnnotationParam.value()).isEqualTo("new value");
     }
 }

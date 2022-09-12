@@ -15,6 +15,16 @@ class TypeVisitor(private val unitName: String, private val errorCollector: Erro
     override fun visitMethod_arguments(ctx: JasmParser.Method_argumentsContext?) =
         "(" + super.visitMethod_arguments(ctx) + ")"
 
+    override fun visitMethod_argument(ctx: JasmParser.Method_argumentContext) = when {
+        ctx.prim_type() != null     -> visitPrim_type(ctx.prim_type())
+        ctx.ref_type() != null      -> visitRef_type(ctx.ref_type())
+        ctx.array_type() != null    -> visitArray_type(ctx.array_type())
+        else -> {
+            errorCollector.addError(CodeError(unitName, ctx, "Invalid type ${ctx.text} encountered in method argument"))
+            ""
+        }
+    }
+
     override fun visitPrim_type(ctx: JasmParser.Prim_typeContext) = when {
         ctx.TYPE_BOOL()   != null       -> "Z"
         ctx.TYPE_BYTE()   != null       -> "B"

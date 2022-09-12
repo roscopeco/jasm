@@ -135,7 +135,10 @@ public manualExceptionHandlerTest()java/lang/Exception {
 @java/lang/Deprecated
 @com/roscopeco/jasm/model/annotations/TestAnnotation(stringArg = "Yolo", classArg = java/util/List, arrayArg = { "one", "two" }, enumArg = [com/roscopeco/jasm/model/annotations/TestEnum.THREE])
 class ComplexAnnotatedClass {
-    // ...
+    @java/lang/Deprecated(since = "2002")
+    public test(@com/roscopeco/jasm/model/annotations/TestAnnotation I, @java/lang/Deprecated(since = "3003") @com/roscopeco/jasm/model/annotations/TestAnnotation(classArg = java/util/List) java/lang/String)V {
+        
+    }
 }
 ```
 
