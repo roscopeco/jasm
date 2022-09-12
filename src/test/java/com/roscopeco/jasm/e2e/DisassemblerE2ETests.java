@@ -3,10 +3,14 @@ package com.roscopeco.jasm.e2e;
 import com.roscopeco.jasm.model.Interface1;
 import com.roscopeco.jasm.model.Interface2;
 import com.roscopeco.jasm.model.Superclass;
+import com.roscopeco.jasm.model.annotations.TestAnno2;
+import com.roscopeco.jasm.model.annotations.TestAnnotation;
+import com.roscopeco.jasm.model.annotations.TestEnum;
 import org.junit.jupiter.api.Test;
 import org.objectweb.asm.Opcodes;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 
 import static com.roscopeco.jasm.TestUtil.assembleString;
 import static com.roscopeco.jasm.TestUtil.defineClass;
@@ -237,6 +241,53 @@ public class DisassemblerE2ETests {
         assertThat(clz.getSuperclass()).isEqualTo(Superclass.class);
         assertThat(clz.getInterfaces())
             .containsExactlyInAnyOrder(Interface1.class, Interface2.class);
+    }
+
+    @Test
+    void shouldDisassembleAnnotatedClass() throws NoSuchFieldException, NoSuchMethodException {
+        final var source = disassemble("AnnotatedClass");
+
+        final var clz = checkAssembleAndDefineClass(source, "AnnotatedClass");
+
+        final var otherField = clz.getDeclaredField("otherField");
+        assertThat(otherField).isNotNull();
+
+        final var fieldAnnotation = otherField.getAnnotation(Deprecated.class);
+        assertThat(fieldAnnotation).isNotNull();
+        assertThat(fieldAnnotation.since()).isEqualTo("2002");
+
+        final var method = clz.getDeclaredMethod("test", int.class, String.class);
+        assertThat(method).isNotNull();
+        assertThat(method.getAnnotations()).hasSize(1);
+
+        final var methodAnnotation = method.getAnnotation(TestAnnotation.class);
+        assertThat(methodAnnotation).isNotNull();
+        assertThat(methodAnnotation.stringArg()).isEqualTo("Changed"); /* Explicitly specified arguments */
+        assertThat(methodAnnotation.classArg()).isEqualTo(List.class);
+        assertThat(methodAnnotation.arrayArg()).containsExactly("one", "two");
+        assertThat(methodAnnotation.enumArg()).isEqualTo(TestEnum.THREE);
+
+        final var anno2 = (TestAnno2)methodAnnotation.annotationParameter();
+        assertThat(anno2.value()).isEqualTo("Test Value 2");
+
+        final var annotations = method.getParameterAnnotations();
+
+        assertThat(annotations[0]).hasSize(1);
+        var annotation = annotations[0][0];
+        assertThat(annotation.annotationType()).isEqualTo(TestAnnotation.class);
+        var testAnnotation = (TestAnnotation)annotation;
+        assertThat(testAnnotation.classArg()).isEqualTo(Object.class); /* default */
+
+        assertThat(annotations[1]).hasSize(2);
+        annotation = annotations[1][0];
+        assertThat(annotation.annotationType()).isEqualTo(Deprecated.class);
+        final var deprecatedAnnotation = (Deprecated)annotation;
+        assertThat(deprecatedAnnotation.since()).isEqualTo("3003");
+
+        annotation = annotations[1][1];
+        assertThat(annotation.annotationType()).isEqualTo(TestAnnotation.class);
+        testAnnotation = (TestAnnotation)annotation;
+        assertThat(testAnnotation.classArg()).isEqualTo(Object.class); /* default */
     }
 
     private Class<?> checkAssembleAndDefineClass(final String source, final String name) {

@@ -11,4 +11,6 @@ public @interface TestAnnotation {
     String[] arrayArg() default {};
 
     TestEnum enumArg() default TestEnum.ONE;
+
+    TestAnno2 annotationParameter() default @TestAnno2;
 }

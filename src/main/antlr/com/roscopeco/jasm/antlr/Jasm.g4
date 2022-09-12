@@ -24,6 +24,7 @@ annotation_arg
  | bool_atom
  | enum_value_literal
  | annotation_array_literal
+ | annotation
  | NAME
  | LITERAL_NAME
  | QNAME
@@ -88,9 +89,9 @@ method_arguments
  ;
 
 method_argument
- : prim_type
- | ref_type
- | array_type
+ : annotation* prim_type
+ | annotation* ref_type
+ | annotation* array_type
  ;
 
 membername

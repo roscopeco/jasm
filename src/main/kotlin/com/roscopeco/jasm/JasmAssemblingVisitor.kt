@@ -78,7 +78,8 @@ class JasmAssemblingVisitor(
 
     override fun visitAnnotation(ctx: JasmParser.AnnotationContext) {
         val annotationVisitor = visitor.visitAnnotation(typeVisitor.visitClassname(ctx.classname()), true)
-        return JasmAnnotationVisitor(annotationVisitor).visitAnnotation(ctx)
+        JasmAnnotationVisitor(annotationVisitor).visitAnnotation(ctx)
+        annotationVisitor.visitEnd()
     }
 
 
@@ -155,68 +156,12 @@ class JasmAssemblingVisitor(
         }
     }
 
-    private fun generateAnnotationArg(name: String, ctx: JasmParser.Annotation_argContext, visitor: AnnotationVisitor) {
-        when {
-            ctx.int_atom() != null          -> visitor.visit(name, generateInteger(ctx.int_atom()))
-            ctx.float_atom() != null        -> visitor.visit(name, generateFloatingPoint(ctx.float_atom()))
-            ctx.string_atom() != null       -> visitor.visit(name, unescapeConstantString(ctx.string_atom().text))
-            ctx.bool_atom() != null         -> if (java.lang.Boolean.parseBoolean(ctx.bool_atom().text)) {
-                visitor.visit(name, 1)
-            } else {
-                visitor.visit(name, 0)
-            }
-            ctx.annotation_array_literal() != null -> generateAnnotationArrayLiteral(name, ctx, visitor)
-            ctx.enum_value_literal() != null -> generateAnnotationEnumLiteral(name, ctx, visitor)
-            ctx.NAME() != null              -> visitor.visit(name, Type.getType("L" + ctx.NAME().text + ";"))
-            ctx.LITERAL_NAME() != null      -> visitor.visit(name, Type.getType("L" + LiteralNames.unescape(ctx.LITERAL_NAME().text) + ";"))
-            ctx.QNAME() != null             -> visitor.visit(name, Type.getType("L" + ctx.QNAME().text + ";"))
-            else -> {
-                errorCollector.addError(CodeError(unitName, ctx, "Unsupported annotation arg: " + ctx.text))
-            }
-        }
-    }
-
-    private fun generateAnnotationArrayLiteral(name: String, ctx: JasmParser.Annotation_argContext, visitor: AnnotationVisitor) {
-        val arrayVisitor = visitor.visitArray(name)
-        ctx.annotation_array_literal().annotation_arg().map {
-            generateAnnotationArg("ignored", it, arrayVisitor)
-        }.toTypedArray()
-        arrayVisitor.visitEnd()
-    }
-
-    private fun generateAnnotationEnumLiteral(name: String, ctx: JasmParser.Annotation_argContext, visitor: AnnotationVisitor) {
-        val owner = ctx.enum_value_literal().classname()
-        val ownerDescriptor = when {
-            owner.NAME() != null            -> Type.getType("L" + owner.NAME().text + ";")
-            owner.LITERAL_NAME() != null    -> Type.getType("L" + LiteralNames.unescape(owner.LITERAL_NAME().text) + ";")
-            owner.QNAME() != null           -> Type.getType("L" + owner.QNAME().text + ";")
-            else                            -> {
-                errorCollector.addError(CodeError(unitName, ctx, "[BUG] Unsupported enum owner: " + ctx.text))
-                Type.getType(Object::class.java)
-            }
-        }
-        val valueCtx = ctx.enum_value_literal().enum_literal_value()
-        val value = when {
-            valueCtx.NAME() != null         -> valueCtx.NAME().text
-            valueCtx.LITERAL_NAME() != null -> LiteralNames.unescape(valueCtx.LITERAL_NAME().text)
-            else                            -> {
-                errorCollector.addError(CodeError(unitName, ctx, "[BUG] Unsupported enum value: " + ctx.text))
-                "<error>"
-            }
-        }
-
-        visitor.visitEnum(name, ownerDescriptor.descriptor, value)
-    }
-
     override fun visitMethod(ctx: JasmParser.MethodContext) {
         return JasmMethodVisitor(ctx).visitMethod(ctx)
     }
 
     private inner class JasmAnnotationVisitor(val visitor: AnnotationVisitor) : JasmBaseVisitor<Unit>() {
 
-        override fun visitAnnotation(ctx: JasmParser.AnnotationContext?) {
-            return super.visitAnnotation(ctx)
-        }
         override fun visitAnnotation_param(ctx: JasmParser.Annotation_paramContext) {
             val name = when {
                 ctx.NAME() != null          -> ctx.NAME().text
@@ -227,6 +172,64 @@ class JasmAssemblingVisitor(
             generateAnnotationArg(name, ctx.annotation_arg(), visitor)
 
             return super.visitAnnotation_param(ctx)
+        }
+
+        private fun generateAnnotationArg(name: String, ctx: JasmParser.Annotation_argContext, visitor: AnnotationVisitor) {
+            when {
+                ctx.int_atom() != null          -> visitor.visit(name, generateInteger(ctx.int_atom()))
+                ctx.float_atom() != null        -> visitor.visit(name, generateFloatingPoint(ctx.float_atom()))
+                ctx.string_atom() != null       -> visitor.visit(name, unescapeConstantString(ctx.string_atom().text))
+                ctx.bool_atom() != null         -> if (java.lang.Boolean.parseBoolean(ctx.bool_atom().text)) {
+                    visitor.visit(name, 1)
+                } else {
+                    visitor.visit(name, 0)
+                }
+                ctx.annotation_array_literal() != null -> generateAnnotationArrayLiteral(name, ctx, visitor)
+                ctx.enum_value_literal() != null -> generateAnnotationEnumLiteral(name, ctx, visitor)
+                ctx.NAME() != null              -> visitor.visit(name, Type.getType("L" + ctx.NAME().text + ";"))
+                ctx.LITERAL_NAME() != null      -> visitor.visit(name, Type.getType("L" + LiteralNames.unescape(ctx.LITERAL_NAME().text) + ";"))
+                ctx.QNAME() != null             -> visitor.visit(name, Type.getType("L" + ctx.QNAME().text + ";"))
+                ctx.annotation() != null        -> {
+                    val annotationVisitor = visitor.visitAnnotation(name, typeVisitor.visitClassname(ctx.annotation().classname()))
+                    JasmAnnotationVisitor(annotationVisitor).visitAnnotation(ctx.annotation())
+                    annotationVisitor.visitEnd()
+                }
+                else -> {
+                    errorCollector.addError(CodeError(unitName, ctx, "Unsupported annotation arg: " + ctx.text))
+                }
+            }
+        }
+
+        private fun generateAnnotationArrayLiteral(name: String, ctx: JasmParser.Annotation_argContext, visitor: AnnotationVisitor) {
+            val arrayVisitor = visitor.visitArray(name)
+            ctx.annotation_array_literal().annotation_arg().map {
+                generateAnnotationArg("ignored", it, arrayVisitor)
+            }.toTypedArray()
+            arrayVisitor.visitEnd()
+        }
+
+        private fun generateAnnotationEnumLiteral(name: String, ctx: JasmParser.Annotation_argContext, visitor: AnnotationVisitor) {
+            val owner = ctx.enum_value_literal().classname()
+            val ownerDescriptor = when {
+                owner.NAME() != null            -> Type.getType("L" + owner.NAME().text + ";")
+                owner.LITERAL_NAME() != null    -> Type.getType("L" + LiteralNames.unescape(owner.LITERAL_NAME().text) + ";")
+                owner.QNAME() != null           -> Type.getType("L" + owner.QNAME().text + ";")
+                else                            -> {
+                    errorCollector.addError(CodeError(unitName, ctx, "[BUG] Unsupported enum owner: " + ctx.text))
+                    Type.getType(Object::class.java)
+                }
+            }
+            val valueCtx = ctx.enum_value_literal().enum_literal_value()
+            val value = when {
+                valueCtx.NAME() != null         -> valueCtx.NAME().text
+                valueCtx.LITERAL_NAME() != null -> LiteralNames.unescape(valueCtx.LITERAL_NAME().text)
+                else                            -> {
+                    errorCollector.addError(CodeError(unitName, ctx, "[BUG] Unsupported enum value: " + ctx.text))
+                    "<error>"
+                }
+            }
+
+            visitor.visitEnum(name, ownerDescriptor.descriptor, value)
         }
     }
 
@@ -243,13 +246,26 @@ class JasmAssemblingVisitor(
         )
 
         override fun visitAnnotation(ctx: JasmParser.AnnotationContext) {
-            val annotationVisitor = methodVisitor.visitAnnotation(typeVisitor.visitClassname(ctx.classname()), true)
-            JasmAnnotationVisitor(annotationVisitor).visitAnnotation(ctx)
-            annotationVisitor.visitEnd()
+            // Intentionally do nothing here, we can't differentiate between method and parameter annotations,
+            // so we'll manually drive visiting of those in visitMethod instead...
         }
 
         override fun visitMethod(ctx: JasmParser.MethodContext) {
-             super.visitMethod(ctx)
+            ctx.annotation()?.forEach { annotation ->
+                val annotationVisitor = methodVisitor.visitAnnotation(typeVisitor.visitClassname(annotation.classname()), true)
+                JasmAnnotationVisitor(annotationVisitor).visitAnnotation(annotation)
+                annotationVisitor.visitEnd()
+            }
+
+            ctx.method_descriptor().method_arguments()?.method_argument()?.forEachIndexed { num, arg ->
+                arg.annotation()?.forEach { annotation ->
+                    val annotationVisitor = methodVisitor.visitParameterAnnotation(num, typeVisitor.visitClassname(annotation.classname()), true)
+                    JasmAnnotationVisitor(annotationVisitor).visitAnnotation(annotation)
+                    annotationVisitor.visitEnd()
+                }
+            }
+
+            super.visitMethod(ctx)
 
             // Do this **before** computing frames, as if a label hasn't been visited
             // but is referenced in the code it can cause NPE from ASM (with message
