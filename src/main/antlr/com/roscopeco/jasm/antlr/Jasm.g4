@@ -873,23 +873,31 @@ const_args
  ;
 
 method_handle
- : handle_tag bootstrap_spec
+ : method_tag bootstrap_spec
+ | field_tag field_spec
  ;
 
-bootstrap_spec
- : owner DOT membername method_descriptor
+field_tag
+ : GETFIELD
+ | GETSTATIC
+ | PUTFIELD
+ | PUTSTATIC
  ;
 
-handle_tag
+method_tag
  : INVOKEINTERFACE
  | INVOKESPECIAL
  | INVOKESTATIC STAR?
  | INVOKEVIRTUAL STAR?
  | NEWINVOKESPECIAL
- | GETFIELD
- | GETSTATIC
- | PUTFIELD
- | PUTSTATIC
+ ;
+
+field_spec
+ : owner DOT membername type
+ ;
+
+bootstrap_spec
+ : owner DOT membername method_descriptor
  ;
 
 const_arg

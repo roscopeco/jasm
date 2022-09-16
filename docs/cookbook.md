@@ -522,3 +522,124 @@ public class `com/roscopeco/jasm/Literal Names` implements com/roscopeco/jasm/mo
 }
 ```
 
+#### Records
+
+Records are just regular classes that subclass `java/lang/Records` and have their
+`equals`, `hashCode` and `toString` methods implemented with an `invokedynamic`
+bootstrapped by `java/lang/runtime/ObjectMethods.bootstrap`.
+
+The full disassembly of a record:
+
+```java
+public record RecordClass<T>(T thing, String other) { }
+```
+
+looks like:
+
+```java
+/*
+ * Disassembled from RecordClass (originally RecordClass.java) by JASM
+ *
+ * Original class version: 61
+ * Signature: <T:Ljava/lang/Object;>Ljava/lang/Record;
+ */
+public class com/roscopeco/jasm/model/disasm/RecordClass extends java/lang/Record {
+    // TT;
+    private final thing java/lang/Object
+
+    // <no signature>
+    private final other java/lang/String
+
+    // (TT;Ljava/lang/String;)V
+    // <no exceptions>
+    public <init>(java/lang/Object, java/lang/String)V {
+        
+        label0:
+        aload 0
+        invokespecial java/lang/Record.<init>()V
+        aload 0
+        aload 1
+        putfield com/roscopeco/jasm/model/disasm/RecordClass.thing java/lang/Object
+        aload 0
+        aload 2
+        putfield com/roscopeco/jasm/model/disasm/RecordClass.other java/lang/String
+        return
+        
+        label1:
+    }
+
+    // <no signature>
+    // <no exceptions>
+    public final toString()java/lang/String {
+        
+        label0:
+        aload 0
+        invokedynamic toString(com/roscopeco/jasm/model/disasm/RecordClass)java/lang/String {
+            invokestatic java/lang/runtime/ObjectMethods.bootstrap(java/lang/invoke/MethodHandles$Lookup, java/lang/String, java/lang/invoke/TypeDescriptor, java/lang/Class, java/lang/String, [java/lang/invoke/MethodHandle)java/lang/Object
+            [com/roscopeco/jasm/model/disasm/RecordClass, "thing;other", getfield com/roscopeco/jasm/model/disasm/RecordClass.thing java/lang/Object, getfield com/roscopeco/jasm/model/disasm/RecordClass.other java/lang/String]
+        }
+
+        areturn
+        
+        label1:
+    }
+
+    // <no signature>
+    // <no exceptions>
+    public final hashCode()I {
+        
+        label0:
+        aload 0
+        invokedynamic hashCode(com/roscopeco/jasm/model/disasm/RecordClass)I {
+            invokestatic java/lang/runtime/ObjectMethods.bootstrap(java/lang/invoke/MethodHandles$Lookup, java/lang/String, java/lang/invoke/TypeDescriptor, java/lang/Class, java/lang/String, [java/lang/invoke/MethodHandle)java/lang/Object
+            [com/roscopeco/jasm/model/disasm/RecordClass, "thing;other", getfield com/roscopeco/jasm/model/disasm/RecordClass.thing java/lang/Object, getfield com/roscopeco/jasm/model/disasm/RecordClass.other java/lang/String]
+        }
+
+        ireturn
+        
+        label1:
+    }
+
+    // <no signature>
+    // <no exceptions>
+    public final equals(java/lang/Object)Z {
+        
+        label0:
+        aload 0
+        aload 1
+        invokedynamic equals(com/roscopeco/jasm/model/disasm/RecordClass, java/lang/Object)Z {
+            invokestatic java/lang/runtime/ObjectMethods.bootstrap(java/lang/invoke/MethodHandles$Lookup, java/lang/String, java/lang/invoke/TypeDescriptor, java/lang/Class, java/lang/String, [java/lang/invoke/MethodHandle)java/lang/Object
+            [com/roscopeco/jasm/model/disasm/RecordClass, "thing;other", getfield com/roscopeco/jasm/model/disasm/RecordClass.thing java/lang/Object, getfield com/roscopeco/jasm/model/disasm/RecordClass.other java/lang/String]
+        }
+
+        ireturn
+        
+        label1:
+    }
+
+    // ()TT;
+    // <no exceptions>
+    public thing()java/lang/Object {
+        
+        label0:
+        aload 0
+        getfield com/roscopeco/jasm/model/disasm/RecordClass.thing java/lang/Object
+        areturn
+        
+        label1:
+    }
+
+    // <no signature>
+    // <no exceptions>
+    public other()java/lang/String {
+        
+        label0:
+        aload 0
+        getfield com/roscopeco/jasm/model/disasm/RecordClass.other java/lang/String
+        areturn
+        
+        label1:
+    }
+}
+```
+
