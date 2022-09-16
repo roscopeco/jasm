@@ -11,6 +11,7 @@ import org.objectweb.asm.Opcodes;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
+import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
@@ -337,9 +338,57 @@ public class DisassemblerE2ETests {
 
     */
 
+    @Test
+    void shouldRoundTripInterfaceCorrectly() {
+        final var source = disassemble("Interface");
+
+        assertThat(source).contains("public abstract interface class");
+        assertThat(source).contains("public abstract test()java/lang/String" + System.lineSeparator());
+
+        final var clz = checkAssembleAndDefineClass(source, "Interface");
+
+        assertThat(clz).isInterface();
+        assertThat(clz).hasPublicMethods("test");
+    }
+
+    @Test
+    void shouldRoundTripInterfaceWithDefaultCorrectly() throws NoSuchMethodException {
+        final var source = disassemble("InterfaceWithDefault");
+
+        System.out.println(source);
+
+        assertThat(source).contains("public abstract interface class");
+        assertThat(source).contains("public abstract getString()java/lang/String" + System.lineSeparator());
+        assertThat(source).contains("public doStuff()V {" + System.lineSeparator());
+
+        final var clz = checkAssembleAndDefineClass(source, "InterfaceWithDefault");
+
+        assertThat(clz).isInterface();
+        assertThat(clz).hasPublicMethods("getString", "doStuff");
+    }
+
+    @Test
+    void shouldRoundTripEnumCorrectly() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        final var source = disassemble("AnEnum");
+
+        assertThat(source).contains("public enum class");
+
+        final var clz = checkAssembleAndDefineClass(source, "AnEnum");
+
+        assertThat(clz.isEnum()).isTrue();
+        assertThat(clz).hasPublicMethods("values", "getI");
+
+        final var values = clz.getMethod("values").invoke(null);
+        final var one = Array.get(values, 0);
+        final var two = Array.get(values, 1);
+
+        assertThat(clz.getMethod("getI").invoke(one)).isEqualTo(1);
+        assertThat(clz.getMethod("getI").invoke(two)).isEqualTo(2);
+    }
+
     private Class<?> checkAssembleAndDefineClass(final String source, final String name) {
-        final var clz = defineClass(assembleString(
-            source.replace("com/roscopeco/jasm/model/disasm/" + name, "com/roscopeco/jasm/" + name + "Test0000"), Opcodes.V11));
+        final var newSource = source.replace("com/roscopeco/jasm/model/disasm/" + name, "com/roscopeco/jasm/" + name + "Test0000");
+        final var clz = defineClass(assembleString(newSource, Opcodes.V11));
 
         assertThat(clz.getName()).isEqualTo("com.roscopeco.jasm." + name + "Test0000");
 

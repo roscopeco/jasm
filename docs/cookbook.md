@@ -522,6 +522,228 @@ public class `com/roscopeco/jasm/Literal Names` implements com/roscopeco/jasm/mo
 }
 ```
 
+#### Interfaces
+
+Interfaces are classes with `abstract interface` modifiers. Their methods are also
+abstract (unless they are `default` in Java - see below) and have no body (obviously).
+
+The full disassembly of an interface:
+
+```java
+public interface Interface {
+    String test();
+}
+```
+
+looks like:
+
+```java
+/*
+ * Disassembled from Interface (originally Interface.java) by JASM
+ *
+ * Original class version: 55
+ * Signature: <no signature>
+ */
+public abstract interface class com/roscopeco/jasm/model/disasm/Interface {
+    // <no signature>
+    // <no exceptions>
+    public abstract test()java/lang/String
+
+}
+```
+
+Java `default` methods are simply methods on the interface that are not marked abstract
+and have a body. E.g. The following Java interface:
+
+```java
+public interface InterfaceWithDefault {
+    String getString();
+
+    default void doStuff() {
+    }
+}
+```
+disassembles to:
+
+```java
+/*
+ * Disassembled from InterfaceWithDefault (originally InterfaceWithDefault.java) by JASM
+ *
+ * Original class version: 55
+ * Signature: <no signature>
+ */
+public abstract interface class com/roscopeco/jasm/model/disasm/InterfaceWithDefault {
+    // <no signature>
+    // <no exceptions>
+    public abstract getString()java/lang/String
+
+
+    // <no signature>
+    // <no exceptions>
+    public doStuff()V {
+        
+        label0:
+        return
+    }
+}
+```
+
+#### Enums
+
+Enums are regular classes with the `enum` modifier, that subclass `java/lang/Enum`.
+
+The full disassembly of an enum:
+
+```java
+public enum AnEnum {
+    ONE(1),
+    TWO(2);
+
+    private final int i;
+
+    AnEnum(int i) {
+        this.i = i;
+    }
+
+    public int getI() {
+        return i;
+    }
+}
+```
+looks like:
+
+```java
+/*
+ * Disassembled from AnEnum (originally AnEnum.java) by JASM
+ *
+ * Original class version: 55
+ * Signature: Ljava/lang/Enum<Lcom/roscopeco/jasm/model/disasm/AnEnum;>;
+ */
+public enum class com/roscopeco/jasm/model/disasm/AnEnum extends java/lang/Enum {
+    // <no signature>
+    public static final ONE com/roscopeco/jasm/model/disasm/AnEnum
+
+    // <no signature>
+    public static final TWO com/roscopeco/jasm/model/disasm/AnEnum
+
+    // <no signature>
+    private final i I
+
+    // <no signature>
+    private static final synthetic $VALUES [com/roscopeco/jasm/model/disasm/AnEnum
+
+    // <no signature>
+    // <no exceptions>
+    public static values()[com/roscopeco/jasm/model/disasm/AnEnum {
+        
+        label0:
+        getstatic com/roscopeco/jasm/model/disasm/AnEnum.$VALUES [com/roscopeco/jasm/model/disasm/AnEnum
+        invokevirtual [com/roscopeco/jasm/model/disasm/AnEnum.clone()java/lang/Object
+        checkcast [com/roscopeco/jasm/model/disasm/AnEnum
+        areturn
+    }
+
+
+    // <no signature>
+    // <no exceptions>
+    public static valueOf(java/lang/String)com/roscopeco/jasm/model/disasm/AnEnum {
+        
+        label0:
+        ldc com/roscopeco/jasm/model/disasm/AnEnum
+        aload 0
+        invokestatic java/lang/Enum.valueOf(java/lang/Class, java/lang/String)java/lang/Enum
+        checkcast com/roscopeco/jasm/model/disasm/AnEnum
+        areturn
+        
+        label1:
+    }
+
+
+    // (I)V
+    // <no exceptions>
+    private <init>(java/lang/String, I, I)V {
+        
+        label0:
+        aload 0
+        aload 1
+        iload 2
+        invokespecial java/lang/Enum.<init>(java/lang/String, I)V
+        
+        label1:
+        aload 0
+        iload 3
+        putfield com/roscopeco/jasm/model/disasm/AnEnum.i I
+        
+        label2:
+        return
+        
+        label3:
+    }
+
+
+    // <no signature>
+    // <no exceptions>
+    public getI()I {
+        
+        label0:
+        aload 0
+        getfield com/roscopeco/jasm/model/disasm/AnEnum.i I
+        ireturn
+        
+        label1:
+    }
+
+
+    // <no signature>
+    // <no exceptions>
+    private static synthetic $values()[com/roscopeco/jasm/model/disasm/AnEnum {
+        
+        label0:
+        iconst 2
+        anewarray com/roscopeco/jasm/model/disasm/AnEnum
+        dup
+        iconst 0
+        getstatic com/roscopeco/jasm/model/disasm/AnEnum.ONE com/roscopeco/jasm/model/disasm/AnEnum
+        aastore
+        dup
+        iconst 1
+        getstatic com/roscopeco/jasm/model/disasm/AnEnum.TWO com/roscopeco/jasm/model/disasm/AnEnum
+        aastore
+        areturn
+    }
+
+
+    // <no signature>
+    // <no exceptions>
+    static <clinit>()V {
+        
+        label0:
+        new com/roscopeco/jasm/model/disasm/AnEnum
+        dup
+        ldc "ONE"
+        iconst 0
+        iconst 1
+        invokespecial com/roscopeco/jasm/model/disasm/AnEnum.<init>(java/lang/String, I, I)V
+        putstatic com/roscopeco/jasm/model/disasm/AnEnum.ONE com/roscopeco/jasm/model/disasm/AnEnum
+        
+        label1:
+        new com/roscopeco/jasm/model/disasm/AnEnum
+        dup
+        ldc "TWO"
+        iconst 1
+        iconst 2
+        invokespecial com/roscopeco/jasm/model/disasm/AnEnum.<init>(java/lang/String, I, I)V
+        putstatic com/roscopeco/jasm/model/disasm/AnEnum.TWO com/roscopeco/jasm/model/disasm/AnEnum
+        
+        label2:
+        invokestatic com/roscopeco/jasm/model/disasm/AnEnum.$values()[com/roscopeco/jasm/model/disasm/AnEnum
+        putstatic com/roscopeco/jasm/model/disasm/AnEnum.$VALUES [com/roscopeco/jasm/model/disasm/AnEnum
+        return
+    }
+
+}
+```
+
 #### Records
 
 Records are just regular classes that subclass `java/lang/Records` and have their

@@ -361,7 +361,8 @@ class JasmDisassemblingVisitor(
     private fun handleBareType(bareType: String): String {
         return LiteralNames.escape(if (bareType.contains("[")) {
             val lastLSquare = bareType.lastIndexOf("[")
-            bareType.substring(0, lastLSquare + 1) + bareType.substring(lastLSquare + 1, bareType.length - 1)
+            // start at lastLSquare + 2 to remove 'L'...
+            bareType.substring(0, lastLSquare + 1) + bareType.substring(lastLSquare + 2, bareType.length - 1)
         } else {
             bareType
         })
@@ -652,8 +653,7 @@ class JasmDisassemblingVisitor(
                 methodComment(indenter) +
                 methodAnnotations(indenter) +
                 methodHeader(indenter) +
-                methodBody(indenter.indent()) +
-                indenter.indented("}")
+                methodBody(indenter.indent())
 
         fun methodComment(indenter: Indenter): String
                 = indenter.indented("// ${signature ?: "<no signature>"}$LINE_SEPARATOR") +
@@ -670,13 +670,13 @@ class JasmDisassemblingVisitor(
         fun methodHeader(indenter: Indenter): String
                 = indenter.indented("${formattedModifiers(access)}${LiteralNames.escapeMethodName(name)}${
                     disassembleMethodDescriptor(descriptor, parameterAnnotations)
-                } {\n")
+                }")
 
         fun methodBody(indenter: Indenter): String {
             return if (blocks.isNotEmpty())
-                blocks.joinToString(LINE_SEPARATOR) { it.generate(indenter) } + LINE_SEPARATOR
+                " {$LINE_SEPARATOR${blocks.joinToString(LINE_SEPARATOR) { it.generate(indenter) }}$LINE_SEPARATOR${indenter.outdent().indented("}")}$LINE_SEPARATOR"
             else
-                ""
+                LINE_SEPARATOR
         }
 
         override fun visitAnnotation(descriptor: String?, visible: Boolean): AnnotationVisitor? {
