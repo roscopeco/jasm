@@ -1139,7 +1139,7 @@ label
  ;
 
 exception_handler
- : EXCEPTION NAME COMMA? NAME COMMA? NAME COMMA? ref_type
+ : EXCEPTION NAME COMMA? NAME COMMA? NAME (COMMA? ref_type)?
  ;
 
 try_catch_block

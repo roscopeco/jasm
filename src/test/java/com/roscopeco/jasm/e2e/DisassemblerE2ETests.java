@@ -9,6 +9,8 @@ import com.roscopeco.jasm.model.annotations.TestEnum;
 import org.junit.jupiter.api.Test;
 import org.objectweb.asm.Opcodes;
 
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
@@ -288,6 +290,22 @@ public class DisassemblerE2ETests {
         assertThat(annotation.annotationType()).isEqualTo(TestAnnotation.class);
         testAnnotation = (TestAnnotation)annotation;
         assertThat(testAnnotation.classArg()).isEqualTo(Object.class); /* default */
+    }
+
+    // https://github.com/roscopeco/jasm/issues/40
+    @Test
+    void shouldRoundTripNullTypeFinallyTryCatchCorrectly() throws Throwable {
+        final var source = disassemble("FinallyClass");
+
+        assertThat(source).contains("exception label0, label1, label2" + System.lineSeparator());
+
+        final var clz = checkAssembleAndDefineClass(source, "FinallyClass");
+        final var method = MethodHandles.lookup().findVirtual(clz, "theMethod", MethodType.methodType(String.class));
+        final var obj = clz.getDeclaredConstructor().newInstance();
+
+        final var result = method.invoke(obj);
+
+        assertThat(result).isEqualTo("Finally");
     }
 
     private Class<?> checkAssembleAndDefineClass(final String source, final String name) {

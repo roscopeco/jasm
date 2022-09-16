@@ -699,9 +699,9 @@ class JasmDisassemblingVisitor(
             }
         }
 
-        override fun visitTryCatchBlock(start: Label, end: Label, handler: Label, type: String) {
-            blocks.add(Line("exception ${getLabelName(start)}, ${getLabelName(end)}, ${getLabelName(handler)}, ${
-                handleBareType(type)
+        override fun visitTryCatchBlock(start: Label, end: Label, handler: Label, type: String?) {
+            blocks.add(Line("exception ${getLabelName(start)}, ${getLabelName(end)}, ${getLabelName(handler)}${
+                if (type != null) ", ${handleBareType(type)}" else ""
             }"))
         }
 
