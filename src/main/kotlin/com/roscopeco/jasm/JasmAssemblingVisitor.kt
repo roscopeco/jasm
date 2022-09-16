@@ -775,7 +775,7 @@ class JasmAssemblingVisitor(
                 getLabel(ctx.NAME(0).text).label,
                 getLabel(ctx.NAME(1).text).label,
                 getLabel(ctx.NAME(2).text).label,
-                ctx.ref_type().text
+                ctx.ref_type()?.text
             )
         }
 

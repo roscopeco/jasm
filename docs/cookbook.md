@@ -279,6 +279,15 @@ When you use `try`/`catch` blocks, JASM will generate a bunch of labels and `got
 you. If you don't want this, then you should use the `exception` statement and manage the flow manually with 
 labels.
 
+##### Finally
+
+The first form also allows the exception type to be omitted, which indicates the catch should be called for all
+exception types. Javac uses this for `finally` blocks.
+
+```java
+exception tryBegin, tryEnd, finallyBegin
+```
+
 #### Static initializers
 
 In Java, you have static initializers. For example, given the Java code:
