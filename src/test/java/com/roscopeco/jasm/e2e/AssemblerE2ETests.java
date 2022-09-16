@@ -158,7 +158,7 @@ class AssemblerE2ETests {
         assertThat(clz.getDeclaredFields()).isEmpty();
 
         assertThat(clz.getDeclaredConstructors()).hasSize(1);
-        assertThat(clz.getDeclaredMethods()).hasSize(11);
+        assertThat(clz.getDeclaredMethods()).hasSize(12);
 
         final var obj = instantiate(clz, LdcAconstAreturn.class);
 
@@ -185,6 +185,9 @@ class AssemblerE2ETests {
 
         // Tests LDC(class), ARETURN
         assertThat(obj.testLdcClass()).isEqualTo(List.class);
+
+        // Tests LDC(class), ARETURN
+        assertThat(obj.testLdcClassWithLiteralName()).isEqualTo(List.class);
 
         // Tests LDC(methodtype), ARETURN
         assertThat(obj.testLdcMethodType().returnType()).isEqualTo(int.class);

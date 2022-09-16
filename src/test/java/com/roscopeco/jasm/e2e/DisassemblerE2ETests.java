@@ -194,7 +194,6 @@ public class DisassemblerE2ETests {
 
     @Test
     void shouldDisassembleInvokeDynamic() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        System.out.println(disassemble("InvokeDynamicTest"));
         final var source = disassemble("InvokeDynamicTest");
         final var test = doParseString(source);
 
