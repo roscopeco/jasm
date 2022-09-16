@@ -277,7 +277,7 @@ class JasmAssemblingVisitor(
         }
 
         override fun visitLabel(ctx: JasmParser.LabelContext) {
-            val label = declareLabel(ctx.LABEL()?.text ?: ctx.LITERAL_NAME().text)
+            val label = declareLabel(ctx.LABEL()?.text ?: LiteralNames.unescape(ctx.LITERAL_NAME().text))
             methodVisitor.visitLabel(label.label)
         }
 
@@ -454,7 +454,7 @@ class JasmAssemblingVisitor(
         }
 
         override fun visitInsn_goto(ctx: JasmParser.Insn_gotoContext)
-                = methodVisitor.visitJumpInsn(Opcodes.GOTO, getLabel(ctx.NAME()?.text ?: ctx.LITERAL_NAME().text).label)
+                = methodVisitor.visitJumpInsn(Opcodes.GOTO, getLabel(ctx.NAME()?.text ?: LiteralNames.unescape(ctx.LITERAL_NAME().text)).label)
 
         override fun visitInsn_i2b(ctx: JasmParser.Insn_i2bContext) = methodVisitor.visitInsn(Opcodes.I2B)
 
@@ -899,7 +899,7 @@ class JasmAssemblingVisitor(
                 ctx.string_atom() != null       -> unescapeConstantString(ctx.string_atom().text)
                 ctx.bool_atom() != null         -> if (java.lang.Boolean.parseBoolean(ctx.bool_atom().text)) 1 else 0
                 ctx.NAME() != null              -> Type.getType("L" + ctx.NAME().text + ";")
-                ctx.LITERAL_NAME() != null      -> Type.getType("L" + ctx.LITERAL_NAME().text + ";")
+                ctx.LITERAL_NAME() != null      -> Type.getType("L" + LiteralNames.unescape(ctx.LITERAL_NAME().text) + ";")
                 ctx.QNAME() != null             -> Type.getType("L" + ctx.QNAME().text + ";")
                 ctx.method_handle() != null     -> buildBootstrapHandle(ctx.method_handle())
                 ctx.method_descriptor() != null -> Type.getMethodType(typeVisitor.visitMethod_descriptor(ctx.method_descriptor()))

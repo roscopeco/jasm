@@ -12,6 +12,7 @@ interface LdcAconstAreturn {
     fun testLdcDouble(): Double
     fun testLdcBool(): Boolean
     fun testLdcClass(): Class<*>
+    fun testLdcClassWithLiteralName(): Class<*>
     fun testLdcMethodType(): MethodType
     fun testLdcMethodHandle(): MethodHandle
     fun testLdcDynamicConst(): String
