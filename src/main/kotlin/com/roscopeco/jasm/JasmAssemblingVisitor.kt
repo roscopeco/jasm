@@ -838,28 +838,52 @@ class JasmAssemblingVisitor(
             }
         }
 
-        private fun buildBootstrapHandle(ctx: JasmParser.Method_handleContext): Handle {
-            return Handle(
-                generateTagForHandle(ctx),
-                typeVisitor.visitOwner(ctx.bootstrap_spec().owner()),
-                typeVisitor.visitMembername(ctx.bootstrap_spec().membername()),
-                typeVisitor.visitMethod_descriptor(ctx.bootstrap_spec().method_descriptor()),
-                ctx.handle_tag().INVOKEINTERFACE() != null,
-            )
+        private fun buildBootstrapHandle(ctx: JasmParser.Method_handleContext): Handle = when {
+            ctx.method_tag() != null -> {
+                Handle(
+                    generateTagForHandle(ctx),
+                    typeVisitor.visitOwner(ctx.bootstrap_spec().owner()),
+                    typeVisitor.visitMembername(ctx.bootstrap_spec().membername()),
+                    typeVisitor.visitMethod_descriptor(ctx.bootstrap_spec().method_descriptor()),
+                    ctx.method_tag().INVOKEINTERFACE() != null,
+                )
+            }
+            ctx.field_tag() != null -> {
+                Handle(
+                    generateTagForHandle(ctx),
+                    typeVisitor.visitOwner(ctx.field_spec().owner()),
+                    typeVisitor.visitMembername(ctx.field_spec().membername()),
+                    typeVisitor.visitType(ctx.field_spec().type()),
+                    false
+                )
+            }
+            else -> {
+                errorCollector.addError(CodeError(unitName, ctx, "Bootstrap handle is neither method nor field: ${ctx.text}"))
+                // "Nothing" handle, it'll be ignored anyway, just return so parse can continue to gather errors
+                Handle(
+                    Opcodes.H_PUTSTATIC,
+                    "Error",
+                    "error",
+                    "Ljava/lang/Object;",
+                    false
+                )
+            }
         }
 
         private fun generateTagForHandle(ctx: JasmParser.Method_handleContext) = when {
-            ctx.handle_tag().INVOKEINTERFACE() != null  -> Opcodes.H_INVOKEINTERFACE
-            ctx.handle_tag().INVOKESPECIAL() != null    -> Opcodes.H_INVOKESPECIAL
-            ctx.handle_tag().INVOKESTATIC() != null     -> Opcodes.H_INVOKESTATIC
-            ctx.handle_tag().INVOKEVIRTUAL() != null    -> Opcodes.H_INVOKEVIRTUAL
-            ctx.handle_tag().NEWINVOKESPECIAL() != null -> Opcodes.H_NEWINVOKESPECIAL
-            ctx.handle_tag().GETFIELD() != null         -> Opcodes.H_GETFIELD
-            ctx.handle_tag().GETSTATIC() != null        -> Opcodes.H_GETSTATIC
-            ctx.handle_tag().PUTFIELD() != null         -> Opcodes.H_PUTFIELD
-            ctx.handle_tag().PUTSTATIC() != null        -> Opcodes.H_PUTSTATIC
+            ctx.method_tag()?.INVOKEINTERFACE() != null  -> Opcodes.H_INVOKEINTERFACE
+            ctx.method_tag()?.INVOKESPECIAL() != null    -> Opcodes.H_INVOKESPECIAL
+            ctx.method_tag()?.INVOKESTATIC() != null     -> Opcodes.H_INVOKESTATIC
+            ctx.method_tag()?.INVOKEVIRTUAL() != null    -> Opcodes.H_INVOKEVIRTUAL
+            ctx.method_tag()?.NEWINVOKESPECIAL() != null -> Opcodes.H_NEWINVOKESPECIAL
+            ctx.field_tag()?.GETFIELD() != null          -> Opcodes.H_GETFIELD
+            ctx.field_tag()?.GETSTATIC() != null         -> Opcodes.H_GETSTATIC
+            ctx.field_tag()?.PUTFIELD() != null          -> Opcodes.H_PUTFIELD
+            ctx.field_tag()?.PUTSTATIC() != null         -> Opcodes.H_PUTSTATIC
             else -> {
-                errorCollector.addError(CodeError(unitName, ctx, "Unknown handle tag " + ctx.handle_tag().text))
+                errorCollector.addError(CodeError(unitName, ctx,
+                    "Unknown handle tag " + (ctx.method_tag()?.text ?: ctx.field_tag()?.text ?: "")
+                ))
                 Opcodes.H_INVOKESTATIC
             }
         }

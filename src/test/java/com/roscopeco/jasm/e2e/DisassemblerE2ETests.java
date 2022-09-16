@@ -308,6 +308,36 @@ public class DisassemblerE2ETests {
         assertThat(result).isEqualTo("Finally");
     }
 
+    /*
+     * TODO leaving this here for when we migrate to Java 17
+     *
+     * Relies on a RecordClass in the model.disasm package:
+     *
+     * public record RecordClass<T>(T thing, String other) { }
+
+    @Test
+    void shouldRoundTripRecordsCorrectly() throws Throwable {
+        final var source = disassemble("RecordClass");
+
+        System.out.println(source);
+
+        final var clz = checkAssembleAndDefineClass(source, "RecordClass");
+
+        final var obj1 = clz.getDeclaredConstructor(Object.class, String.class).newInstance("Hello", "World");
+        final var obj2 = clz.getDeclaredConstructor(Object.class, String.class).newInstance("Yolo", "World");
+        final var obj3 = clz.getDeclaredConstructor(Object.class, String.class).newInstance("Hello", "World");
+
+        assertThat(obj1.equals(obj2)).isFalse();
+        assertThat(obj1.equals(obj3)).isTrue();
+        assertThat(obj1.hashCode()).isNotEqualTo(obj2.hashCode());
+        assertThat(obj1.hashCode()).isEqualTo(obj3.hashCode());
+        assertThat(obj1.toString()).isEqualTo("RecordClassTest0000[thing=Hello, other=World]");
+        assertThat(obj2.toString()).isEqualTo("RecordClassTest0000[thing=Yolo, other=World]");
+        assertThat(obj3.toString()).isEqualTo("RecordClassTest0000[thing=Hello, other=World]");
+    }
+
+    */
+
     private Class<?> checkAssembleAndDefineClass(final String source, final String name) {
         final var clz = defineClass(assembleString(
             source.replace("com/roscopeco/jasm/model/disasm/" + name, "com/roscopeco/jasm/" + name + "Test0000"), Opcodes.V11));

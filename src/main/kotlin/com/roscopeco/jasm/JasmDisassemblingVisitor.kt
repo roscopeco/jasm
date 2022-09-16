@@ -407,7 +407,13 @@ class JasmDisassemblingVisitor(
     }
 
     private fun disassembleMethodHandle(handle: Handle): String {
-        return "${HANDLE_TAGS[handle.tag]} ${handleBareType(handle.owner)}.${handle.name}${disassembleMethodDescriptor(handle.desc)}"
+        return when (handle.tag) {
+            Opcodes.H_GETFIELD,
+            Opcodes.H_GETSTATIC,
+            Opcodes.H_PUTFIELD,
+            Opcodes.H_PUTSTATIC -> "${HANDLE_TAGS[handle.tag]} ${handleBareType(handle.owner)}.${handle.name} ${disassembleTypeDescriptor(handle.desc)}"
+            else -> "${HANDLE_TAGS[handle.tag]} ${handleBareType(handle.owner)}.${handle.name}${disassembleMethodDescriptor(handle.desc)}"
+        }
     }
 
     private fun disassembleBootstrapArguments(indenter: Indenter, arguments: Array<out Any?>): String {
@@ -427,7 +433,7 @@ class JasmDisassemblingVisitor(
             "${annotations.getOrNull(i)?.joinToString(" ") { it.outputNonIndented() } ?: ""} ${disassembleSingleType(paramCtx.type())}".trim()
         }
 
-        return "(${params.joinToString(", ")})${disassembleSingleType(ctx.return_().type())}"
+        return "(${params.joinToString(", ")})${if (ctx.return_() != null) disassembleSingleType(ctx.return_().type()) else ""}"
     }
 
     private fun disassembleMethodDescriptor(descriptor: String) = disassembleMethodDescriptor(descriptor, emptyList())
