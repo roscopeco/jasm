@@ -355,8 +355,6 @@ public class DisassemblerE2ETests {
     void shouldRoundTripInterfaceWithDefaultCorrectly() throws NoSuchMethodException {
         final var source = disassemble("InterfaceWithDefault");
 
-        System.out.println(source);
-
         assertThat(source).contains("public abstract interface class");
         assertThat(source).contains("public abstract getString()java/lang/String" + System.lineSeparator());
         assertThat(source).contains("public doStuff()V {" + System.lineSeparator());
