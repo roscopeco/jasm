@@ -7,7 +7,7 @@ here feel free to [raise an issue](https://github.com/roscopeco/jasm/issues) or
 Some of these omit the class boilerplate for clarity - if you want to compile them 
 you'll need to put them in a JASM class.
 
-You can also fine lots of examples in [the tests](src/test/resources/jasm) showing the syntax for
+You can also fine lots of examples in [the tests](/src/test/resources/jasm) showing the syntax for
 the different instructions and with examples of how they're used.
 
 There is also some more in-depth documentation and a few "standard recipes" in [the cookbook](cookbook.md).
