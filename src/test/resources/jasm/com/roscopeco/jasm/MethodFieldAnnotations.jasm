@@ -1,0 +1,12 @@
+class com/roscopeco/jasm/MethodFieldAnnotations {
+    @java/lang/Deprecated(since = "1001")
+    public myField I
+
+    @java/lang/Deprecated(since = "2002")
+    public test(@com/roscopeco/jasm/model/annotations/TestAnnotation I, @java/lang/Deprecated(since = "3003") @com/roscopeco/jasm/model/annotations/TestAnnotation(classArg = java/util/List) java/lang/String)V {
+        return
+    }
+
+    @com/roscopeco/jasm/model/annotations/TestAnnotation(annotationParameter = @com/roscopeco/jasm/model/annotations/TestAnno2(value = "new value"))
+    public otherField B
+}

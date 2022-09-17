@@ -8,12 +8,9 @@ package com.roscopeco.jasm;
 import com.roscopeco.jasm.antlr.JasmLexer;
 import org.junit.jupiter.api.Test;
 
-import static com.roscopeco.jasm.TestUtil.doParse;
 import static com.roscopeco.jasm.TestUtil.testCaseLexer;
-import static com.roscopeco.jasm.asserts.LexerParserAssertions.assertClass;
 import static com.roscopeco.jasm.asserts.LexerParserAssertions.assertNextToken;
 import static com.roscopeco.jasm.asserts.LexerParserAssertions.assertTokens;
-import static org.assertj.core.api.Assertions.assertThat;
 
 class LexerTests {
     @Test
@@ -963,5 +960,380 @@ class LexerTests {
             .hasType(JasmLexer.RBRACE);
 
         /* no need to go further */
+    }
+
+    @Test
+    void shouldLexClassWithGetForNumericField() {
+        // https://github.com/roscopeco/jasm/issues/35
+        final var lexer = testCaseLexer("com/roscopeco/jasm/LiteralNames.jasm");
+        assertNextToken(lexer)
+            .hasType(JasmLexer.PUBLIC);
+
+        assertNextToken(lexer)
+            .hasType(JasmLexer.CLASS);
+
+        assertNextToken(lexer)
+            .hasType(JasmLexer.LITERAL_NAME)
+            .hasText("`com/roscopeco/jasm/Literal Names`");
+
+        assertNextToken(lexer)
+            .hasType(JasmLexer.IMPLEMENTS);
+
+        assertNextToken(lexer)
+            .hasType(JasmLexer.QNAME)
+            .hasText("com/roscopeco/jasm/model/LiteralNames");
+
+        assertNextToken(lexer)
+            .hasType(JasmLexer.LBRACE);
+
+        assertNextToken(lexer)
+            .hasType(JasmLexer.PRIVATE);
+
+        assertNextToken(lexer)
+            .hasType(JasmLexer.STATIC);
+
+        assertNextToken(lexer)
+            .hasType(JasmLexer.LITERAL_NAME)
+            .hasText("`0`");
+
+        assertNextToken(lexer)
+            .hasType(JasmLexer.QNAME)
+            .hasText("java/lang/String");
+
+        assertNextToken(lexer)
+            .hasType(JasmLexer.EQUALS);
+
+        assertNextToken(lexer)
+            .hasType(JasmLexer.STRING)
+            .hasText("\"test\"");
+
+        assertNextToken(lexer)
+            .hasType(JasmLexer.PRIVATE);
+
+        assertNextToken(lexer)
+            .hasType(JasmLexer.LITERAL_NAME)
+            .hasText("`1`");
+
+        assertNextToken(lexer)
+            .hasType(JasmLexer.QNAME)
+            .hasText("java/lang/String");
+
+        // No need to go further - we're lexing literal names fine
+    }
+
+    @Test
+    void shouldLexClassWithSimpleAnnotation() {
+        final var lexer = testCaseLexer("SimpleAnnotatedClass.jasm");
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.ANNOTATION_NAME)
+                .hasText("@com/roscopeco/jasm/model/annotations/TestAnnotation");
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.CLASS);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.NAME)
+                .hasText("SimpleAnnotatedClass");
+    }
+
+    @Test
+    void shouldLexClassWithComplexAnnotation() {
+        final var lexer = testCaseLexer("ComplexAnnotatedClass.jasm");
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.ANNOTATION_NAME)
+                .hasText("@com/roscopeco/jasm/model/annotations/TestAnnotation");
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.LPAREN);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.NAME)
+                .hasText("stringArg");
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.EQUALS);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.STRING)
+                .hasText("\"Yolo\"");
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.COMMA);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.NAME)
+                .hasText("classArg");
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.EQUALS);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.QNAME)
+                .hasText("java/util/List");
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.COMMA);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.NAME)
+                .hasText("arrayArg");
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.EQUALS);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.LBRACE);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.STRING)
+                .hasText("\"one\"");
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.COMMA);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.STRING)
+                .hasText("\"two\"");
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.RBRACE);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.COMMA);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.NAME)
+                .hasText("enumArg");
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.EQUALS);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.LSQUARE);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.QNAME)
+                .hasText("com/roscopeco/jasm/model/annotations/TestEnum");
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.DOT);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.NAME)
+                .hasText("THREE");
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.RSQUARE);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.RPAREN);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.CLASS);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.NAME)
+                .hasText("ComplexAnnotatedClass");
+    }
+
+    @Test
+    void shouldLexFieldAndMethodAnnotations() {
+        final var lexer = testCaseLexer("com/roscopeco/jasm/MethodFieldAnnotations.jasm");
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.CLASS);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.QNAME)
+                .hasText("com/roscopeco/jasm/MethodFieldAnnotations");
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.LBRACE);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.ANNOTATION_NAME)
+                .hasText("@java/lang/Deprecated");
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.LPAREN);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.NAME)
+                .hasText("since");
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.EQUALS);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.STRING)
+                .hasText("\"1001\"");
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.RPAREN);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.PUBLIC);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.NAME)
+                .hasText("myField");
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.TYPE_INT);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.ANNOTATION_NAME)
+                .hasText("@java/lang/Deprecated");
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.LPAREN);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.NAME)
+                .hasText("since");
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.EQUALS);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.STRING)
+                .hasText("\"2002\"");
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.RPAREN);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.PUBLIC);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.NAME)
+                .hasText("test");
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.LPAREN);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.ANNOTATION_NAME)
+                .hasText("@com/roscopeco/jasm/model/annotations/TestAnnotation");
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.TYPE_INT);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.COMMA);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.ANNOTATION_NAME)
+                .hasText("@java/lang/Deprecated");
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.LPAREN);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.NAME)
+                .hasText("since");
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.EQUALS);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.STRING)
+                .hasText("\"3003\"");
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.RPAREN);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.ANNOTATION_NAME)
+                .hasText("@com/roscopeco/jasm/model/annotations/TestAnnotation");
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.LPAREN);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.NAME)
+                .hasText("classArg");
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.EQUALS);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.QNAME)
+                .hasText("java/util/List");
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.RPAREN);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.QNAME)
+                .hasText("java/lang/String");
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.RPAREN);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.TYPE_VOID);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.LBRACE);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.RETURN);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.RBRACE);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.ANNOTATION_NAME)
+                .hasText("@com/roscopeco/jasm/model/annotations/TestAnnotation");
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.LPAREN);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.NAME)
+                .hasText("annotationParameter");
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.EQUALS);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.ANNOTATION_NAME)
+                .hasText("@com/roscopeco/jasm/model/annotations/TestAnno2");
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.LPAREN);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.NAME)
+                .hasText("value");
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.EQUALS);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.STRING)
+                .hasText("\"new value\"");
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.RPAREN);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.RPAREN);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.PUBLIC);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.NAME)
+                .hasText("otherField");
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.TYPE_BYTE);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.RBRACE);
     }
 }

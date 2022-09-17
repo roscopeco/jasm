@@ -6,6 +6,7 @@
 package com.roscopeco.jasm.asserts
 
 import TestErrorCollector
+import com.roscopeco.jasm.LiteralNames
 import com.roscopeco.jasm.TypeVisitor
 import com.roscopeco.jasm.antlr.JasmParser
 import org.assertj.core.api.Assertions
@@ -202,7 +203,7 @@ class CodeSequenceAssert<Caller> internal constructor(actual: Stat_blockContext,
         )
 
     fun _goto(expected: String) = genericStringOperandCheck("goto", expected, InstructionContext::insn_goto) {
-            _goto -> _goto.NAME().text
+            _goto -> _goto.NAME()?.text ?: _goto.LITERAL_NAME().text
     }
 
     fun i2b() = genericNoOperandCheck("i2b", InstructionContext::insn_i2b)
@@ -817,7 +818,8 @@ class CodeSequenceAssert<Caller> internal constructor(actual: Stat_blockContext,
         val stat = actual.stat()[pc]
 
         if (getInsnFunc.invoke(stat.instruction()) == null
-            || getOperandTextFunc.invoke(expectedOperand) != getAtomTextFunc.invoke(getInsnFunc.invoke(stat.instruction()))) {
+            || getOperandTextFunc.invoke(expectedOperand) !=
+                LiteralNames.unescape(getAtomTextFunc.invoke(getInsnFunc.invoke(stat.instruction())))) {
             failWithMessage(
                 "Expected "
                         + name
@@ -946,9 +948,9 @@ class CodeSequenceAssert<Caller> internal constructor(actual: Stat_blockContext,
 
         val insn = invokeExtractor.invoke(stat.instruction())
 
-        val extractedOwner = ownerExtractor.invoke(insn)
-        val extractedName = membernameExtractor.invoke(insn)
-        val extractedDesc = descriptorExtractor.invoke(insn)
+        val extractedOwner = LiteralNames.unescape(ownerExtractor.invoke(insn))
+        val extractedName = LiteralNames.unescape(membernameExtractor.invoke(insn))
+        val extractedDesc = LiteralNames.unescape(descriptorExtractor.invoke(insn))
         val extractedInterfaceIndicator = interfaceIndicatorExtractor.invoke(insn)
 
         if (owner != extractedOwner) {

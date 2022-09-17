@@ -9,6 +9,7 @@ import lombok.NonNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.objectweb.asm.Type;
 
 import static com.roscopeco.jasm.TestUtil.doParse;
 import static com.roscopeco.jasm.asserts.LexerParserAssertions.assertClass;
@@ -297,5 +298,95 @@ class ParserTests {
                 .noMoreCode();
 
         // Member 4 is uninteresting constructor
+    }
+
+    @Test
+    void shouldParseLiteralNames() {
+        // https://github.com/roscopeco/jasm/issues/35
+        final var test = doParse("com/roscopeco/jasm/LiteralNames.jasm");
+
+        assertClass(test)
+            .hasName("com/roscopeco/jasm/Literal Names");
+
+        assertThat(test.classbody().member()).hasSize(7);
+
+        assertMember(test.classbody().member(0))
+            .isField()
+            .hasName("0");
+
+        assertMember(test.classbody().member(1))
+            .isField()
+            .hasName("1");
+
+        assertMember(test.classbody().member(2))
+            .isMethod()
+            .hasName("test1")
+            .hasDescriptor("()Ljava/lang/String;")
+            .hasCodeSequence()
+                .getStatic("com/roscopeco/jasm/Literal Names", "0", "Ljava/lang/String;")
+                .areturn();
+
+        assertMember(test.classbody().member(3))
+            .isMethod()
+            .hasName("test2")
+            .hasDescriptor("()Ljava/lang/String;")
+            .hasCodeSequence()
+                .aload(0)
+                .getField("com/roscopeco/jasm/Literal Names", "1", "Ljava/lang/String;")
+                .areturn();
+
+        assertMember(test.classbody().member(4))
+            .isMethod()
+            .hasName("final native")
+            .hasDescriptor("()I")
+            .hasCodeSequence()
+                ._goto("my label")
+                .ldc(24)
+                .ireturn()
+                .label("my label:")
+                .ldc(42)
+                .ireturn();
+
+        assertMember(test.classbody().member(5))
+            .isMethod()
+            .hasName("test3")
+            .hasDescriptor("()I")
+            .hasCodeSequence()
+                .aload(0)
+                .invokeVirtual("com/roscopeco/jasm/Literal Names", "final native", "()I", false)
+                .ireturn();
+
+        assertMember(test.classbody().member(6))
+            .isMethod()
+            .hasName("<init>")
+            .hasDescriptor("(Ljava/lang/String;)V")
+            .hasCodeSequence()
+                .aload(0)
+                .dup()
+                .invokeSpecial("java/lang/Object", "<init>", "()V")
+                .aload(1)
+                .putField("com/roscopeco/jasm/Literal Names", "1", "Ljava/lang/String;")
+                .vreturn();
+    }
+
+    @Test
+    void shouldParseSimpleAnnotatedClass() {
+        final var test = doParse("SimpleAnnotatedClass.jasm");
+
+        assertClass(test)
+            .hasName("SimpleAnnotatedClass")
+            .hasAnnotationNamed("com/roscopeco/jasm/model/annotations/TestAnnotation");
+    }
+
+    @Test
+    void shouldParseComplexAnnotatedClass() {
+        final var test = doParse("ComplexAnnotatedClass.jasm");
+
+        assertClass(test)
+            .hasName("ComplexAnnotatedClass")
+            .hasAnnotationNamed("com/roscopeco/jasm/model/annotations/TestAnnotation")
+                .hasNamedParamWithValue("stringArg", "Yolo")
+                .hasNamedParamWithValue("classArg", java.util.List.class)
+                .hasNamedParamWithValue("arrayArg", new String[] { "one", "two" });
     }
 }

@@ -279,6 +279,15 @@ When you use `try`/`catch` blocks, JASM will generate a bunch of labels and `got
 you. If you don't want this, then you should use the `exception` statement and manage the flow manually with 
 labels.
 
+##### Finally
+
+The first form also allows the exception type to be omitted, which indicates the catch should be called for all
+exception types. Javac uses this for `finally` blocks.
+
+```java
+exception tryBegin, tryEnd, finallyBegin
+```
+
 #### Static initializers
 
 In Java, you have static initializers. For example, given the Java code:
@@ -457,5 +466,402 @@ valid JASM:
             )java/lang/Object
             [com/roscopeco/jasm/model/TestBootstrap]
         }
+```
+
+#### Literal Names
+
+The JVM is very flexible when it comes to what characters can appear in the names of things.
+There are no restrictions on having spaces in names, naming methods after keywords in any languages,
+numbers, punctuation (except semicolon) and so on.
+
+JASM supports this with _Literal Names_, which are enclosed within backticks. 
+
+With this syntax, you can use any keywords, whitespace and all other characters supported by the 
+JVM in class names, descriptors and anywhere else you might need to.
+
+```java
+public class `com/roscopeco/jasm/Literal Names` implements com/roscopeco/jasm/model/LiteralNames {
+    private static `0` java/lang/String = "test"
+    private `1` java/lang/String
+
+    public test1()java/lang/String {
+        getstatic `com/roscopeco/jasm/Literal Names`.`0` java/lang/String
+        areturn
+    }
+
+    public test2()java/lang/String {
+        aload 0
+        getfield `com/roscopeco/jasm/Literal Names`.`1` java/lang/String
+        areturn
+    }
+
+    public `final native`()I {
+        goto `my label`
+        ldc 24
+        ireturn
+
+        `my label`:
+        ldc 42
+        ireturn
+    }
+
+    public test3()I {
+        aload 0
+        invokevirtual `com/roscopeco/jasm/Literal Names`.`final native`()I
+        ireturn
+    }
+
+    public <init>(java/lang/String)V {
+        aload 0
+        dup
+        invokespecial java/lang/Object.<init>()V
+        aload 1
+        putfield `com/roscopeco/jasm/Literal Names`.`1` java/lang/String
+        return
+    }
+}
+```
+
+#### Interfaces
+
+Interfaces are classes with `abstract interface` modifiers. Their methods are also
+abstract (unless they are `default` in Java - see below) and have no body (obviously).
+
+The full disassembly of an interface:
+
+```java
+public interface Interface {
+    String test();
+}
+```
+
+looks like:
+
+```java
+/*
+ * Disassembled from Interface (originally Interface.java) by JASM
+ *
+ * Original class version: 55
+ * Signature: <no signature>
+ */
+public abstract interface class com/roscopeco/jasm/model/disasm/Interface {
+    // <no signature>
+    // <no exceptions>
+    public abstract test()java/lang/String
+
+}
+```
+
+Java `default` methods are simply methods on the interface that are not marked abstract
+and have a body. E.g. The following Java interface:
+
+```java
+public interface InterfaceWithDefault {
+    String getString();
+
+    default void doStuff() {
+    }
+}
+```
+disassembles to:
+
+```java
+/*
+ * Disassembled from InterfaceWithDefault (originally InterfaceWithDefault.java) by JASM
+ *
+ * Original class version: 55
+ * Signature: <no signature>
+ */
+public abstract interface class com/roscopeco/jasm/model/disasm/InterfaceWithDefault {
+    // <no signature>
+    // <no exceptions>
+    public abstract getString()java/lang/String
+
+
+    // <no signature>
+    // <no exceptions>
+    public doStuff()V {
+        
+        label0:
+        return
+    }
+}
+```
+
+#### Enums
+
+Enums are regular classes with the `enum` modifier, that subclass `java/lang/Enum`.
+
+The full disassembly of an enum:
+
+```java
+public enum AnEnum {
+    ONE(1),
+    TWO(2);
+
+    private final int i;
+
+    AnEnum(int i) {
+        this.i = i;
+    }
+
+    public int getI() {
+        return i;
+    }
+}
+```
+looks like:
+
+```java
+/*
+ * Disassembled from AnEnum (originally AnEnum.java) by JASM
+ *
+ * Original class version: 55
+ * Signature: Ljava/lang/Enum<Lcom/roscopeco/jasm/model/disasm/AnEnum;>;
+ */
+public enum class com/roscopeco/jasm/model/disasm/AnEnum extends java/lang/Enum {
+    // <no signature>
+    public static final ONE com/roscopeco/jasm/model/disasm/AnEnum
+
+    // <no signature>
+    public static final TWO com/roscopeco/jasm/model/disasm/AnEnum
+
+    // <no signature>
+    private final i I
+
+    // <no signature>
+    private static final synthetic $VALUES [com/roscopeco/jasm/model/disasm/AnEnum
+
+    // <no signature>
+    // <no exceptions>
+    public static values()[com/roscopeco/jasm/model/disasm/AnEnum {
+        
+        label0:
+        getstatic com/roscopeco/jasm/model/disasm/AnEnum.$VALUES [com/roscopeco/jasm/model/disasm/AnEnum
+        invokevirtual [com/roscopeco/jasm/model/disasm/AnEnum.clone()java/lang/Object
+        checkcast [com/roscopeco/jasm/model/disasm/AnEnum
+        areturn
+    }
+
+
+    // <no signature>
+    // <no exceptions>
+    public static valueOf(java/lang/String)com/roscopeco/jasm/model/disasm/AnEnum {
+        
+        label0:
+        ldc com/roscopeco/jasm/model/disasm/AnEnum
+        aload 0
+        invokestatic java/lang/Enum.valueOf(java/lang/Class, java/lang/String)java/lang/Enum
+        checkcast com/roscopeco/jasm/model/disasm/AnEnum
+        areturn
+        
+        label1:
+    }
+
+
+    // (I)V
+    // <no exceptions>
+    private <init>(java/lang/String, I, I)V {
+        
+        label0:
+        aload 0
+        aload 1
+        iload 2
+        invokespecial java/lang/Enum.<init>(java/lang/String, I)V
+        
+        label1:
+        aload 0
+        iload 3
+        putfield com/roscopeco/jasm/model/disasm/AnEnum.i I
+        
+        label2:
+        return
+        
+        label3:
+    }
+
+
+    // <no signature>
+    // <no exceptions>
+    public getI()I {
+        
+        label0:
+        aload 0
+        getfield com/roscopeco/jasm/model/disasm/AnEnum.i I
+        ireturn
+        
+        label1:
+    }
+
+
+    // <no signature>
+    // <no exceptions>
+    private static synthetic $values()[com/roscopeco/jasm/model/disasm/AnEnum {
+        
+        label0:
+        iconst 2
+        anewarray com/roscopeco/jasm/model/disasm/AnEnum
+        dup
+        iconst 0
+        getstatic com/roscopeco/jasm/model/disasm/AnEnum.ONE com/roscopeco/jasm/model/disasm/AnEnum
+        aastore
+        dup
+        iconst 1
+        getstatic com/roscopeco/jasm/model/disasm/AnEnum.TWO com/roscopeco/jasm/model/disasm/AnEnum
+        aastore
+        areturn
+    }
+
+
+    // <no signature>
+    // <no exceptions>
+    static <clinit>()V {
+        
+        label0:
+        new com/roscopeco/jasm/model/disasm/AnEnum
+        dup
+        ldc "ONE"
+        iconst 0
+        iconst 1
+        invokespecial com/roscopeco/jasm/model/disasm/AnEnum.<init>(java/lang/String, I, I)V
+        putstatic com/roscopeco/jasm/model/disasm/AnEnum.ONE com/roscopeco/jasm/model/disasm/AnEnum
+        
+        label1:
+        new com/roscopeco/jasm/model/disasm/AnEnum
+        dup
+        ldc "TWO"
+        iconst 1
+        iconst 2
+        invokespecial com/roscopeco/jasm/model/disasm/AnEnum.<init>(java/lang/String, I, I)V
+        putstatic com/roscopeco/jasm/model/disasm/AnEnum.TWO com/roscopeco/jasm/model/disasm/AnEnum
+        
+        label2:
+        invokestatic com/roscopeco/jasm/model/disasm/AnEnum.$values()[com/roscopeco/jasm/model/disasm/AnEnum
+        putstatic com/roscopeco/jasm/model/disasm/AnEnum.$VALUES [com/roscopeco/jasm/model/disasm/AnEnum
+        return
+    }
+
+}
+```
+
+#### Records
+
+Records are just regular classes that subclass `java/lang/Records` and have their
+`equals`, `hashCode` and `toString` methods implemented with an `invokedynamic`
+bootstrapped by `java/lang/runtime/ObjectMethods.bootstrap`.
+
+The full disassembly of a record:
+
+```java
+public record RecordClass<T>(T thing, String other) { }
+```
+
+looks like:
+
+```java
+/*
+ * Disassembled from RecordClass (originally RecordClass.java) by JASM
+ *
+ * Original class version: 61
+ * Signature: <T:Ljava/lang/Object;>Ljava/lang/Record;
+ */
+public class com/roscopeco/jasm/model/disasm/RecordClass extends java/lang/Record {
+    // TT;
+    private final thing java/lang/Object
+
+    // <no signature>
+    private final other java/lang/String
+
+    // (TT;Ljava/lang/String;)V
+    // <no exceptions>
+    public <init>(java/lang/Object, java/lang/String)V {
+        
+        label0:
+        aload 0
+        invokespecial java/lang/Record.<init>()V
+        aload 0
+        aload 1
+        putfield com/roscopeco/jasm/model/disasm/RecordClass.thing java/lang/Object
+        aload 0
+        aload 2
+        putfield com/roscopeco/jasm/model/disasm/RecordClass.other java/lang/String
+        return
+        
+        label1:
+    }
+
+    // <no signature>
+    // <no exceptions>
+    public final toString()java/lang/String {
+        
+        label0:
+        aload 0
+        invokedynamic toString(com/roscopeco/jasm/model/disasm/RecordClass)java/lang/String {
+            invokestatic java/lang/runtime/ObjectMethods.bootstrap(java/lang/invoke/MethodHandles$Lookup, java/lang/String, java/lang/invoke/TypeDescriptor, java/lang/Class, java/lang/String, [java/lang/invoke/MethodHandle)java/lang/Object
+            [com/roscopeco/jasm/model/disasm/RecordClass, "thing;other", getfield com/roscopeco/jasm/model/disasm/RecordClass.thing java/lang/Object, getfield com/roscopeco/jasm/model/disasm/RecordClass.other java/lang/String]
+        }
+
+        areturn
+        
+        label1:
+    }
+
+    // <no signature>
+    // <no exceptions>
+    public final hashCode()I {
+        
+        label0:
+        aload 0
+        invokedynamic hashCode(com/roscopeco/jasm/model/disasm/RecordClass)I {
+            invokestatic java/lang/runtime/ObjectMethods.bootstrap(java/lang/invoke/MethodHandles$Lookup, java/lang/String, java/lang/invoke/TypeDescriptor, java/lang/Class, java/lang/String, [java/lang/invoke/MethodHandle)java/lang/Object
+            [com/roscopeco/jasm/model/disasm/RecordClass, "thing;other", getfield com/roscopeco/jasm/model/disasm/RecordClass.thing java/lang/Object, getfield com/roscopeco/jasm/model/disasm/RecordClass.other java/lang/String]
+        }
+
+        ireturn
+        
+        label1:
+    }
+
+    // <no signature>
+    // <no exceptions>
+    public final equals(java/lang/Object)Z {
+        
+        label0:
+        aload 0
+        aload 1
+        invokedynamic equals(com/roscopeco/jasm/model/disasm/RecordClass, java/lang/Object)Z {
+            invokestatic java/lang/runtime/ObjectMethods.bootstrap(java/lang/invoke/MethodHandles$Lookup, java/lang/String, java/lang/invoke/TypeDescriptor, java/lang/Class, java/lang/String, [java/lang/invoke/MethodHandle)java/lang/Object
+            [com/roscopeco/jasm/model/disasm/RecordClass, "thing;other", getfield com/roscopeco/jasm/model/disasm/RecordClass.thing java/lang/Object, getfield com/roscopeco/jasm/model/disasm/RecordClass.other java/lang/String]
+        }
+
+        ireturn
+        
+        label1:
+    }
+
+    // ()TT;
+    // <no exceptions>
+    public thing()java/lang/Object {
+        
+        label0:
+        aload 0
+        getfield com/roscopeco/jasm/model/disasm/RecordClass.thing java/lang/Object
+        areturn
+        
+        label1:
+    }
+
+    // <no signature>
+    // <no exceptions>
+    public other()java/lang/String {
+        
+        label0:
+        aload 0
+        getfield com/roscopeco/jasm/model/disasm/RecordClass.other java/lang/String
+        areturn
+        
+        label1:
+    }
+}
 ```
 

@@ -5,12 +5,48 @@ grammar Jasm;
 }
 
 class
- : type_modifier* CLASS classname extends? implements? (LBRACE classbody RBRACE)?
+ : annotation* type_modifier* CLASS classname extends? implements? (LBRACE classbody RBRACE)?
+ ;
+
+annotation
+ : ANNOTATION_NAME (LPAREN annotation_param? (COMMA annotation_param)* RPAREN)?
+ ;
+
+annotation_param
+ : NAME EQUALS annotation_arg
+ | LITERAL_NAME EQUALS annotation_arg
+ ;
+
+annotation_arg
+ : int_atom
+ | float_atom
+ | string_atom
+ | bool_atom
+ | enum_value_literal
+ | annotation_array_literal
+ | annotation
+ | NAME
+ | LITERAL_NAME
+ | QNAME
+ ;
+
+enum_value_literal
+ : LSQUARE classname DOT enum_literal_value RSQUARE
+ ;
+
+enum_literal_value
+ : NAME
+ | LITERAL_NAME
+ ;
+
+annotation_array_literal
+ : LBRACE annotation_arg? (COMMA annotation_arg)* RBRACE
  ;
 
 classname
  : QNAME
  | NAME
+ | LITERAL_NAME
  ;
 
 extends
@@ -31,7 +67,7 @@ member
  ;
 
 field
- : field_modifier* membername type (EQUALS field_initializer)?
+ : annotation* field_modifier* membername type (EQUALS field_initializer)?
  ;
 
 field_initializer
@@ -41,7 +77,7 @@ field_initializer
  ;
 
 method
- : method_modifier* membername method_descriptor (LBRACE stat_block RBRACE)?
+ : annotation* method_modifier* membername method_descriptor (LBRACE stat_block RBRACE)?
  ;
 
 method_descriptor
@@ -53,13 +89,14 @@ method_arguments
  ;
 
 method_argument
- : prim_type
- | ref_type
- | array_type
+ : annotation* prim_type
+ | annotation* ref_type
+ | annotation* array_type
  ;
 
 membername
  : NAME
+ | LITERAL_NAME
  | INIT
  | CLINIT
  | AALOAD
@@ -507,6 +544,8 @@ insn_castore
 
 insn_checkcast
  : CHECKCAST LSQUARE* QNAME
+ | CHECKCAST LSQUARE* NAME
+ | CHECKCAST LSQUARE* LITERAL_NAME
  ;
 
 insn_d2f
@@ -679,6 +718,7 @@ insn_getstatic
 
 insn_goto
  : GOTO NAME
+ | GOTO LITERAL_NAME
  ;
 
 insn_i2b
@@ -815,7 +855,9 @@ insn_ineg
  ;
 
 insn_instanceof
- : INSTANCEOF QNAME
+ : INSTANCEOF LSQUARE* QNAME
+ | INSTANCEOF LSQUARE* NAME
+ | INSTANCEOF LSQUARE* LITERAL_NAME
  ;
 
 insn_invokedynamic
@@ -831,23 +873,31 @@ const_args
  ;
 
 method_handle
- : handle_tag bootstrap_spec
+ : method_tag bootstrap_spec
+ | field_tag field_spec
  ;
 
-bootstrap_spec
- : owner DOT membername method_descriptor
+field_tag
+ : GETFIELD
+ | GETSTATIC
+ | PUTFIELD
+ | PUTSTATIC
  ;
 
-handle_tag
+method_tag
  : INVOKEINTERFACE
  | INVOKESPECIAL
  | INVOKESTATIC STAR?
  | INVOKEVIRTUAL STAR?
  | NEWINVOKESPECIAL
- | GETFIELD
- | GETSTATIC
- | PUTFIELD
- | PUTSTATIC
+ ;
+
+field_spec
+ : owner DOT membername type
+ ;
+
+bootstrap_spec
+ : owner DOT membername method_descriptor
  ;
 
 const_arg
@@ -855,6 +905,8 @@ const_arg
  | float_atom
  | string_atom
  | bool_atom
+ | NAME
+ | LITERAL_NAME
  | QNAME
  | method_descriptor
  | method_handle
@@ -1091,10 +1143,11 @@ insn_tableswitch
 
 label
  : LABEL
+ | LITERAL_NAME COLON
  ;
 
 exception_handler
- : EXCEPTION NAME COMMA? NAME COMMA? NAME COMMA? ref_type
+ : EXCEPTION NAME COMMA? NAME COMMA? NAME (COMMA? ref_type)?
  ;
 
 try_catch_block
@@ -1108,6 +1161,7 @@ catch_block
 owner
  : LSQUARE* QNAME
  | LSQUARE* NAME
+ | LSQUARE* LITERAL_NAME
  ;
 
 int_atom    : INT | LONG;
@@ -1129,6 +1183,7 @@ COMMA   : ',';
 EQUALS  : '=';
 DQUOTE  : '"';
 STAR    : '*';
+BACKTICK: '`';
 
 CLASS       : 'class';
 EXTENDS     : 'extends';
@@ -1371,6 +1426,16 @@ NAME
 
 QNAME
  : [a-zA-Z_$] [a-zA-Z_$0-9/]*
+ ;
+
+LITERAL_NAME
+ : BACKTICK (~[`\r\n] | '``')* BACKTICK
+ ;
+
+ANNOTATION_NAME
+ : '@' NAME
+ | '@' QNAME
+ | '@' LITERAL_NAME
  ;
 
 LONG

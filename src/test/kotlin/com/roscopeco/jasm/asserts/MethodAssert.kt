@@ -6,6 +6,7 @@
 package com.roscopeco.jasm.asserts
 
 import TestErrorCollector
+import com.roscopeco.jasm.LiteralNames
 import com.roscopeco.jasm.TypeVisitor
 import com.roscopeco.jasm.antlr.JasmParser.MethodContext
 import org.assertj.core.api.AbstractAssert
@@ -21,7 +22,7 @@ class MethodAssert internal constructor(actual: MethodContext) :
     fun hasName(expected: String): MethodAssert {
         isNotNull
 
-        if (expected != actual.membername().text) {
+        if (expected != LiteralNames.unescape(actual.membername().text)) {
             failWithMessage(
                 "Expected method to have name '"
                         + expected
@@ -78,7 +79,8 @@ class MethodAssert internal constructor(actual: MethodContext) :
         }
 
         val type = actual.method_descriptor()?.type()
-        if (type?.ref_type()?.text != expected && type?.array_type()?.ref_type()?.text != expected) {
+        val typeStr = LiteralNames.unescape(type?.ref_type()?.text ?: type?.array_type()?.ref_type()?.text ?: "<No Type>")
+        if (typeStr != expected) {
             failWithMessage(failureMessage.invoke())
         }
 

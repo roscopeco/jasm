@@ -9,6 +9,7 @@ import com.roscopeco.jasm.antlr.JasmBaseVisitor
 import com.roscopeco.jasm.antlr.JasmParser
 import com.roscopeco.jasm.errors.CodeError
 import com.roscopeco.jasm.errors.ErrorCollector
+import org.objectweb.asm.AnnotationVisitor
 import org.objectweb.asm.ClassVisitor
 import org.objectweb.asm.ConstantDynamic
 import org.objectweb.asm.Handle
@@ -34,6 +35,7 @@ class JasmAssemblingVisitor(
     private val classFormat: Int,
     private val errorCollector: ErrorCollector
 ) : JasmBaseVisitor<Unit>() {
+    private val typeVisitor = TypeVisitor(unitName, errorCollector)
 
     /**
      * Convenience constructor which will use the class format for Java 11 (55.0) and a default
@@ -59,11 +61,11 @@ class JasmAssemblingVisitor(
         visitor.visit(
             classFormat,
             modifiers.mapModifiers(ctx.type_modifier()),
-            ctx.classname().text,
+            LiteralNames.unescape(ctx.classname().text),
             null,
-            ctx.extends_()?.classname()?.QNAME()?.text ?: "java/lang/Object",
+            LiteralNames.unescape(ctx.extends_()?.classname()?.QNAME()?.text ?: "java/lang/Object"),
             ctx.implements_()?.classname()
-                ?.map { it.QNAME().text }
+                ?.map { LiteralNames.unescape(it.QNAME().text) }
                 ?.toTypedArray()
                     ?: emptyArray<String>()
         )
@@ -74,13 +76,25 @@ class JasmAssemblingVisitor(
         visitor.visitEnd()
     }
 
+    private fun getAnnotationClassname(annotationName: String) =
+        "L" + LiteralNames.unescape(annotationName.substring(1)) + ";"
+
+    override fun visitAnnotation(ctx: JasmParser.AnnotationContext) {
+        val annotationVisitor = visitor.visitAnnotation(getAnnotationClassname(ctx.ANNOTATION_NAME().text), true)
+        JasmAnnotationVisitor(annotationVisitor).visitAnnotation(ctx)
+        annotationVisitor.visitEnd()
+    }
+
+
     override fun visitField(ctx: JasmParser.FieldContext) {
         if ((ctx.field_initializer() != null) && (modifiers.mapModifiers(ctx.field_modifier()) and Opcodes.ACC_STATIC) == 0) {
             errorCollector.addError(
                 CodeError(
                     unitName,
                     ctx,
-                    "Unexpected initializer value for non-static field ${ctx.membername().text}"
+                    "Unexpected initializer value for non-static field ${
+                        typeVisitor.visitMembername(ctx.membername())
+                    }"
                 )
             )
         }
@@ -88,19 +102,31 @@ class JasmAssemblingVisitor(
         val type = TypeVisitor(unitName, errorCollector).visitType(ctx.type())
 
         if ("V" == type) {
-            errorCollector.addError(CodeError(unitName, ctx, "Field ${ctx.membername().text} cannot have void type"))
+            errorCollector.addError(CodeError(unitName, ctx, "Field ${
+                typeVisitor.visitMembername(ctx.membername())
+            } cannot have void type"))
         }
 
         val fv = visitor.visitField(
             modifiers.mapModifiers(ctx.field_modifier()),
-            ctx.membername().text,
+            typeVisitor.visitMembername(ctx.membername()),
             type,
             null,
             generateFieldInitializer(ctx.field_initializer())
         )
 
-        super.visitField(ctx)
+        // Manually driving this rather than having a specific field visitor, maybe later...
+        if (ctx.annotation() != null) {
+            ctx.annotation().forEach {
+                val annotationVisitor = fv.visitAnnotation(getAnnotationClassname(it.ANNOTATION_NAME().text), true)
+                JasmAnnotationVisitor(annotationVisitor).visitAnnotation(it)
+                annotationVisitor.visitEnd()
+            }
+        }
+
         fv.visitEnd()
+
+        // Do **not** call super here, we manually handled the field completely
     }
 
     private fun unescapeConstantString(constant: String) =
@@ -137,20 +163,112 @@ class JasmAssemblingVisitor(
         return JasmMethodVisitor(ctx).visitMethod(ctx)
     }
 
+    private inner class JasmAnnotationVisitor(val visitor: AnnotationVisitor) : JasmBaseVisitor<Unit>() {
+
+        override fun visitAnnotation_param(ctx: JasmParser.Annotation_paramContext) {
+            val name = when {
+                ctx.NAME() != null          -> ctx.NAME().text
+                ctx.LITERAL_NAME() != null  -> LiteralNames.unescape(ctx.LITERAL_NAME().text)
+                else                        -> "<Invalid annotation name>"
+            }
+
+            generateAnnotationArg(name, ctx.annotation_arg(), visitor)
+
+            return super.visitAnnotation_param(ctx)
+        }
+
+        private fun generateAnnotationArg(name: String, ctx: JasmParser.Annotation_argContext, visitor: AnnotationVisitor) {
+            when {
+                ctx.int_atom() != null          -> visitor.visit(name, generateInteger(ctx.int_atom()))
+                ctx.float_atom() != null        -> visitor.visit(name, generateFloatingPoint(ctx.float_atom()))
+                ctx.string_atom() != null       -> visitor.visit(name, unescapeConstantString(ctx.string_atom().text))
+                ctx.bool_atom() != null         -> if (java.lang.Boolean.parseBoolean(ctx.bool_atom().text)) {
+                    visitor.visit(name, 1)
+                } else {
+                    visitor.visit(name, 0)
+                }
+                ctx.annotation_array_literal() != null -> generateAnnotationArrayLiteral(name, ctx, visitor)
+                ctx.enum_value_literal() != null -> generateAnnotationEnumLiteral(name, ctx, visitor)
+                ctx.NAME() != null              -> visitor.visit(name, Type.getType("L" + ctx.NAME().text + ";"))
+                ctx.LITERAL_NAME() != null      -> visitor.visit(name, Type.getType("L" + LiteralNames.unescape(ctx.LITERAL_NAME().text) + ";"))
+                ctx.QNAME() != null             -> visitor.visit(name, Type.getType("L" + ctx.QNAME().text + ";"))
+                ctx.annotation() != null        -> {
+                    val annotationVisitor = visitor.visitAnnotation(name, getAnnotationClassname(ctx.annotation().ANNOTATION_NAME().text))
+                    JasmAnnotationVisitor(annotationVisitor).visitAnnotation(ctx.annotation())
+                    annotationVisitor.visitEnd()
+                }
+                else -> {
+                    errorCollector.addError(CodeError(unitName, ctx, "Unsupported annotation arg: " + ctx.text))
+                }
+            }
+        }
+
+        private fun generateAnnotationArrayLiteral(name: String, ctx: JasmParser.Annotation_argContext, visitor: AnnotationVisitor) {
+            val arrayVisitor = visitor.visitArray(name)
+            ctx.annotation_array_literal().annotation_arg().map {
+                generateAnnotationArg("ignored", it, arrayVisitor)
+            }.toTypedArray()
+            arrayVisitor.visitEnd()
+        }
+
+        private fun generateAnnotationEnumLiteral(name: String, ctx: JasmParser.Annotation_argContext, visitor: AnnotationVisitor) {
+            val owner = ctx.enum_value_literal().classname()
+            val ownerDescriptor = when {
+                owner.NAME() != null            -> Type.getType("L" + owner.NAME().text + ";")
+                owner.LITERAL_NAME() != null    -> Type.getType("L" + LiteralNames.unescape(owner.LITERAL_NAME().text) + ";")
+                owner.QNAME() != null           -> Type.getType("L" + owner.QNAME().text + ";")
+                else                            -> {
+                    errorCollector.addError(CodeError(unitName, ctx, "[BUG] Unsupported enum owner: " + ctx.text))
+                    Type.getType(Object::class.java)
+                }
+            }
+            val valueCtx = ctx.enum_value_literal().enum_literal_value()
+            val value = when {
+                valueCtx.NAME() != null         -> valueCtx.NAME().text
+                valueCtx.LITERAL_NAME() != null -> LiteralNames.unescape(valueCtx.LITERAL_NAME().text)
+                else                            -> {
+                    errorCollector.addError(CodeError(unitName, ctx, "[BUG] Unsupported enum value: " + ctx.text))
+                    "<error>"
+                }
+            }
+
+            visitor.visitEnum(name, ownerDescriptor.descriptor, value)
+        }
+    }
+
     private inner class JasmMethodVisitor(ctx: JasmParser.MethodContext) : JasmBaseVisitor<Unit>() {
         private val labels = HashMap<String, LabelHolder>()
 
         // Cheating slightly, but prevents us having to have an apparently-mutable visitor...
         private val methodVisitor: MethodVisitor = visitor.visitMethod(
             modifiers.mapModifiers(ctx.method_modifier()),
-            ctx.membername().text,
-            TypeVisitor(unitName, errorCollector).visitMethod_descriptor(ctx.method_descriptor()),
+            typeVisitor.visitMembername(ctx.membername()),
+            typeVisitor.visitMethod_descriptor(ctx.method_descriptor()),
             null,
             null
         )
 
+        override fun visitAnnotation(ctx: JasmParser.AnnotationContext) {
+            // Intentionally do nothing here, we can't differentiate between method and parameter annotations,
+            // so we'll manually drive visiting of those in visitMethod instead...
+        }
+
         override fun visitMethod(ctx: JasmParser.MethodContext) {
-             super.visitMethod(ctx)
+            ctx.annotation()?.forEach { annotation ->
+                val annotationVisitor = methodVisitor.visitAnnotation(getAnnotationClassname(annotation.ANNOTATION_NAME().text), true)
+                JasmAnnotationVisitor(annotationVisitor).visitAnnotation(annotation)
+                annotationVisitor.visitEnd()
+            }
+
+            ctx.method_descriptor().method_arguments()?.method_argument()?.forEachIndexed { num, arg ->
+                arg.annotation()?.forEach { annotation ->
+                    val annotationVisitor = methodVisitor.visitParameterAnnotation(num, getAnnotationClassname(annotation.ANNOTATION_NAME().text), true)
+                    JasmAnnotationVisitor(annotationVisitor).visitAnnotation(annotation)
+                    annotationVisitor.visitEnd()
+                }
+            }
+
+            super.visitMethod(ctx)
 
             // Do this **before** computing frames, as if a label hasn't been visited
             // but is referenced in the code it can cause NPE from ASM (with message
@@ -162,7 +280,7 @@ class JasmAssemblingVisitor(
         }
 
         override fun visitLabel(ctx: JasmParser.LabelContext) {
-            val label = declareLabel(ctx.LABEL().text)
+            val label = declareLabel(ctx.LABEL()?.text ?: LiteralNames.unescape(ctx.LITERAL_NAME().text))
             methodVisitor.visitLabel(label.label)
         }
 
@@ -177,7 +295,7 @@ class JasmAssemblingVisitor(
                 = methodVisitor.visitVarInsn(Opcodes.ALOAD, ctx.int_atom().text.toInt())
 
         override fun visitInsn_anewarray(ctx: JasmParser.Insn_anewarrayContext)
-                = methodVisitor.visitTypeInsn(Opcodes.ANEWARRAY, ctx.QNAME().text)
+                = methodVisitor.visitTypeInsn(Opcodes.ANEWARRAY, LiteralNames.unescape(ctx.QNAME().text))
 
         override fun visitInsn_areturn(ctx: JasmParser.Insn_areturnContext) = methodVisitor.visitInsn(Opcodes.ARETURN)
 
@@ -202,7 +320,7 @@ class JasmAssemblingVisitor(
 
         override fun visitInsn_checkcast(ctx: JasmParser.Insn_checkcastContext)
                 = methodVisitor.visitTypeInsn(Opcodes.CHECKCAST,
-                    TypeVisitor(unitName, errorCollector).visitInsn_checkcast(ctx))
+                    typeVisitor.visitInsn_checkcast(ctx))
 
         override fun visitInsn_d2f(ctx: JasmParser.Insn_d2fContext) = methodVisitor.visitInsn(Opcodes.D2F)
 
@@ -304,16 +422,25 @@ class JasmAssemblingVisitor(
         override fun visitInsn_fstore(ctx: JasmParser.Insn_fstoreContext)
                 = methodVisitor.visitVarInsn(Opcodes.FSTORE, ctx.int_atom().text.toInt())
 
-        override fun visitInsn_getfield(ctx: JasmParser.Insn_getfieldContext)
-                = methodVisitor.visitFieldInsn(
-                    Opcodes.GETFIELD,
-                    ctx.owner().text,
-                    ctx.membername().text,
-                    TypeVisitor(unitName, errorCollector).visitType(ctx.type())
-                )
+        override fun visitInsn_getfield(ctx: JasmParser.Insn_getfieldContext) {
+            var type = typeVisitor.visitType(ctx.type())
+
+            // This can happen if we had mismatched input during the parse, default it here
+            // so we can keep collecting errors...
+            //
+            // https://github.com/roscopeco/jasm/issues/20
+            if (type.isEmpty()) type = "I"
+
+            methodVisitor.visitFieldInsn(
+                Opcodes.GETFIELD,
+                typeVisitor.visitOwner(ctx.owner()),
+                typeVisitor.visitMembername(ctx.membername()),
+                type
+            )
+        }
 
         override fun visitInsn_getstatic(ctx: JasmParser.Insn_getstaticContext) {
-            var type = TypeVisitor(unitName, errorCollector).visitType(ctx.type())
+            var type = typeVisitor.visitType(ctx.type())
 
             // This can happen if we had mismatched input during the parse, default it here
             // so we can keep collecting errors...
@@ -323,14 +450,14 @@ class JasmAssemblingVisitor(
 
             methodVisitor.visitFieldInsn(
                 Opcodes.GETSTATIC,
-                ctx.owner().text,
-                ctx.membername().text,
+                typeVisitor.visitOwner(ctx.owner()),
+                typeVisitor.visitMembername(ctx.membername()),
                 type
             )
         }
 
         override fun visitInsn_goto(ctx: JasmParser.Insn_gotoContext)
-                = methodVisitor.visitJumpInsn(Opcodes.GOTO, getLabel(ctx.NAME().text).label)
+                = methodVisitor.visitJumpInsn(Opcodes.GOTO, getLabel(ctx.NAME()?.text ?: LiteralNames.unescape(ctx.LITERAL_NAME().text)).label)
 
         override fun visitInsn_i2b(ctx: JasmParser.Insn_i2bContext) = methodVisitor.visitInsn(Opcodes.I2B)
 
@@ -416,12 +543,12 @@ class JasmAssemblingVisitor(
         override fun visitInsn_ineg(ctx: JasmParser.Insn_inegContext) = methodVisitor.visitInsn(Opcodes.INEG)
 
         override fun visitInsn_instanceof(ctx: JasmParser.Insn_instanceofContext)
-                = methodVisitor.visitTypeInsn(Opcodes.INSTANCEOF, ctx.QNAME().text)
+                = methodVisitor.visitTypeInsn(Opcodes.INSTANCEOF, typeVisitor.visitInsn_instanceof(ctx))
 
         override fun visitInsn_invokedynamic(ctx: JasmParser.Insn_invokedynamicContext)
                  = methodVisitor.visitInvokeDynamicInsn(
-                    ctx.membername().text,
-                    TypeVisitor(unitName, errorCollector).visitMethod_descriptor(ctx.method_descriptor()),
+                    typeVisitor.visitMembername(ctx.membername()),
+                    typeVisitor.visitMethod_descriptor(ctx.method_descriptor()),
                     buildBootstrapHandle(ctx.invokedynamic_body().method_handle()),
                     *generateConstArgs(ctx.invokedynamic_body().const_args().const_arg())
                 )
@@ -429,36 +556,36 @@ class JasmAssemblingVisitor(
         override fun visitInsn_invokeinterface(ctx: JasmParser.Insn_invokeinterfaceContext)
                 = visitNonDynamicInvoke(
                     Opcodes.INVOKEINTERFACE,
-                    TypeVisitor(unitName, errorCollector).visitOwner(ctx.owner()),
-                    ctx.membername().text,
-                    TypeVisitor(unitName, errorCollector).visitMethod_descriptor(ctx.method_descriptor()),
+                    typeVisitor.visitOwner(ctx.owner()),
+                    typeVisitor.visitMembername(ctx.membername()),
+                    typeVisitor.visitMethod_descriptor(ctx.method_descriptor()),
                     true
                 )
 
         override fun visitInsn_invokespecial(ctx: JasmParser.Insn_invokespecialContext)
                 = visitNonDynamicInvoke(
                     Opcodes.INVOKESPECIAL,
-                    TypeVisitor(unitName, errorCollector).visitOwner(ctx.owner()),
-                    ctx.membername().text,
-                    TypeVisitor(unitName, errorCollector).visitMethod_descriptor(ctx.method_descriptor()),
+                    typeVisitor.visitOwner(ctx.owner()),
+                    typeVisitor.visitMembername(ctx.membername()),
+                    typeVisitor.visitMethod_descriptor(ctx.method_descriptor()),
                     false
                 )
 
         override fun visitInsn_invokestatic(ctx: JasmParser.Insn_invokestaticContext)
                 = visitNonDynamicInvoke(
                     Opcodes.INVOKESTATIC,
-                    TypeVisitor(unitName, errorCollector).visitOwner(ctx.owner()),
-                    ctx.membername().text,
-                    TypeVisitor(unitName, errorCollector).visitMethod_descriptor(ctx.method_descriptor()),
+                    typeVisitor.visitOwner(ctx.owner()),
+                    typeVisitor.visitMembername(ctx.membername()),
+                    typeVisitor.visitMethod_descriptor(ctx.method_descriptor()),
                     ctx.STAR() != null
                 )
 
         override fun visitInsn_invokevirtual(ctx: JasmParser.Insn_invokevirtualContext)
                 = visitNonDynamicInvoke(
                     Opcodes.INVOKEVIRTUAL,
-                    TypeVisitor(unitName, errorCollector).visitOwner(ctx.owner()),
-                    ctx.membername().text,
-                    TypeVisitor(unitName, errorCollector).visitMethod_descriptor(ctx.method_descriptor()),
+                    typeVisitor.visitOwner(ctx.owner()),
+                    typeVisitor.visitMembername(ctx.membername()),
+                    typeVisitor.visitMethod_descriptor(ctx.method_descriptor()),
                     ctx.STAR() != null
                 )
 
@@ -560,7 +687,7 @@ class JasmAssemblingVisitor(
 
         override fun visitInsn_multianewarray(ctx: JasmParser.Insn_multianewarrayContext)
                 = methodVisitor.visitMultiANewArrayInsn(
-                    TypeVisitor(unitName, errorCollector).visitArray_type(ctx.array_type()),
+                    typeVisitor.visitArray_type(ctx.array_type()),
                     getOrComputeArrayDims(ctx)
                 )
 
@@ -579,21 +706,39 @@ class JasmAssemblingVisitor(
         override fun visitInsn_ret(ctx: JasmParser.Insn_retContext)
             = methodVisitor.visitIntInsn(Opcodes.RET, ctx.int_atom().text.toInt())
 
-        override fun visitInsn_putfield(ctx: JasmParser.Insn_putfieldContext)
-                = methodVisitor.visitFieldInsn(
-                    Opcodes.PUTFIELD,
-                    ctx.owner().text,
-                    ctx.membername().text,
-                    TypeVisitor(unitName, errorCollector).visitType(ctx.type())
-                )
+        override fun visitInsn_putfield(ctx: JasmParser.Insn_putfieldContext) {
+            var type = typeVisitor.visitType(ctx.type())
 
-        override fun visitInsn_putstatic(ctx: JasmParser.Insn_putstaticContext)
-                = methodVisitor.visitFieldInsn(
-                    Opcodes.PUTSTATIC,
-                    ctx.owner().text,
-                    ctx.membername().text,
-                    TypeVisitor(unitName, errorCollector).visitType(ctx.type())
-                )
+            // This can happen if we had mismatched input during the parse, default it here
+            // so we can keep collecting errors...
+            //
+            // https://github.com/roscopeco/jasm/issues/20
+            if (type.isEmpty()) type = "I"
+
+            methodVisitor.visitFieldInsn(
+                Opcodes.PUTFIELD,
+                typeVisitor.visitOwner(ctx.owner()),
+                typeVisitor.visitMembername(ctx.membername()),
+                type
+            )
+        }
+
+        override fun visitInsn_putstatic(ctx: JasmParser.Insn_putstaticContext) {
+            var type = typeVisitor.visitType(ctx.type())
+
+            // This can happen if we had mismatched input during the parse, default it here
+            // so we can keep collecting errors...
+            //
+            // https://github.com/roscopeco/jasm/issues/20
+            if (type.isEmpty()) type = "I"
+
+            methodVisitor.visitFieldInsn(
+                Opcodes.PUTSTATIC,
+                typeVisitor.visitOwner(ctx.owner()),
+                typeVisitor.visitMembername(ctx.membername()),
+                type
+            )
+        }
 
         override fun visitInsn_return(ctx: JasmParser.Insn_returnContext) = methodVisitor.visitInsn(Opcodes.RETURN)
 
@@ -633,7 +778,7 @@ class JasmAssemblingVisitor(
                 getLabel(ctx.NAME(0).text).label,
                 getLabel(ctx.NAME(1).text).label,
                 getLabel(ctx.NAME(2).text).label,
-                ctx.ref_type().text
+                ctx.ref_type()?.text
             )
         }
 
@@ -696,28 +841,52 @@ class JasmAssemblingVisitor(
             }
         }
 
-        private fun buildBootstrapHandle(ctx: JasmParser.Method_handleContext): Handle {
-            return Handle(
-                generateTagForHandle(ctx),
-                TypeVisitor(unitName, errorCollector).visitOwner(ctx.bootstrap_spec().owner()),
-                ctx.bootstrap_spec().membername().text,
-                TypeVisitor(unitName, errorCollector).visitMethod_descriptor(ctx.bootstrap_spec().method_descriptor()),
-                ctx.handle_tag().INVOKEINTERFACE() != null,
-            )
+        private fun buildBootstrapHandle(ctx: JasmParser.Method_handleContext): Handle = when {
+            ctx.method_tag() != null -> {
+                Handle(
+                    generateTagForHandle(ctx),
+                    typeVisitor.visitOwner(ctx.bootstrap_spec().owner()),
+                    typeVisitor.visitMembername(ctx.bootstrap_spec().membername()),
+                    typeVisitor.visitMethod_descriptor(ctx.bootstrap_spec().method_descriptor()),
+                    ctx.method_tag().INVOKEINTERFACE() != null,
+                )
+            }
+            ctx.field_tag() != null -> {
+                Handle(
+                    generateTagForHandle(ctx),
+                    typeVisitor.visitOwner(ctx.field_spec().owner()),
+                    typeVisitor.visitMembername(ctx.field_spec().membername()),
+                    typeVisitor.visitType(ctx.field_spec().type()),
+                    false
+                )
+            }
+            else -> {
+                errorCollector.addError(CodeError(unitName, ctx, "Bootstrap handle is neither method nor field: ${ctx.text}"))
+                // "Nothing" handle, it'll be ignored anyway, just return so parse can continue to gather errors
+                Handle(
+                    Opcodes.H_PUTSTATIC,
+                    "Error",
+                    "error",
+                    "Ljava/lang/Object;",
+                    false
+                )
+            }
         }
 
         private fun generateTagForHandle(ctx: JasmParser.Method_handleContext) = when {
-            ctx.handle_tag().INVOKEINTERFACE() != null  -> Opcodes.H_INVOKEINTERFACE
-            ctx.handle_tag().INVOKESPECIAL() != null    -> Opcodes.H_INVOKESPECIAL
-            ctx.handle_tag().INVOKESTATIC() != null     -> Opcodes.H_INVOKESTATIC
-            ctx.handle_tag().INVOKEVIRTUAL() != null    -> Opcodes.H_INVOKEVIRTUAL
-            ctx.handle_tag().NEWINVOKESPECIAL() != null -> Opcodes.H_NEWINVOKESPECIAL
-            ctx.handle_tag().GETFIELD() != null         -> Opcodes.H_GETFIELD
-            ctx.handle_tag().GETSTATIC() != null        -> Opcodes.H_GETSTATIC
-            ctx.handle_tag().PUTFIELD() != null         -> Opcodes.H_PUTFIELD
-            ctx.handle_tag().PUTSTATIC() != null        -> Opcodes.H_PUTSTATIC
+            ctx.method_tag()?.INVOKEINTERFACE() != null  -> Opcodes.H_INVOKEINTERFACE
+            ctx.method_tag()?.INVOKESPECIAL() != null    -> Opcodes.H_INVOKESPECIAL
+            ctx.method_tag()?.INVOKESTATIC() != null     -> Opcodes.H_INVOKESTATIC
+            ctx.method_tag()?.INVOKEVIRTUAL() != null    -> Opcodes.H_INVOKEVIRTUAL
+            ctx.method_tag()?.NEWINVOKESPECIAL() != null -> Opcodes.H_NEWINVOKESPECIAL
+            ctx.field_tag()?.GETFIELD() != null          -> Opcodes.H_GETFIELD
+            ctx.field_tag()?.GETSTATIC() != null         -> Opcodes.H_GETSTATIC
+            ctx.field_tag()?.PUTFIELD() != null          -> Opcodes.H_PUTFIELD
+            ctx.field_tag()?.PUTSTATIC() != null         -> Opcodes.H_PUTSTATIC
             else -> {
-                errorCollector.addError(CodeError(unitName, ctx, "Unknown handle tag " + ctx.handle_tag().text))
+                errorCollector.addError(CodeError(unitName, ctx,
+                    "Unknown handle tag " + (ctx.method_tag()?.text ?: ctx.field_tag()?.text ?: "")
+                ))
                 Opcodes.H_INVOKESTATIC
             }
         }
@@ -732,12 +901,14 @@ class JasmAssemblingVisitor(
                 ctx.float_atom() != null        -> generateFloatingPoint(ctx.float_atom())
                 ctx.string_atom() != null       -> unescapeConstantString(ctx.string_atom().text)
                 ctx.bool_atom() != null         -> if (java.lang.Boolean.parseBoolean(ctx.bool_atom().text)) 1 else 0
+                ctx.NAME() != null              -> Type.getType("L" + ctx.NAME().text + ";")
+                ctx.LITERAL_NAME() != null      -> Type.getType("L" + LiteralNames.unescape(ctx.LITERAL_NAME().text) + ";")
                 ctx.QNAME() != null             -> Type.getType("L" + ctx.QNAME().text + ";")
                 ctx.method_handle() != null     -> buildBootstrapHandle(ctx.method_handle())
-                ctx.method_descriptor() != null -> Type.getMethodType(TypeVisitor(unitName, errorCollector).visitMethod_descriptor(ctx.method_descriptor()))
+                ctx.method_descriptor() != null -> Type.getMethodType(typeVisitor.visitMethod_descriptor(ctx.method_descriptor()))
                 ctx.constdynamic() != null      -> ConstantDynamic(
-                    ctx.constdynamic().membername().text,
-                    TypeVisitor(unitName, errorCollector).visitType(ctx.constdynamic().type()),
+                    typeVisitor.visitMembername(ctx.constdynamic().membername()),
+                    typeVisitor.visitType(ctx.constdynamic().type()),
                     buildBootstrapHandle(ctx.constdynamic().method_handle()),
                     *generateConstArgs(ctx.constdynamic().const_arg())
                 )
@@ -775,10 +946,10 @@ class JasmAssemblingVisitor(
             }
 
         private fun getLabel(name: String) =
-            labels.computeIfAbsent(normaliseLabelName(name)) { LabelHolder(Label(), false) }
+            labels.computeIfAbsent(normaliseLabelName(LiteralNames.unescape(name))) { LabelHolder(Label(), false) }
 
         private fun declareLabel(name: String): LabelHolder {
-            val normalName = normaliseLabelName(name)
+            val normalName = normaliseLabelName(LiteralNames.unescape(name))
             val label = labels[normalName]
 
             if (label == null) {

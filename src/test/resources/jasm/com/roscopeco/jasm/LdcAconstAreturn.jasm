@@ -45,6 +45,11 @@ class com/roscopeco/jasm/LdcAconstAreturn implements com/roscopeco/jasm/model/Ld
         areturn
     }
 
+    public testLdcClassWithLiteralName()java/lang/Class {
+        ldc `java/util/List`
+        areturn
+    }
+
     public testLdcMethodType()java/lang/invoke/MethodType {
         ldc (java/util/List)I
         areturn

@@ -15,6 +15,16 @@ class TypeVisitor(private val unitName: String, private val errorCollector: Erro
     override fun visitMethod_arguments(ctx: JasmParser.Method_argumentsContext?) =
         "(" + super.visitMethod_arguments(ctx) + ")"
 
+    override fun visitMethod_argument(ctx: JasmParser.Method_argumentContext) = when {
+        ctx.prim_type() != null     -> visitPrim_type(ctx.prim_type())
+        ctx.ref_type() != null      -> visitRef_type(ctx.ref_type())
+        ctx.array_type() != null    -> visitArray_type(ctx.array_type())
+        else -> {
+            errorCollector.addError(CodeError(unitName, ctx, "Invalid type ${ctx.text} encountered in method argument"))
+            ""
+        }
+    }
+
     override fun visitPrim_type(ctx: JasmParser.Prim_typeContext) = when {
         ctx.TYPE_BOOL()   != null       -> "Z"
         ctx.TYPE_BYTE()   != null       -> "B"
@@ -38,10 +48,12 @@ class TypeVisitor(private val unitName: String, private val errorCollector: Erro
         }
     }
 
-    override fun visitRef_type(ctx: JasmParser.Ref_typeContext) = "L" + ctx.text + ";"
+    override fun visitRef_type(ctx: JasmParser.Ref_typeContext) = "L" + LiteralNames.unescape(ctx.text) + ";"
+
+    override fun visitClassname(ctx: JasmParser.ClassnameContext) = "L" + LiteralNames.unescape(ctx.text) + ";"
 
     override fun visitArray_type(ctx: JasmParser.Array_typeContext) =
-        ctx.LSQUARE().joinToString(separator = "") { it.text } + super.visitArray_type(ctx)
+        ctx.LSQUARE().joinToString(separator = "") { LiteralNames.unescape(it.text) } + super.visitArray_type(ctx)
 
     override fun visitOwner(ctx: JasmParser.OwnerContext): String {
         return fixBareType(extractBareType(ctx))
@@ -51,11 +63,25 @@ class TypeVisitor(private val unitName: String, private val errorCollector: Erro
         return fixBareType(extractBareType(ctx))
     }
 
+    override fun visitInsn_instanceof(ctx: JasmParser.Insn_instanceofContext): String {
+        return fixBareType(extractBareType(ctx))
+    }
+
+    override fun visitMembername(ctx: JasmParser.MembernameContext): String {
+        return LiteralNames.unescape(ctx.text)
+    }
+
     private fun extractBareType(ctx: JasmParser.Insn_checkcastContext)
-            = (ctx.LSQUARE()?.joinToString("") { it.text } ?: "") + ctx.QNAME().text
+            = (ctx.LSQUARE()?.joinToString("") { it.text } ?: "") + LiteralNames.unescape(
+                ctx.QNAME()?.text ?: ctx.NAME()?.text ?: ctx.LITERAL_NAME()?.text ?: "<Error: No name>")
+
+    private fun extractBareType(ctx: JasmParser.Insn_instanceofContext)
+            = (ctx.LSQUARE()?.joinToString("") { it.text } ?: "") + LiteralNames.unescape(
+                ctx.QNAME()?.text ?: ctx.NAME()?.text ?: ctx.LITERAL_NAME()?.text ?: "<Error: No name>")
 
     private fun extractBareType(ctx: JasmParser.OwnerContext)
-            = (ctx.LSQUARE()?.joinToString("") { it.text } ?: "") + ctx.QNAME().text
+            = (ctx.LSQUARE()?.joinToString("") { it.text } ?: "") + LiteralNames.unescape(
+                ctx.QNAME()?.text ?: ctx.NAME()?.text ?: ctx.LITERAL_NAME()?.text ?: "<Error: No name>")
 
     private fun fixBareType(bare: String): String {
         return if (bare.startsWith("[")) {
