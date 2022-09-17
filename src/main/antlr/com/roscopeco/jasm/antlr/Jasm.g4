@@ -9,7 +9,7 @@ class
  ;
 
 annotation
- : AT classname (LPAREN annotation_param? (COMMA annotation_param)* RPAREN)?
+ : ANNOTATION_NAME (LPAREN annotation_param? (COMMA annotation_param)* RPAREN)?
  ;
 
 annotation_param
@@ -1169,7 +1169,6 @@ float_atom  : FLOAT | DOUBLE;
 bool_atom   : (TRUE | FALSE);
 string_atom : STRING;
 
-AT      : '@';
 LPAREN  : '(';
 RPAREN  : ')';
 LBRACE  : '{';
@@ -1431,6 +1430,12 @@ QNAME
 
 LITERAL_NAME
  : BACKTICK (~[`\r\n] | '``')* BACKTICK
+ ;
+
+ANNOTATION_NAME
+ : '@' NAME
+ | '@' QNAME
+ | '@' LITERAL_NAME
  ;
 
 LONG

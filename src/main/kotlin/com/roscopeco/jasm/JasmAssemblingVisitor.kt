@@ -76,8 +76,11 @@ class JasmAssemblingVisitor(
         visitor.visitEnd()
     }
 
+    private fun getAnnotationClassname(annotationName: String) =
+        "L" + LiteralNames.unescape(annotationName.substring(1)) + ";"
+
     override fun visitAnnotation(ctx: JasmParser.AnnotationContext) {
-        val annotationVisitor = visitor.visitAnnotation(typeVisitor.visitClassname(ctx.classname()), true)
+        val annotationVisitor = visitor.visitAnnotation(getAnnotationClassname(ctx.ANNOTATION_NAME().text), true)
         JasmAnnotationVisitor(annotationVisitor).visitAnnotation(ctx)
         annotationVisitor.visitEnd()
     }
@@ -115,7 +118,7 @@ class JasmAssemblingVisitor(
         // Manually driving this rather than having a specific field visitor, maybe later...
         if (ctx.annotation() != null) {
             ctx.annotation().forEach {
-                val annotationVisitor = fv.visitAnnotation(typeVisitor.visitClassname(it.classname()), true)
+                val annotationVisitor = fv.visitAnnotation(getAnnotationClassname(it.ANNOTATION_NAME().text), true)
                 JasmAnnotationVisitor(annotationVisitor).visitAnnotation(it)
                 annotationVisitor.visitEnd()
             }
@@ -190,7 +193,7 @@ class JasmAssemblingVisitor(
                 ctx.LITERAL_NAME() != null      -> visitor.visit(name, Type.getType("L" + LiteralNames.unescape(ctx.LITERAL_NAME().text) + ";"))
                 ctx.QNAME() != null             -> visitor.visit(name, Type.getType("L" + ctx.QNAME().text + ";"))
                 ctx.annotation() != null        -> {
-                    val annotationVisitor = visitor.visitAnnotation(name, typeVisitor.visitClassname(ctx.annotation().classname()))
+                    val annotationVisitor = visitor.visitAnnotation(name, getAnnotationClassname(ctx.annotation().ANNOTATION_NAME().text))
                     JasmAnnotationVisitor(annotationVisitor).visitAnnotation(ctx.annotation())
                     annotationVisitor.visitEnd()
                 }
@@ -252,14 +255,14 @@ class JasmAssemblingVisitor(
 
         override fun visitMethod(ctx: JasmParser.MethodContext) {
             ctx.annotation()?.forEach { annotation ->
-                val annotationVisitor = methodVisitor.visitAnnotation(typeVisitor.visitClassname(annotation.classname()), true)
+                val annotationVisitor = methodVisitor.visitAnnotation(getAnnotationClassname(annotation.ANNOTATION_NAME().text), true)
                 JasmAnnotationVisitor(annotationVisitor).visitAnnotation(annotation)
                 annotationVisitor.visitEnd()
             }
 
             ctx.method_descriptor().method_arguments()?.method_argument()?.forEachIndexed { num, arg ->
                 arg.annotation()?.forEach { annotation ->
-                    val annotationVisitor = methodVisitor.visitParameterAnnotation(num, typeVisitor.visitClassname(annotation.classname()), true)
+                    val annotationVisitor = methodVisitor.visitParameterAnnotation(num, getAnnotationClassname(annotation.ANNOTATION_NAME().text), true)
                     JasmAnnotationVisitor(annotationVisitor).visitAnnotation(annotation)
                     annotationVisitor.visitEnd()
                 }

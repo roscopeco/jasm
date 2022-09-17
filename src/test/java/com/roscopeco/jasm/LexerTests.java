@@ -1026,11 +1026,8 @@ class LexerTests {
         final var lexer = testCaseLexer("SimpleAnnotatedClass.jasm");
 
         assertNextToken(lexer)
-                .hasType(JasmLexer.AT);
-
-        assertNextToken(lexer)
-                .hasType(JasmLexer.QNAME)
-                .hasText("com/roscopeco/jasm/model/annotations/TestAnnotation");
+                .hasType(JasmLexer.ANNOTATION_NAME)
+                .hasText("@com/roscopeco/jasm/model/annotations/TestAnnotation");
 
         assertNextToken(lexer)
                 .hasType(JasmLexer.CLASS);
@@ -1045,11 +1042,8 @@ class LexerTests {
         final var lexer = testCaseLexer("ComplexAnnotatedClass.jasm");
 
         assertNextToken(lexer)
-                .hasType(JasmLexer.AT);
-
-        assertNextToken(lexer)
-                .hasType(JasmLexer.QNAME)
-                .hasText("com/roscopeco/jasm/model/annotations/TestAnnotation");
+                .hasType(JasmLexer.ANNOTATION_NAME)
+                .hasText("@com/roscopeco/jasm/model/annotations/TestAnnotation");
 
         assertNextToken(lexer)
                 .hasType(JasmLexer.LPAREN);
@@ -1159,11 +1153,8 @@ class LexerTests {
                 .hasType(JasmLexer.LBRACE);
 
         assertNextToken(lexer)
-                .hasType(JasmLexer.AT);
-
-        assertNextToken(lexer)
-                .hasType(JasmLexer.QNAME)
-                .hasText("java/lang/Deprecated");
+                .hasType(JasmLexer.ANNOTATION_NAME)
+                .hasText("@java/lang/Deprecated");
 
         assertNextToken(lexer)
                 .hasType(JasmLexer.LPAREN);
@@ -1193,11 +1184,8 @@ class LexerTests {
                 .hasType(JasmLexer.TYPE_INT);
 
         assertNextToken(lexer)
-                .hasType(JasmLexer.AT);
-
-        assertNextToken(lexer)
-                .hasType(JasmLexer.QNAME)
-                .hasText("java/lang/Deprecated");
+                .hasType(JasmLexer.ANNOTATION_NAME)
+                .hasText("@java/lang/Deprecated");
 
         assertNextToken(lexer)
                 .hasType(JasmLexer.LPAREN);
@@ -1227,11 +1215,8 @@ class LexerTests {
                 .hasType(JasmLexer.LPAREN);
 
         assertNextToken(lexer)
-                .hasType(JasmLexer.AT);
-
-        assertNextToken(lexer)
-                .hasType(JasmLexer.QNAME)
-                .hasText("com/roscopeco/jasm/model/annotations/TestAnnotation");
+                .hasType(JasmLexer.ANNOTATION_NAME)
+                .hasText("@com/roscopeco/jasm/model/annotations/TestAnnotation");
 
         assertNextToken(lexer)
                 .hasType(JasmLexer.TYPE_INT);
@@ -1240,11 +1225,8 @@ class LexerTests {
                 .hasType(JasmLexer.COMMA);
 
         assertNextToken(lexer)
-                .hasType(JasmLexer.AT);
-
-        assertNextToken(lexer)
-                .hasType(JasmLexer.QNAME)
-                .hasText("java/lang/Deprecated");
+                .hasType(JasmLexer.ANNOTATION_NAME)
+                .hasText("@java/lang/Deprecated");
 
         assertNextToken(lexer)
                 .hasType(JasmLexer.LPAREN);
@@ -1264,11 +1246,8 @@ class LexerTests {
                 .hasType(JasmLexer.RPAREN);
 
         assertNextToken(lexer)
-                .hasType(JasmLexer.AT);
-
-        assertNextToken(lexer)
-                .hasType(JasmLexer.QNAME)
-                .hasText("com/roscopeco/jasm/model/annotations/TestAnnotation");
+                .hasType(JasmLexer.ANNOTATION_NAME)
+                .hasText("@com/roscopeco/jasm/model/annotations/TestAnnotation");
 
         assertNextToken(lexer)
                 .hasType(JasmLexer.LPAREN);
@@ -1307,11 +1286,8 @@ class LexerTests {
                 .hasType(JasmLexer.RBRACE);
 
         assertNextToken(lexer)
-                .hasType(JasmLexer.AT);
-
-        assertNextToken(lexer)
-                .hasType(JasmLexer.QNAME)
-                .hasText("com/roscopeco/jasm/model/annotations/TestAnnotation");
+                .hasType(JasmLexer.ANNOTATION_NAME)
+                .hasText("@com/roscopeco/jasm/model/annotations/TestAnnotation");
 
         assertNextToken(lexer)
                 .hasType(JasmLexer.LPAREN);
@@ -1324,11 +1300,8 @@ class LexerTests {
                 .hasType(JasmLexer.EQUALS);
 
         assertNextToken(lexer)
-                .hasType(JasmLexer.AT);
-
-        assertNextToken(lexer)
-                .hasType(JasmLexer.QNAME)
-                .hasText("com/roscopeco/jasm/model/annotations/TestAnno2");
+                .hasType(JasmLexer.ANNOTATION_NAME)
+                .hasText("@com/roscopeco/jasm/model/annotations/TestAnno2");
 
         assertNextToken(lexer)
                 .hasType(JasmLexer.LPAREN);
