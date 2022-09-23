@@ -20,6 +20,7 @@ import com.roscopeco.jasm.model.IntMathTests;
 import com.roscopeco.jasm.model.Interface1;
 import com.roscopeco.jasm.model.Interface2;
 import com.roscopeco.jasm.model.InvokedynamicTest;
+import com.roscopeco.jasm.model.JavaEscapesTest;
 import com.roscopeco.jasm.model.JsrRetTest;
 import com.roscopeco.jasm.model.LdcAconstAreturn;
 import com.roscopeco.jasm.model.LiteralNames;
@@ -1032,5 +1033,14 @@ class AssemblerE2ETests {
 
         assertThat(fieldAnnotationParam).isNotNull();
         assertThat(fieldAnnotationParam.value()).isEqualTo("new value");
+    }
+
+    @Test
+    void shouldAssembleStringsWithJavaEscapesCorrectly() {
+        final var clz = assembleAndDefine("com/roscopeco/jasm/JavaEscapesTest.jasm");
+        final var obj = instantiate(clz, JavaEscapesTest.class);
+
+        assertThat(obj.getEscapeTestStr())
+                .isEqualTo("\" \t \b \n \r \f ' \" \\");
     }
 }

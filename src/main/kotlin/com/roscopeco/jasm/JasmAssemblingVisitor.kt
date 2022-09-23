@@ -130,7 +130,16 @@ class JasmAssemblingVisitor(
     }
 
     private fun unescapeConstantString(constant: String) =
-        constant.substring(1, constant.length - 1).replace("\"\"", "\"")
+        constant.substring(1, constant.length - 1)
+            .replace("\"\"", "\"")          /* double quote for compatibility */
+            .replace("\\t", "\t")           /* Java-compatible escapes */
+            .replace("\\b", "\b")
+            .replace("\\n", "\n")
+            .replace("\\r", "\r")
+            .replace("\\f", "\u000c")
+            .replace("\\'", "'")
+            .replace("\\\"", "\"")
+            .replace("\\\\", "\\")
 
     private fun generateFieldInitializer(ctx: JasmParser.Field_initializerContext?) = when {
         ctx?.int_atom() != null     -> generateInteger(ctx.int_atom())
