@@ -1,0 +1,13 @@
+public class com/roscopeco/jasm/JavaEscapesTest implements com/roscopeco/jasm/model/JavaEscapesTest {
+    @java/lang/Override
+    public getEscapeTestStr() java/lang/String {
+        ldc """ \t \b \n \r \f \' \" \\"
+        areturn
+    }
+
+    public <init>()V {
+        aload 0
+        invokespecial java/lang/Object.<init>()V
+        return
+    }
+}

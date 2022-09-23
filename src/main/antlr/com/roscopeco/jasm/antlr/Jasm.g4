@@ -1457,7 +1457,7 @@ FLOAT
  ;
 
 STRING
- : DQUOTE (~["\r\n] | '""')* DQUOTE
+ : DQUOTE (~["\r\n] | '""' | '\\"')* DQUOTE
  ;
 
 COMMENT
