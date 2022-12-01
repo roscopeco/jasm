@@ -653,7 +653,7 @@ class AssemblerE2ETests {
         assertThat(clz.getDeclaredClasses()).isEmpty();
         assertThat(clz.getDeclaredFields()).isEmpty();
         assertThat(clz.getDeclaredConstructors()).hasSize(1);
-        assertThat(clz.getDeclaredMethods()).hasSize(13);
+        assertThat(clz.getDeclaredMethods()).hasSize(14);
 
         final var obj = instantiate(clz, FloatMathTests.class);
 
@@ -663,6 +663,7 @@ class AssemblerE2ETests {
 
         assertThat(obj.testFconst0()).isEqualTo(0.0f);
         assertThat(obj.testFconst1()).isEqualTo(1.0f);
+        assertThat(obj.testFconst2()).isEqualTo(2.0f);
 
         assertThat(obj.testFcmpg(10f, 1f)).isEqualTo(1);
         assertThat(obj.testFcmpg(1f, 10f)).isEqualTo(-1);

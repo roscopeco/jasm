@@ -109,7 +109,7 @@ class JasmDisassemblingVisitor(
             Opcodes.IFNE to "ifne",
             Opcodes.IFLT to "iflt",
             Opcodes.IFGE to "ifge",
-            Opcodes.IFGT to "igt",
+            Opcodes.IFGT to "ifgt",
             Opcodes.IFLE to "ifle",
             Opcodes.IFNULL to "ifnull",
             Opcodes.IFNONNULL to "ifnonnull",

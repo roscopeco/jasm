@@ -248,19 +248,23 @@ public class TestUtil {
     }
 
     public static byte[] loadDisasmTestClassBytes(final String name) {
+        return loadNamedDisasmTestClassBytes("/com/roscopeco/jasm/model/disasm/" + name + ".class");
+    }
+
+    public static byte[] loadNamedDisasmTestClassBytes(final String filename) {
         try {
-            final var filename = "/com/roscopeco/jasm/model/disasm/" + name + ".class";
             final var url = TestUtil.class.getResource(filename);
 
             if (url == null) {
                 throw new FileNotFoundException(filename);
             } else {
-                final var in = new FileInputStream(new File(url.toURI()));
-                final var out = new byte[in.available()];
-                if (in.read(out) == 0) {
-                    throw new IOException("No data");
+                try (final var in = new FileInputStream(new File(url.toURI()))) {
+                    final var out = new byte[in.available()];
+                    if (in.read(out) == 0) {
+                        throw new IOException("No data");
+                    }
+                    return out;
                 }
-                return out;
             }
         } catch (IOException e) {
             throw new UncheckedIOException(e);
@@ -273,12 +277,27 @@ public class TestUtil {
         return new ClassReader(loadDisasmTestClassBytes(name));
     }
 
+    public static ClassReader loadNamedDisasmTestClass(final String filename) {
+        return new ClassReader(loadNamedDisasmTestClassBytes(filename));
+    }
+
     public static String disassemble(final String testCase) {
         return disassemble(new JasmDisassemblingVisitor(testCase, new StandardErrorCollector()), testCase);
     }
 
     public static String disassemble(final JasmDisassemblingVisitor disassembler, final String testCase) {
         final var clz = loadDisasmTestClass(testCase);
+        clz.accept(disassembler, ClassReader.SKIP_FRAMES);
+
+        if (Boolean.parseBoolean(System.getProperty("jasmTestDumpClass"))) {
+            System.out.println(disassembler.output());
+        }
+
+        return disassembler.output();
+    }
+
+    public static String disassembleFullName(final JasmDisassemblingVisitor disassembler, final String filename) {
+        final var clz = loadNamedDisasmTestClass(filename);
         clz.accept(disassembler, ClassReader.SKIP_FRAMES);
 
         if (Boolean.parseBoolean(System.getProperty("jasmTestDumpClass"))) {

@@ -407,9 +407,10 @@ class JasmAssemblingVisitor(
         override fun visitInsn_fconst(ctx: JasmParser.Insn_fconstContext) = when (ctx.int_atom().text.toInt()) {
             0 -> methodVisitor.visitInsn(Opcodes.FCONST_0)
             1 -> methodVisitor.visitInsn(Opcodes.FCONST_1)
+            2 -> methodVisitor.visitInsn(Opcodes.FCONST_2)
             else -> errorCollector.addError(
                 CodeError(unitName, ctx.int_atom(),
-                    "Invalid operand to FCONST: ${ctx.int_atom().text} (expecting 0 or 1)")
+                    "Invalid operand to FCONST: ${ctx.int_atom().text} (expecting 0, 1 or 2)")
             )
         }
 
