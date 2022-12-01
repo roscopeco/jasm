@@ -34,6 +34,11 @@ public class com/roscopeco/jasm/FloatMathTests implements com/roscopeco/jasm/mod
         freturn
     }
 
+    public testFconst2()F {
+        fconst 2
+        freturn
+    }
+
     public testFcmpg(F, F)I {
         fload 1
         fload 2

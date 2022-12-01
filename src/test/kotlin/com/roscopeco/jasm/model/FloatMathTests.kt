@@ -7,6 +7,7 @@ interface FloatMathTests {
     fun testFadd(d1: Float, d2: Float): Float
     fun testFconst0(): Float
     fun testFconst1(): Float
+    fun testFconst2(): Float
     fun testFcmpg(a: Float, b: Float): Int
     fun testFcmpl(a: Float, b: Float): Int
     fun testFdiv(a: Float, b: Float): Float
