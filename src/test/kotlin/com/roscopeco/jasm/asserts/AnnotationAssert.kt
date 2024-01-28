@@ -10,7 +10,8 @@ class AnnotationAssert<Caller> internal constructor(actual: JasmParser.Annotatio
     AbstractAssert<AnnotationAssert<Caller>, JasmParser.AnnotationContext>(actual, AnnotationAssert::class.java) {
     
     fun hasNamedParamWithValue(name: String, value: Any?): AnnotationAssert<Caller> {
-        val matches = actual.annotation_param().filter { it.NAME()?.text == name || it.LITERAL_NAME()?.text == "`$name`" }
+        val matches = (actual.visible_annotation() ?: actual.invisible_annotation().visible_annotation())
+            .annotation_param().filter { it.NAME()?.text == name || it.LITERAL_NAME()?.text == "`$name`" }
         
         assertThat(matches).hasSize(1)
         val match = matches[0].annotation_arg()

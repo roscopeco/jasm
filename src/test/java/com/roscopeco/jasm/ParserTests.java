@@ -383,6 +383,8 @@ class ParserTests {
         final var test = doParse("ComplexAnnotatedClass.jasm");
 
         assertClass(test)
+                .hasInvisibleAnnotationNamed("com/whatever/HiddenAnnotation");
+        assertClass(test)
             .hasName("ComplexAnnotatedClass")
             .hasAnnotationNamed("com/roscopeco/jasm/model/annotations/TestAnnotation")
                 .hasNamedParamWithValue("stringArg", "Yolo")

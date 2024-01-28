@@ -9,8 +9,18 @@ class
  ;
 
 annotation
- : ANNOTATION_NAME (LPAREN annotation_param? (COMMA annotation_param)* RPAREN)?
+	:
+	invisible_annotation
+	| visible_annotation
+	;
+
+invisible_annotation
+ : HIDDEN_ANNOT_INDICATOR visible_annotation
  ;
+
+visible_annotation
+	: ANNOTATION_NAME (LPAREN annotation_param? (COMMA annotation_param)* RPAREN)?
+;
 
 annotation_param
  : NAME EQUALS annotation_arg
@@ -1184,6 +1194,7 @@ EQUALS  : '=';
 DQUOTE  : '"';
 STAR    : '*';
 BACKTICK: '`';
+HIDDEN_ANNOT_INDICATOR: '#';
 
 CLASS       : 'class';
 EXTENDS     : 'extends';
