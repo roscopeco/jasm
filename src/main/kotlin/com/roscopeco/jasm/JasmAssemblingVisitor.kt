@@ -7,6 +7,7 @@ package com.roscopeco.jasm
 
 import com.roscopeco.jasm.antlr.JasmBaseVisitor
 import com.roscopeco.jasm.antlr.JasmParser
+import com.roscopeco.jasm.antlr.JasmParser.Visible_annotationContext
 import com.roscopeco.jasm.errors.CodeError
 import com.roscopeco.jasm.errors.ErrorCollector
 import org.objectweb.asm.AnnotationVisitor
@@ -80,7 +81,9 @@ class JasmAssemblingVisitor(
         "L" + LiteralNames.unescape(annotationName.substring(1)) + ";"
 
     override fun visitAnnotation(ctx: JasmParser.AnnotationContext) {
-        val annotationVisitor = visitor.visitAnnotation(getAnnotationClassname(ctx.ANNOTATION_NAME().text), true)
+        val visible = ctx.visible_annotation() != null
+        val name = (if (visible) {ctx.visible_annotation()} else {ctx.invisible_annotation().visible_annotation()}).ANNOTATION_NAME().text
+        val annotationVisitor = visitor.visitAnnotation(getAnnotationClassname(name), visible)
         JasmAnnotationVisitor(annotationVisitor).visitAnnotation(ctx)
         annotationVisitor.visitEnd()
     }
@@ -118,7 +121,9 @@ class JasmAssemblingVisitor(
         // Manually driving this rather than having a specific field visitor, maybe later...
         if (ctx.annotation() != null) {
             ctx.annotation().forEach {
-                val annotationVisitor = fv.visitAnnotation(getAnnotationClassname(it.ANNOTATION_NAME().text), true)
+                val visible = it.visible_annotation() != null
+                val name = (if (visible) {it.visible_annotation()} else {it.invisible_annotation().visible_annotation()}).ANNOTATION_NAME().text
+                val annotationVisitor = fv.visitAnnotation(getAnnotationClassname(name), visible)
                 JasmAnnotationVisitor(annotationVisitor).visitAnnotation(it)
                 annotationVisitor.visitEnd()
             }
@@ -202,7 +207,9 @@ class JasmAssemblingVisitor(
                 ctx.LITERAL_NAME() != null      -> visitor.visit(name, Type.getType("L" + LiteralNames.unescape(ctx.LITERAL_NAME().text) + ";"))
                 ctx.QNAME() != null             -> visitor.visit(name, Type.getType("L" + ctx.QNAME().text + ";"))
                 ctx.annotation() != null        -> {
-                    val annotationVisitor = visitor.visitAnnotation(name, getAnnotationClassname(ctx.annotation().ANNOTATION_NAME().text))
+                    val visible = ctx.annotation().visible_annotation() != null
+                    val nme = (if (visible) {ctx.annotation().visible_annotation()} else {ctx.annotation().invisible_annotation().visible_annotation()}).ANNOTATION_NAME().text
+                    val annotationVisitor = visitor.visitAnnotation(name, getAnnotationClassname(nme))
                     JasmAnnotationVisitor(annotationVisitor).visitAnnotation(ctx.annotation())
                     annotationVisitor.visitEnd()
                 }
@@ -264,14 +271,18 @@ class JasmAssemblingVisitor(
 
         override fun visitMethod(ctx: JasmParser.MethodContext) {
             ctx.annotation()?.forEach { annotation ->
-                val annotationVisitor = methodVisitor.visitAnnotation(getAnnotationClassname(annotation.ANNOTATION_NAME().text), true)
+                val visible = annotation.visible_annotation() != null
+                val name = (if (visible) {annotation.visible_annotation()} else {annotation.invisible_annotation().visible_annotation()}).ANNOTATION_NAME().text
+                val annotationVisitor = methodVisitor.visitAnnotation(getAnnotationClassname(name), visible)
                 JasmAnnotationVisitor(annotationVisitor).visitAnnotation(annotation)
                 annotationVisitor.visitEnd()
             }
 
             ctx.method_descriptor().method_arguments()?.method_argument()?.forEachIndexed { num, arg ->
                 arg.annotation()?.forEach { annotation ->
-                    val annotationVisitor = methodVisitor.visitParameterAnnotation(num, getAnnotationClassname(annotation.ANNOTATION_NAME().text), true)
+                    val visible = annotation.visible_annotation() != null
+                    val name = (if (visible) {annotation.visible_annotation()} else {annotation.invisible_annotation().visible_annotation()}).ANNOTATION_NAME().text
+                    val annotationVisitor = methodVisitor.visitParameterAnnotation(num, getAnnotationClassname(name), visible)
                     JasmAnnotationVisitor(annotationVisitor).visitAnnotation(annotation)
                     annotationVisitor.visitEnd()
                 }

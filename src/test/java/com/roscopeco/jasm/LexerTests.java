@@ -1131,6 +1131,12 @@ class LexerTests {
                 .hasType(JasmLexer.RPAREN);
 
         assertNextToken(lexer)
+                .hasType(JasmLexer.HIDDEN_ANNOT_INDICATOR);
+
+        assertNextToken(lexer)
+                .hasType(JasmLexer.ANNOTATION_NAME);
+
+        assertNextToken(lexer)
                 .hasType(JasmLexer.CLASS);
 
         assertNextToken(lexer)
