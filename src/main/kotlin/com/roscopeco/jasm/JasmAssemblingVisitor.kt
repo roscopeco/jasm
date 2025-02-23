@@ -713,7 +713,7 @@ class JasmAssemblingVisitor(
                 )
 
         override fun visitInsn_new(ctx: JasmParser.Insn_newContext)
-                = methodVisitor.visitTypeInsn(Opcodes.NEW, ctx.QNAME().text)
+                = methodVisitor.visitTypeInsn(Opcodes.NEW, typeVisitor.visitInsn_new(ctx))
 
         override fun visitInsn_newarray(ctx: JasmParser.Insn_newarrayContext)
                 = methodVisitor.visitIntInsn(Opcodes.NEWARRAY, typeForNewarray(ctx.prim_type()))

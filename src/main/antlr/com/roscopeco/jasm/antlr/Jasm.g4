@@ -1097,6 +1097,8 @@ insn_multianewarray
 
 insn_new
  : NEW QNAME
+ | NEW NAME
+ | NEW LITERAL_NAME
  ;
 
 insn_newarray

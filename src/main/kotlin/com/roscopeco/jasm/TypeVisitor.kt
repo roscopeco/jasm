@@ -67,6 +67,10 @@ class TypeVisitor(private val unitName: String, private val errorCollector: Erro
         return fixBareType(extractBareType(ctx))
     }
 
+    override fun visitInsn_new(ctx: JasmParser.Insn_newContext): String {
+        return fixBareType(extractBareType(ctx))
+    }
+
     override fun visitMembername(ctx: JasmParser.MembernameContext): String {
         return LiteralNames.unescape(ctx.text)
     }
@@ -78,6 +82,10 @@ class TypeVisitor(private val unitName: String, private val errorCollector: Erro
     private fun extractBareType(ctx: JasmParser.Insn_instanceofContext)
             = (ctx.LSQUARE()?.joinToString("") { it.text } ?: "") + LiteralNames.unescape(
                 ctx.QNAME()?.text ?: ctx.NAME()?.text ?: ctx.LITERAL_NAME()?.text ?: "<Error: No name>")
+
+    private fun extractBareType(ctx: JasmParser.Insn_newContext)
+            = "" + LiteralNames.unescape(
+        ctx.QNAME()?.text ?: ctx.NAME()?.text ?: ctx.LITERAL_NAME()?.text ?: "<Error: No name>")
 
     private fun extractBareType(ctx: JasmParser.OwnerContext)
             = (ctx.LSQUARE()?.joinToString("") { it.text } ?: "") + LiteralNames.unescape(
