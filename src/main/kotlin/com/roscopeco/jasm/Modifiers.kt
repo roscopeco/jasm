@@ -60,7 +60,7 @@ class Modifiers {
         Pair(Opcodes.ACC_PUBLIC, "public"),
         Pair(Opcodes.ACC_STATIC, "static"),
         Pair(Opcodes.ACC_FINAL, "final"),
-        Pair(Opcodes.ACC_TRANSIENT, "volatile"),
+        Pair(Opcodes.ACC_VOLATILE, "volatile"),
         Pair(Opcodes.ACC_TRANSIENT, "transient"),
         Pair(Opcodes.ACC_SYNTHETIC, "synthetic"),
     )
